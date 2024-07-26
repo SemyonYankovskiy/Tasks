@@ -1,13 +1,6 @@
-<div id="mymap" style="width: 100%; height: 100%"> </div>
+<div id="map" style="height: 80vh"></div>
 
 <script>
-let map = L.map('mymap').setView([44.680537, 33.759686], 11);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap sevtelecom',
-    maxZoom: 20,
-    minZoom: 2,
-    tileSize: 512,
-    zoomOffset: -1
-}).addTo(map);
-
+const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
+const map = L.map("map", { layers: [osm], minZoom: 5 }).setView([44.61, 33.5], 15);
 </script>
