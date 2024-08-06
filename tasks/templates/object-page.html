@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}TASKS Объект{% endblock title %}
+
+{% block content %}
+
+<div class="px-5 text-center container"  >
+  <div class="row pb-3">
+      {% include "components/object-content.html" %}
+{#    <div class="col">#}
+{#      {% include "map.html" %}#}
+{#    </div>#}
+{#    <div class="col">#}
+{#      {% include "object.html"  %}#}
+{#    </div>#}
+  </div>
+
+  <div id="tasks" class="row shadow p-4 mt-5 bg-body-tertiary rounded border-top border-3 ">
+      <div class="row pb-3 ">
+
+          <h4>Задачи</h4>
+      </div>
+    {% include "components/task.html" %}
+</div>
+</div>
+
+{% endblock%}

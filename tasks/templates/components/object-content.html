@@ -1,0 +1,67 @@
+<div class="container text-center ">
+    <div class="row shadow p-3 mb-2 bg-body-tertiary rounded" >
+        <div class="row mb-2"><h2>ул. Матье Бал, 1</h2></div>
+
+
+        <div class="row" style="height: 200px;  overflow: hidden" >
+            {% include "components/obj-gallery.html" %}
+        </div>
+
+    </div>
+
+
+<div class="row shadow p-3 mb-2 bg-body-tertiary rounded ">
+{#    <div class="col d-flex align-items-center">#}
+{#        <span class="m-1 badge text-bg-danger">Danger</span>#}
+{#        <span class="m-1 badge text-bg-warning">Warning</span>#}
+{#        <span class="m-1 badge text-bg-info">Info</span>#}
+{#        <span class="m-1 badge text-bg-info">Info</span>#}
+{##}
+{##}
+{#    </div>#}
+      <div class="col d-flex align-items-center">
+          <div class="col d-flex  ">
+              <a href="#tasks" role="button" class="btn btn-outline-success ">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-task" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M2 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5V3a.5.5 0 0 0-.5-.5H2zM3 3H2v1h1V3z"/>
+  <path d="M5 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM5.5 7a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm0 4a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9z"/>
+  <path fill-rule="evenodd" d="M1.5 7a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5V7zM2 7h1v1H2V7zm0 3.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5H2zm1 .5H2v1h1v-1z"/>
+</svg>
+                  Задачи</a>
+          </div>
+
+      </div>
+
+      <div class="col d-flex align-items-center">
+          <div class="col d-flex justify-content-center ">
+              <button type="button " class="btn btn-success ">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                    </svg>
+                  Создать задачу</button>
+          </div>
+
+      </div>
+
+
+    <div class="col d-flex justify-content-end align-items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt" viewBox="0 0 16 16">
+  <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
+  <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+</svg>
+      44.5897698, 33.4454948
+    </div>
+  </div>
+
+
+
+          <div class="d-flex p-4 my-5 justify-content-center" style="height: 500px;  overflow: scroll; overflow-x: hidden; flex-wrap: wrap">
+                {% include "components/test-object-prewiew.html" %}
+                {% include "components/object-preview.html" %}
+                {% include "components/object-preview.html" %}
+                {% include "components/object-preview.html" %}
+                {% include "components/object-preview.html" %}
+                {% include "components/object-preview.html" %}
+                {% include "components/object-preview.html" %}
+          </div>

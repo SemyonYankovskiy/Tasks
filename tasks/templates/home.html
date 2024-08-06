@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}TASKS Главная{% endblock title %}
+
+{% block content %}
+<div class="container">
+      <div class="d-flex p-4 my-5 justify-content-center" style="height: 50rem;  overflow: scroll; overflow-x: hidden; flex-wrap: wrap">
+        {% include "components/test-object-prewiew.html" %}
+        {% include "components/object-preview.html" %}
+        {% include "components/object-preview.html" %}
+        {% include "components/object-preview.html" %}
+        {% include "components/object-preview.html" %}
+        {% include "components/object-preview.html" %}
+        {% include "components/object-preview.html" %}
+  </div>
+
+</div>
+{% endblock%}
