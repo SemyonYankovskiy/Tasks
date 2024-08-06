@@ -14,13 +14,13 @@ class UserObjectGroup(models.Model):
         W = 'W', "Запись"
     permission = models.CharField(choices=Permission.choices, max_length=10)
     class Meta:
-        db_table = "users_objects_groups"
+        db_table = "users_objects_groups_m2m"
 
 class ObjectGroup(models.Model):
     name = models.CharField(max_length=128)
     users = models.ManyToManyField(get_user_model(), related_name="object_groups", through=UserObjectGroup)
     class Meta:
-        db_table = "objects_groups"
+        db_table = "object_groups"
 
 
 class Object(models.Model):
@@ -33,10 +33,10 @@ class Object(models.Model):
     name = models.CharField(max_length=64)
     address = models.ForeignKey("Address", on_delete = models.CASCADE)
     description = models.TextField()
-    tasks = models.ManyToManyField("Task", related_name="objects")
-    tags = models.ManyToManyField("Tag", related_name="objects")
-    files = models.ManyToManyField("AttachedFile", related_name="objects")
-    groups = models.ManyToManyField("ObjectGroup", related_name="objects")
+    tasks = models.ManyToManyField("Task", related_name="objects", db_table="objects_tasks_m2m")
+    tags = models.ManyToManyField("Tag", related_name="objects", db_table="objects_tags_m2m")
+    files = models.ManyToManyField("AttachedFile", related_name="objects", db_table="objects_files_m2m")
+    groups = models.ManyToManyField("ObjectGroup", related_name="objects", db_table="objects_groups_m2m")
     class Meta:
         db_table = "objects"
 
@@ -52,11 +52,11 @@ class Task(models.Model):
     completion_time = models.DateTimeField()
     header = models.CharField(max_length=128)
     text = models.TextField()
-    engineers = models.ManyToManyField("Engineer", related_name="tasks")
-    tags = models.ManyToManyField("Tag", related_name="tasks")
-    files = models.ManyToManyField("AttachedFile", related_name="tasks")
+    engineers = models.ManyToManyField("Engineer", related_name="tasks", db_table="tasks_engineers_m2m")
+    tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m")
+    files = models.ManyToManyField("AttachedFile", related_name="tasks", db_table="tasks_files_m2m")
     class Meta:
-        db_table = "objects_tasks"
+        db_table = "object_tasks"
 
 class Tag(models.Model):
     tag_name = models.CharField(max_length=64)
