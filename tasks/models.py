@@ -113,6 +113,9 @@ class AttachedFile(models.Model):
     def __str__(self):
         return self.file.name
 
+    def is_image(self) -> bool:
+        return re.search(r'\.(jpeg|jpg|png)$', self.file.name) is not None
+
 
 class Address(models.Model):
     region = models.CharField(

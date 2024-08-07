@@ -3,16 +3,17 @@
 {% block title %}TASKS Главная{% endblock title %}
 
 {% block content %}
-<div class="container">
-      <div class="d-flex p-4 my-5 justify-content-center" style="height: 50rem;  overflow: scroll; overflow-x: hidden; flex-wrap: wrap">
-        {% include "components/test-object-prewiew.html" %}
-        {% include "components/object-preview.html" %}
-        {% include "components/object-preview.html" %}
-        {% include "components/object-preview.html" %}
-        {% include "components/object-preview.html" %}
-        {% include "components/object-preview.html" %}
-        {% include "components/object-preview.html" %}
-  </div>
+<div class="container d-flex p-4 my-5 justify-content-center flex-wrap">
+
+
+
+        {% for object in objects %}
+            {% include "components/object-preview.html" with img_preview=object.img_preview title=object.title desc=object.desc object_id=object.id%}
+        {% endfor %}
+
+
+
+
 
 </div>
 {% endblock%}

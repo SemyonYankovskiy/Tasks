@@ -1,19 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}TASKS Объект{% endblock title %}
+{% block title %}{{ object.name }}{% endblock title %}
 
 {% block content %}
 
 <div class="px-5 text-center container"  >
   <div class="row pb-3">
-      {% include "components/object-content.html" %}
-{#    <div class="col">#}
-{#      {% include "map.html" %}#}
-{#    </div>#}
-{#    <div class="col">#}
-{#      {% include "object.html"  %}#}
-{#    </div>#}
+      {% include "components/object-content.html" with object=object%}
   </div>
 
   <div id="tasks" class="row shadow p-4 mt-5 bg-body-tertiary rounded border-top border-3 ">

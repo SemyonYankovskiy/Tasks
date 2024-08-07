@@ -2,11 +2,15 @@
 from django.urls import path
 from tasks import views
 from django.contrib import admin
-
+from django.conf.urls.static import static
+from django.conf import settings
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('object/1', views.get_object_page),
-    path('', views.index),
+    path('object/<int:object_id>/', views.get_object_page, name='show-object'),
+    path('', views.get_home, name='home'),
 ]
+
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
