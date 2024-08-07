@@ -11,10 +11,15 @@ def get_home(request):
         attached_files = item.files.all()
         img_preview = attached_files.filter(file__regex=r'\.(jpeg|jpg|png)$').first()
 
+        if len(item.description)>50:
+            desc = item.description[:50]+ "..."
+        else: desc = item.description
+
         data.append({"id": item.pk,
                     "title": item.name,
-                    "desc": item.description,
-                    "img_preview": img_preview.file.url, })
+                    "desc": desc,
+                    "priority": item.priority,
+                    "img_preview": img_preview.file.url if img_preview else None, })
 
 
     context = {"objects": data}
