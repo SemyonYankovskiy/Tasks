@@ -1,0 +1,36 @@
+<div class="container">
+    <div>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="tab1-tab" data-bs-toggle="tab" href="#tab1" role="tab" aria-controls="tab1" aria-selected="true">
+                    Активные ({{ not_done_count }})
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="tab2-tab" data-bs-toggle="tab" href="#tab2" role="tab" aria-controls="tab2" aria-selected="false">
+                    Завершенные ({{ done_count }})
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="tab-content mt-4" id="myTabContent">
+        <!-- Вкладка активных задач -->
+        <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+            {% for tasks in object.tasks.all %}
+                {% if tasks.is_done == False %}
+                    {% include "components/task.html" with task=tasks %}
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Вкладка завершенных задач -->
+        <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+            {% for tasks in object.tasks.all %}
+                {% if tasks.is_done == True %}
+                    {% include "components/task.html" with task=tasks %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>

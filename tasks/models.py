@@ -90,7 +90,7 @@ class Engineer(models.Model):
     first_name = models.CharField(max_length=128)
     second_name = models.CharField(max_length=128)
     position = models.CharField(max_length=256)
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, null=True)
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         db_table = "engineers"

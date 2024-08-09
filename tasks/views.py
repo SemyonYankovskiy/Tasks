@@ -27,8 +27,24 @@ def get_home(request):
     return render(request, "home.html", context=context)
 
 
+# def get_object_page(request, object_id):
+#     object = get_object_or_404(Object, pk=object_id)
+#     context = {"object": object}
+#     return render(request, "object-page.html", context=context)
 def get_object_page(request, object_id):
     object = get_object_or_404(Object, pk=object_id)
-    context = {"object": object}
-    return render(request, "object-page.html", context=context)
 
+    # Подсчёт задач
+    tasks = object.tasks.all()
+    task_count = sum(1 for task in tasks if task)
+    done_count = sum(1 for task in tasks if task.is_done is True)
+    not_done_count = sum(1 for task in tasks if task.is_done is False)
+
+    context = {
+        "object": object,
+        "task_count": task_count,
+        "done_count": done_count,
+        "not_done_count": not_done_count,
+    }
+
+    return render(request, "object-page.html", context=context)

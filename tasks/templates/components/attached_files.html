@@ -1,0 +1,17 @@
+<div class="attached-files mt-3">
+  <h5>Прикрепленные файлы</h5>
+  <ul class="list-group">
+    {% for file in files %}
+    {% if not file.is_image %}
+
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>
+          <!-- Можно заменить иконку в зависимости от типа файла -->
+          <i class="bi bi-file-earmark"></i> {{ file }}
+        </span>
+        <a href="{{ file.url }}" class="btn btn-sm btn-outline-primary" download>Скачать</a>
+      </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+</div>
