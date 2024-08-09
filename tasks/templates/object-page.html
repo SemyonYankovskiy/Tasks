@@ -5,18 +5,28 @@
 
 {% block content %}
 
-<div class="px-5 text-center container"  >
+<div class="px-5 text-center container">
   <div class="row pb-3">
-      {% include "components/object-content.html" with object=object%}
+      {% include "components/object-content.html" with object=object %}
   </div>
 
-  <div id="tasks_all" class="row shadow p-4 mt-5 bg-body-tertiary rounded border-top border-3 ">
-      <div class="row pb-3 ">
+  <div>
 
-          <h4>Задачи</h4>
-      </div>
+    <div class="container d-flex p-4 my-3 justify-content-center flex-wrap">
+      {% for child in child_data %}
+        {% include "components/object-preview.html" with img_preview=child.img_preview title=child.title desc=child.desc object_id=child.id priority=child.priority %}
+      {% empty %}
+
+      {% endfor %}
+    </div>
+  </div>
+
+  <div id="tasks_all" class="row shadow p-4 mt-5 bg-body-tertiary rounded border-top border-3">
+    <div class="row pb-3">
+      <h4>Задачи</h4>
+    </div>
     {% include "components/task_container.html" with object=object %}
-</div>
+  </div>
 </div>
 
-{% endblock%}
+{% endblock %}
