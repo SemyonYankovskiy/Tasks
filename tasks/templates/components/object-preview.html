@@ -15,5 +15,12 @@
                 </svg> </h5>
     <p class="card-text">{{ desc }}</p>
 
+   <div>
+    {% for group in groups %}
+       <p class="border border-primary rounded-pill card-text d-flex justify-content-center align-items-center">{{ group.name }}</p>
+    {% endfor %}
+    </div>
+
+
   </div>
 </a>

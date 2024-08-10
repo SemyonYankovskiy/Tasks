@@ -15,7 +15,14 @@ def get_home(request):
             desc = item.description[:50]+ "..."
         else: desc = item.description
 
+        groups_arr = []
+        item_groups_all = item.groups.all()
+        for group in item_groups_all:
+
+            groups_arr.append(group)
+        print(groups_arr)
         data.append({"id": item.pk,
+                    "groups": groups_arr,
                     "title": item.name,
                     "desc": desc,
                     "priority": item.priority,

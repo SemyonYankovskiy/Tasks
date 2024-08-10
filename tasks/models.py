@@ -28,6 +28,9 @@ class ObjectGroup(models.Model):
     class Meta:
         db_table = "object_groups"
 
+    def __str__(self):
+        return self.name
+
 
 class Object(models.Model):
 
