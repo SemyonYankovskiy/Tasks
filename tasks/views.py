@@ -18,9 +18,8 @@ def get_home(request):
         groups_arr = []
         item_groups_all = item.groups.all()
         for group in item_groups_all:
-
             groups_arr.append(group)
-        print(groups_arr)
+
         data.append({"id": item.pk,
                     "groups": groups_arr,
                     "title": item.name,
@@ -61,8 +60,14 @@ def get_object_page(request, object_id):
 
         desc = child.description[:50] + "..." if len(child.description) > 50 else child.description
 
+        groups_arr = []
+        item_groups_all = child.groups.all()
+        for group in item_groups_all:
+            groups_arr.append(group)
+
         child_data.append({
             "id": child.pk,
+            "groups": groups_arr,
             "title": child.name,
             "desc": desc,
             "priority": child.priority,

@@ -14,7 +14,7 @@
 
     <div class="container d-flex p-4 my-3 justify-content-center flex-wrap">
       {% for child in child_data %}
-        {% include "components/object-preview.html" with img_preview=child.img_preview title=child.title desc=child.desc object_id=child.id priority=child.priority %}
+        {% include "components/object-preview.html" with img_preview=child.img_preview title=child.title desc=child.desc object_id=child.id priority=child.priority groups=child.groups%}
       {% empty %}
 
       {% endfor %}
