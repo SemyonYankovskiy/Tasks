@@ -27,6 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
 
 # Application definition
 
@@ -39,8 +44,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tasks',
     'user',
-    'bootstrap5',
 ]
+
+if DEBUG:
+    INSTALLED_APPS += ["debug_toolbar"]
 
 AUTH_USER_MODEL = "user.User"
 
@@ -53,6 +60,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+if DEBUG:
+    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
+
 
 ROOT_URLCONF = 'djangoProject.urls'
 

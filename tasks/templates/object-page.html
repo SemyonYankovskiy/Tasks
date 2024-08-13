@@ -13,8 +13,8 @@
   <div>
 
     <div class="container d-flex p-4 my-3 justify-content-center flex-wrap">
-      {% for child in child_data %}
-        {% include "components/object-preview.html" with img_preview=child.img_preview title=child.title desc=child.desc object_id=child.id priority=child.priority groups=child.groups%}
+      {% for object in child_objects %}
+        {% include "components/object-preview.html" with img_preview=object.img_preview title=object.name desc=object.short_description object_id=object.id priority=object.priority groups=object.groups%}
       {% empty %}
 
       {% endfor %}
@@ -25,7 +25,7 @@
     <div class="row pb-3">
       <h4>Задачи</h4>
     </div>
-    {% include "components/task_container.html" with object=object %}
+    {% include "components/task_container.html" with tasks=tasks not_done_count=not_done_count done_count=done_count %}
   </div>
 </div>
 

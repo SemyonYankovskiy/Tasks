@@ -17,7 +17,7 @@
     <div class="tab-content mt-4" id="myTabContent">
         <!-- Вкладка активных задач -->
         <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
-            {% for tasks in object.tasks.all %}
+            {% for tasks in tasks %}
                 {% if tasks.is_done == False %}
                     {% include "components/task.html" with task=tasks %}
                 {% endif %}
@@ -26,7 +26,7 @@
 
         <!-- Вкладка завершенных задач -->
         <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
-            {% for tasks in object.tasks.all %}
+            {% for tasks in tasks %}
                 {% if tasks.is_done == True %}
                     {% include "components/task.html" with task=tasks %}
                 {% endif %}

@@ -12,14 +12,16 @@ class UserObjectGroup(models.Model):
     group = models.ForeignKey("ObjectGroup", on_delete=models.CASCADE)
 
     class Permission(models.TextChoices):
-        R = 'R', "Чтение"
-        W = 'W', "Запись"
+        R = 'R', "Только чтение"
+        W = 'RW', "Чтение/Запись"
 
     permission = models.CharField(choices=Permission.choices, max_length=10)
 
     class Meta:
         db_table = "users_objects_groups_m2m"
 
+    def __str__(self):
+        return f"{self.user}-{self.group}-{self.permission}"
 
 class ObjectGroup(models.Model):
     name = models.CharField(max_length=128)
@@ -41,14 +43,14 @@ class Object(models.Model):
         LOW = "LOW", "Низкий"
 
     priority = models.CharField(choices=Priority.choices, max_length=10)
-    parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL)
+    parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, related_name="children")
     name = models.CharField(max_length=64)
     address = models.ForeignKey("Address", on_delete=models.CASCADE)
     description = models.TextField()
-    tasks = models.ManyToManyField("Task", related_name="objects", db_table="objects_tasks_m2m", blank=True)
-    tags = models.ManyToManyField("Tag", related_name="objects", db_table="objects_tags_m2m", blank=True)
-    files = models.ManyToManyField("AttachedFile", related_name="objects", db_table="objects_files_m2m", blank=True)
-    groups = models.ManyToManyField("ObjectGroup", related_name="objects", db_table="objects_groups_m2m")
+    tasks = models.ManyToManyField("Task", related_name="objects_set", db_table="objects_tasks_m2m", blank=True)
+    tags = models.ManyToManyField("Tag", related_name="objects_set", db_table="objects_tags_m2m", blank=True)
+    files = models.ManyToManyField("AttachedFile", related_name="objects_set", db_table="objects_files_m2m", blank=True)
+    groups = models.ManyToManyField("ObjectGroup", related_name="objects_set", db_table="objects_groups_m2m")
 
 
     class Meta:

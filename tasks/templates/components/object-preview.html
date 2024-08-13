@@ -1,26 +1,36 @@
-
-
-  <a href="{% url 'show-object' object_id %}" class="card m-2" style="text-decoration: none; color: inherit; ">
-  <img src="{{img_preview}}" class="card-img-top" alt="...">
-  <div class="card-body">
-    <h5 class="card-title">{{ title }}
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                     {% if priority == 'LOW' %} fill="#1E90FF"
-                     {% elif priority == 'MEDIUM'  %}  fill="#FFD700"
-                     {% elif priority == 'HIGH'  %}  fill="#FF6347"
-                     {% elif priority == 'CRITICAL'  %}  fill="#FF0000"
-                     {% endif  %}
-                     class="bi bi-bookmarks-fill" viewBox="0 0 18 18">
-                <path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16Zm0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15Z"/>
-                </svg> </h5>
-    <p class="card-text">{{ desc }}</p>
-
-   <div>
-    {% for group in groups %}
-       <p class="badge bg-success-subtle m-1 d-flex justify-content-center align-items-center">{{ group.name }}</p>
-    {% endfor %}
+<a href="{% url 'show-object' object_id %}" class="card m-2"
+   style="text-decoration: none; color: inherit; position: relative;">
+    <img src="/media/{{ img_preview }}" class="card-img-top" alt="...">
+    {% if child_count %}
+     <!-- Иконка с цифрой -->
+    <div class="rounded-3 p-1" style="position: absolute; top: 10px; right: 10px; z-index: 10; background-color: white">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-boxes"
+             viewBox="0 0 16 16">
+            <path d="M7.752.066a.5.5 0 0 1 .496 0l3.75 2.143a.5.5 0 0 1 .252.434v3.995l3.498 2A.5.5 0 0 1 16 9.07v4.286a.5.5 0 0 1-.252.434l-3.75 2.143a.5.5 0 0 1-.496 0l-3.502-2-3.502 2.001a.5.5 0 0 1-.496 0l-3.75-2.143A.5.5 0 0 1 0 13.357V9.071a.5.5 0 0 1 .252-.434L3.75 6.638V2.643a.5.5 0 0 1 .252-.434L7.752.066ZM4.25 7.504 1.508 9.071l2.742 1.567 2.742-1.567L4.25 7.504ZM7.5 9.933l-2.75 1.571v3.134l2.75-1.571V9.933Zm1 3.134 2.75 1.571v-3.134L8.5 9.933v3.134Zm.508-3.996 2.742 1.567 2.742-1.567-2.742-1.567-2.742 1.567Zm2.242-2.433V3.504L8.5 5.076V8.21l2.75-1.572ZM7.5 8.21V5.076L4.75 3.504v3.134L7.5 8.21ZM5.258 2.643 8 4.21l2.742-1.567L8 1.076 5.258 2.643ZM15 9.933l-2.75 1.571v3.134L15 13.067V9.933ZM3.75 14.638v-3.134L1 9.933v3.134l2.75 1.571Z"/>
+        </svg>
+        <span class="font-monospace fs-5">{{ child_count }} </span>
     </div>
+    {% endif %}
 
 
-  </div>
+    <div class="card-body">
+        <h5 class="card-title">{{ title }}
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                    {% if priority == 'LOW' %} fill="#1E90FF"
+                    {% elif priority == 'MEDIUM' %}  fill="#FFD700"
+                    {% elif priority == 'HIGH' %}  fill="#FF6347"
+                    {% elif priority == 'CRITICAL' %}  fill="#FF0000"
+                    {% endif %}
+                 class="bi bi-bookmarks-fill" viewBox="0 0 18 18">
+                <path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16Zm0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15Z"/>
+            </svg>
+        </h5>
+        <p class="card-text">{{ desc }}</p>
+
+        <div class="d-flex justify-content-left align-items-center">
+            {% for group in groups.all %}
+                <div class="badge bg-info-subtle m-1" style="color: #3d444b">{{ group.name }}</div>
+            {% endfor %}
+        </div>
+    </div>
 </a>
