@@ -5,67 +5,68 @@
                     data-bs-target="#collapse{{ task.id }}" aria-expanded="false" aria-controls="collapse{{ task.id }}">
 
                 <div class="container-fluid">
-                    <div class="row w-100">
+                    <div class="d-flex flex-row w-100 align-items-center">
                         <!-- Первый столбец -->
-                        <div class="col d-flex align-items-center">
+                        <div class="d-flex align-items-center pe-3 border-end">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                                  class="bi bi-calendar3 mx-3" viewBox="0 0 16 16">
-                                <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
-                                <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                                <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"></path>
+                                <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"></path>
                             </svg>
-                            <p>{{ task.completion_time }}</p>
+                            <span>{{ task.completion_time }}</span>
 
                         </div>
 
                         <!-- Второй столбец -->
-                        <div class="col  d-flex justify-content-left align-items-center">
-                            <strong>{{ task.header }}</strong>
+                        <div class=" d-flex justify-content-left align-items-center px-3">
+                            <strong style="text-align: justify;">{{ task.header }}</strong>
                         </div>
                     </div>
 
-                    <!-- Третий столбец -->
-                    <div class="d-flex flex-wrap justify-content-left  align-items-center gap-2 mt-2">
-                        {% for engineer in task.engineers.all %}
-                            <div>
-                                <span class="badge bg-secondary">{{ engineer.first_name }} {{ engineer.second_name }}</span>
-                            </div>
+                    <div class="d-flex justify-content-end">
+                        <div class="col-md-10 d-flex flex-wrap justify-content-end  align-items-center gap-2 mt-2">
+                            {% for engineer in task.engineers.all %}
+                                <div>
+                                    <span class="badge bg-secondary">{{ engineer.first_name }} {{ engineer.second_name }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
 
-                        {% endfor %}
-                    </div>
                 </div>
-    </div>
 
-    </button>
-    </h2>
-    <div id="collapse{{ task.id }}" class="accordion-collapse collapse">
-        <div class="accordion-body bg-white">
-            <div class="container text-center">
-                <div class="d-flex row">
-                    <div class="col border-end">
-                        {% include "components/obj-gallery.html" with files=task.files.all %}
+
+            </button>
+        </h2>
+        <div id="collapse{{ task.id }}" class="accordion-collapse collapse">
+            <div class="accordion-body bg-white">
+                <div class="container text-center">
+                    <div class="d-flex row">
+                        <div class="col border-end">
+                            {% include "components/obj-gallery.html" with files=task.files.all %}
+                        </div>
+                        <div class="col">
+                            {% include "components/attached_files.html" with files=task.files.all %}
+                        </div>
                     </div>
-                    <div class="col">
-                        {% include "components/attached_files.html" with files=task.files.all %}
+                    <div class="row mt-3 border border-dark-subtle">
+                        <p class="d-flex justify-content-left">{{ task.text }}</p>
                     </div>
-                </div>
-                <div class="row mt-3 border border-dark-subtle">
-                    <p class="d-flex justify-content-left">{{ task.text }}</p>
-                </div>
-                <div class="row mt-3 text-muted">
-                    <div class="col">
-                        {% for tag in task.tags.all %}
-                            <span class="badge bg-info text-dark">{{ tag.tag_name }}</span>
-                        {% endfor %}
-                    </div>
-                    <div class="col text-center">
-                        <span class="badge bg-success">{{ task.is_done }}</span>
-                    </div>
-                    <div class="col text-end">
-                        <span class="badge bg-warning text-dark">{{ task.priority }}</span>
+                    <div class="row mt-3 text-muted">
+                        <div class="col">
+                            {% for tag in task.tags.all %}
+                                <span class="badge bg-info text-dark">{{ tag.tag_name }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col text-center">
+                            <span class="badge bg-success">{{ task.is_done }}</span>
+                        </div>
+                        <div class="col text-end">
+                            <span class="badge bg-warning text-dark">{{ task.priority }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </div>

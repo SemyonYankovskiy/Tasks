@@ -3,6 +3,7 @@ import uuid
 
 from datetime import datetime
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, MinValueValidator
 from django.db import models
 
@@ -23,6 +24,7 @@ class UserObjectGroup(models.Model):
     def __str__(self):
         return f"{self.user}-{self.group}-{self.permission}"
 
+
 class ObjectGroup(models.Model):
     name = models.CharField(max_length=128)
     users = models.ManyToManyField(get_user_model(), related_name="object_groups", through=UserObjectGroup)
@@ -35,7 +37,6 @@ class ObjectGroup(models.Model):
 
 
 class Object(models.Model):
-
     class Priority(models.TextChoices):
         CRITICAL = 'CRITICAL', "Критический"
         HIGH = 'HIGH', "Высокий"
@@ -59,6 +60,23 @@ class Object(models.Model):
     def __str__(self):
         return self.name
 
+    def clean(self):
+        # Check if the object is trying to set itself as a parent
+        if self.parent == self:
+            raise ValidationError("Сходи нахер со своей рекурсией")
+
+        # Check if the parent object is trying to set itself as a parent
+        if self.parent:
+            # Initialize a variable to store the current parent
+            current_parent = self.parent
+
+            # Loop through the parents to check if self is already on the chain
+            while current_parent:
+                if current_parent == self:
+                    raise ValidationError("ВИЧ-инфекция в дереве наследования объектов. Твой выбранный родитель это твой же потомок, инцест осуждаем")
+                # Move up the chain
+                current_parent = current_parent.parent
+
 
 class Task(models.Model):
     class Priority(models.TextChoices):
@@ -75,6 +93,7 @@ class Task(models.Model):
     engineers = models.ManyToManyField("Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True)
     tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m", blank=True)
     files = models.ManyToManyField("AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True)
+
     # slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
 
     class Meta:
@@ -82,6 +101,7 @@ class Task(models.Model):
 
     def __str__(self):
         return self.header
+
 
 class Tag(models.Model):
     tag_name = models.CharField(max_length=64)
@@ -91,6 +111,7 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.tag_name
+
 
 class Engineer(models.Model):
     first_name = models.CharField(max_length=128)
@@ -103,6 +124,7 @@ class Engineer(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.second_name}"
+
 
 def upload_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
@@ -159,7 +181,7 @@ class Address(models.Model):
         validators=[MinValueValidator(1)],
         verbose_name="Корпус",
         null=True,
-        blank = True,
+        blank=True,
     )
     floor = models.SmallIntegerField(
         verbose_name="Этаж",
