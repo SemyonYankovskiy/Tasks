@@ -1,41 +1,83 @@
 {% load static %}
-    <div class="container" >
-        <header class="d-flex flex-wrap align-items-center justify-content-between mb-4 border border border-top-0 border-3 rounded-3 bg-light" >
+<div class="container">
+    <header class="d-flex flex-wrap align-items-center justify-content-between mb-4 border border border-top-0 border-3 rounded-3 bg-light">
+        {% if user.is_authenticated %}
+
             <div class="col-md-4 d-flex align-items-center">
-                <a href="{% url 'home' %}" class="btn mx-3" >
+                <a href="{% url 'home' %}" class="btn mx-3">
                     <img class="me-3" src="{% static 'img/427227.gif' %}" alt="">
 
                 </a>
                 <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="..." aria-label="Search" >
+                    <input class="form-control me-2" type="search" placeholder="..." aria-label="Search">
                     <button class="btn btn-outline-primary" type="submit">Поиск</button>
                 </form>
             </div>
             <div class="col-md-8 d-flex justify-content-end align-items-center ">
-                <ul class="nav nav-pills me-1">
-                    <li class="nav-item"><a href="#" class="nav-link active" aria-current="page">Home</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">FAQs</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">About</a></li>
+            <ul class="nav nav-pills mx-5">
+
+                <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">About</a></li>
+
+            </ul>
+
+            <div class="nav nav-item dropdown me-3">
+            {#                <a class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown"#}
+            {#                   aria-expanded="false">#}
+            {##}
+            {#                      {{ request.user.username }}#}
+            {#                </a>#}
+
+
+            <div class="dropdown">
+                <button class="btn btn-outline-primary my-btn dropdown-toggle me-3" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                         class="bi bi-person-circle  " viewBox="0 0 16 16">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                        <path fill-rule="evenodd"
+                              d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                    </svg>
+                    {{ request.user }}
+                </button>
+                <ul class="dropdown-menu dd-color">
+                    <li>
+                        <form action="{% url 'user:logout' %}" method="post">
+                            {% csrf_token %}
+                            <button class="dropdown-item dd-item-color">Выйти</button>
+                        </form>
+                    </li>
                 </ul>
 
-                <div class="nav nav-item dropdown me-3">
-                  <a class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-person-circle  " viewBox="0 0 16 16">
-                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
-                        </svg>
-                          {{request.user.username}}
-                  </a>
-
-                  <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#">Действие</a></li>
-                    <li><a class="dropdown-item" href="#">Другое действие</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#">Выход</a></li>
-                  </ul>
-                </div>
             </div>
-        </header>
-    </div>
+
+        {% else %}
+
+
+            <div class="col-md-4 d-flex align-items-center">
+                <a href="{% url 'home' %}" class="btn mx-3">
+                    <img class="me-3" src="{% static 'img/427227.gif' %}" alt="">
+
+                </a>
+
+            </div>
+            <div class="col-md-8 d-flex justify-content-end align-items-center ">
+            <ul class="nav nav-pills mx-5">
+
+                <li class="nav-item"><a href="#" class="nav-link disabled">Features</a></li>
+                <li class="nav-item"><a href="#" class="nav-link disabled">Pricing</a></li>
+                <li class="nav-item"><a href="#" class="nav-link ">About</a></li>
+
+            </ul>
+
+
+            <div class="nav nav-item dropdown me-3">
+                <a class="btn btn-outline-primary my-btn me-3"
+                   href="{% url 'user:login' %}">Войти</a>
+            </div>
+        {% endif %}
+        </div>
+        </div>
+    </header>
+</div>
