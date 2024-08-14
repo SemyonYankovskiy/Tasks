@@ -40,7 +40,7 @@ def get_objects_list(request):
                 ),
 
             )
-            .only("id", "name", "priority")  # Ограничиваем выборку только необходимыми полями
+            .only("id", "name", "priority", "slug")  # Ограничиваем выборку только необходимыми полями
                                             # метод для указания на собственные поля модели
 
             .filter(groups__users=request.user)  # Фильтруем объекты по пользователям в группах
@@ -55,12 +55,13 @@ def get_home(request):
     return render(request, "home.html", context=context)
 
 @login_required
-def get_object_page(request, object_id):
+def get_object_page(request, object_slug):
     obj = (
-        Object.objects.filter(pk=object_id)  # Фильтруем объекты по ID
+        Object.objects.filter(slug=object_slug)  # Фильтруем объекты по ID
             .prefetch_related("files", "tags", "groups")  # Загружаем связанные файлы, теги и группы # метод для указания на поля ManyToMany
             .annotate(
                 parent_name=F("parent__name"),
+                parent_slug=F("parent__slug"),
                 done_tasks_count=Count("id", filter=Q(tasks__is_done=True)),  # Подсчитываем выполненные задачи
                 undone_tasks_count=Count("id", filter=Q(tasks__is_done=False)),  # Подсчитываем невыполненные задачи
             )
@@ -85,7 +86,6 @@ def get_object_page(request, object_id):
     context = {
         "object": obj,  # Основной объект
         "tasks": tasks,  # Задачи, связанные с объектом
-        "parent_name": obj.parent_name,
         "task_count": obj.done_tasks_count + obj.undone_tasks_count,  # Общее количество задач
         "done_count": obj.done_tasks_count,  # Количество выполненных задач
         "not_done_count": obj.undone_tasks_count,  # Количество невыполненных задач

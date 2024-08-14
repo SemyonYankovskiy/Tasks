@@ -8,7 +8,7 @@
 
 
         {% for object in objects %}
-            {% include "components/object-preview.html" with img_preview=object.img_preview title=object.name desc=object.short_description object_id=object.id priority=object.priority groups=object.groups child_count=object.child_count%}
+            {% include "components/object-preview.html" with img_preview=object.img_preview title=object.name desc=object.short_description priority=object.priority groups=object.groups child_count=object.child_count slug=object.slug%}
         {% endfor %}
 
 

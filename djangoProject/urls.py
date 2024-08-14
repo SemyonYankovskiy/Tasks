@@ -12,7 +12,7 @@ from django.urls import include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('user.urls', namespace='user')),
-    path('object/<int:object_id>/', views.get_object_page, name='show-object'),
+    path('object/<slug:object_slug>/', views.get_object_page, name='show-object'),
     path('', views.get_home, name='home'),
 ]
 

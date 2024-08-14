@@ -51,7 +51,7 @@ class Object(models.Model):
     tags = models.ManyToManyField("Tag", related_name="objects_set", db_table="objects_tags_m2m", blank=True)
     files = models.ManyToManyField("AttachedFile", related_name="objects_set", db_table="objects_files_m2m", blank=True)
     groups = models.ManyToManyField("ObjectGroup", related_name="objects_set", db_table="objects_groups_m2m")
-
+    slug = models.SlugField(max_length=255, unique=True, db_index=True)
 
     class Meta:
         db_table = "objects"
@@ -75,6 +75,7 @@ class Task(models.Model):
     engineers = models.ManyToManyField("Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True)
     tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m", blank=True)
     files = models.ManyToManyField("AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True)
+    # slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
 
     class Meta:
         db_table = "object_tasks"

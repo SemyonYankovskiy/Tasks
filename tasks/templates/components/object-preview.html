@@ -1,4 +1,4 @@
-<a href="{% url 'show-object' object_id %}" class="card m-2"
+<a href="{% url 'show-object' slug %}" class="card m-2"
    style="text-decoration: none; color: inherit; position: relative;">
     <img src="/media/{{ img_preview }}" class="card-img-top" alt="...">
     {% if child_count %}
@@ -26,6 +26,7 @@
             </svg>
         </h5>
         <p class="card-text">{{ desc }}</p>
+
 
         <div class="d-flex justify-content-left align-items-center">
             {% for group in groups.all %}
