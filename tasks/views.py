@@ -4,6 +4,7 @@ from django.db.models.functions import Substr, Concat, Length
 from django.http import Http404
 from django.shortcuts import render
 from .models import Object, Task, AttachedFile
+from .filters import ObjectFilter
 
 
 def get_objects_list(request):
@@ -14,45 +15,45 @@ def get_objects_list(request):
             .values("file")[:1]  # Получаем только поле 'file' и ограничиваем результат одним элементом
     )
 
-    # Подзапрос для получения количества детей у объекта
-    child_count_subquery = (
-        Object.objects.filter(parent=OuterRef("pk"))  # Фильтруем объекты, у которых родитель - текущий объект
-            .values("id")  # Получаем идентификаторы детей
-    )
-
-
     # Основной запрос для получения списка объектов
-    return (
+    objects = (
         Object.objects.all()  # Получаем все объекты
-            .prefetch_related("tags", "groups")  # Предварительно загружаем связанные теги и группы для оптимизации запросов
-                                                # метод для указания на поля ManyToMany
-
-            #.select_related()                  # метод для указания на поля ForeignKey
+            .prefetch_related("tags",
+                              "groups")  # Предварительно загружаем связанные теги и группы для оптимизации запросов
             .annotate(
-                img_preview=Subquery(image_subquery),  # Добавляем аннотацию с изображением
-                child_count=Count("children"),  # Подсчитываем количество детей (объектов, у которых этот объект является родителем)
-                description_length=Length("description"),  # Получаем длину полного описания
-                short_description=Case(
-                    When(description_length__gt=53, then=Concat(Substr("description", 1, 50), Value("..."))),
-                    # Если длина описания больше 53, добавляем '...'
-                    default="description",  # В противном случае используем полное описание
-                    output_field=CharField(),  # Указываем, что тип поля - строка
-                ),
-
-            )
+            img_preview=Subquery(image_subquery),  # Добавляем аннотацию с изображением
+            child_count=Count("children"),  # Подсчитываем количество детей
+            description_length=Length("description"),  # Получаем длину полного описания
+            short_description=Case(
+                When(description_length__gt=53, then=Concat(Substr("description", 1, 50), Value("..."))),
+                default="description",  # В противном случае используем полное описание
+                output_field=CharField(),  # Указываем, что тип поля - строка
+            ),
+        )
             .only("id", "name", "priority", "slug")  # Ограничиваем выборку только необходимыми полями
-                                            # метод для указания на собственные поля модели
-
-            .filter(groups__users=request.user)  # Фильтруем объекты по пользователям в группах
             .distinct()  # Убираем дублирование объектов
             .order_by("parent_id", "-id")
     )
 
+    return objects
+
+
 @login_required
 def get_home(request):
-    context = {"objects": get_objects_list(request)}
+    # Создаем фильтр с параметрами запроса
+    filter = ObjectFilter(request.GET, queryset=get_objects_list(request))
+
+    # Применяем фильтр к запросу
+    filtered_objects = filter.qs
+
+    # Передаем отфильтрованные объекты в контекст
+    context = {
+        "objects": filtered_objects,
+        "filter": filter,  # Передаем фильтр в контекст для отображения в шаблоне
+    }
 
     return render(request, "home.html", context=context)
+
 
 @login_required
 def get_object_page(request, object_slug):

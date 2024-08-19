@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tasks',
     'user',
+    'django_filters',
+    'widget_tweaks',
 ]
 
 if DEBUG:
