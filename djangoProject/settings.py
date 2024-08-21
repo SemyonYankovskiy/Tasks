@@ -45,13 +45,17 @@ INSTALLED_APPS = [
     'tasks',
     'user',
     'django_filters',
-    'widget_tweaks',
+    'crispy_forms',
+    'crispy_bootstrap5',
+
 ]
 
 if DEBUG:
     INSTALLED_APPS += ["debug_toolbar"]
 
 AUTH_USER_MODEL = "user.User"
+
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -149,3 +153,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 LOGIN_URL = "user/login/"
+

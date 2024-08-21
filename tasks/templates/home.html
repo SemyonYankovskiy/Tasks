@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 
 {% block title %}TASKS Главная{% endblock title %}
 
@@ -6,26 +7,21 @@
     <div class="container d-flex p-4 my-5 justify-content-center flex-wrap">
 
 
-        <form method="get" class="w-100 m-2">
-            <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                    Фильтры
-                </button>
-                <ul class="dropdown-menu shadow p-3 mb-5 bg-body-tertiary rounded ">
-                    <!-- Поле фильтрации по имени -->
-                    <li>
-                        <!-- Отображение формы фильтрации -->
-                        {{ filter.form.as_p }}
-
-                    </li>
-                    <li class="mt-3">
-                        <button type="submit" class="btn btn-primary">Применить фильтры</button>
-                        <a href="{% url 'home' %}" class="btn btn-secondary">Сбросить фильтры</a>
-                    </li>
-                </ul>
-            </div>
-        </form>
+       <form method="get" class="w-100 m-2">
+           <div class="dropdown">
+               <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                   Фильтры
+               </button>
+               <ul class="dropdown-menu shadow p-3 mb-5 bg-body-tertiary rounded">
+                   <!-- Рендеринг всей формы -->
+                   {{ filter.form|crispy }}
+                   <li class="mt-3">
+                       <button type="submit" class="btn btn-primary">Применить фильтры</button>
+                       <a href="{% url 'home' %}" class="btn btn-secondary">Сбросить фильтры</a>
+                   </li>
+               </ul>
+           </div>
+       </form>
 
         <!-- Список объектов -->
         {% for object in objects %}

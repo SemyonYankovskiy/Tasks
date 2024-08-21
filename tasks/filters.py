@@ -8,11 +8,5 @@ class ObjectFilter(django_filters.FilterSet):
             'name': ['icontains'],
             'tags': ['exact'],
             'groups': ['exact'],
-            'priority':['exact'],
-        }
-        label = {
-            'name': 'Название объекта',
-            'priority': 'Важность',
-            'tags': 'Тег',
-            'groups': 'Группа',
+            'priority': ['exact'],
         }
