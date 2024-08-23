@@ -22,3 +22,32 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Добавление тени при наведении */
 }
 
+
+.files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.file-item {
+    background-color: transparent;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+}
+
+.file-content {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem;
+}
+

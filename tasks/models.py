@@ -47,7 +47,7 @@ class Object(models.Model):
     parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, related_name="children")
     name = models.CharField(max_length=64)
     address = models.ForeignKey("Address", on_delete=models.CASCADE)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     tasks = models.ManyToManyField("Task", related_name="objects_set", db_table="objects_tasks_m2m", blank=True)
     tags = models.ManyToManyField("Tag", related_name="objects_set", db_table="objects_tags_m2m", blank=True)
     files = models.ManyToManyField("AttachedFile", related_name="objects_set", db_table="objects_files_m2m", blank=True)
@@ -129,7 +129,7 @@ class Engineer(models.Model):
 def upload_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     current_date = datetime.now()
-    return f"uploads/{current_date.year}/{current_date.month}/{current_date.day}/{uuid.uuid4()}_{filename}"
+    return f"uploads/{current_date.year}/{current_date.month}/{current_date.day}/{uuid.uuid4()}_._{filename}"
 
 
 class AttachedFile(models.Model):

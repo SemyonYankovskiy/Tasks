@@ -1,17 +1,85 @@
 <div class="attached-files mt-3">
-  <h5>Прикрепленные файлы</h5>
-  <ul class="list-group">
-    {% for file in files %}
-    {% if not file.is_image %}
+    <div class="files-grid">
+        {% for item in files_with_types %}
+            {% if item.type != "image" %}
+                <div class="file-item">
+                    <div class="file-content d-flex align-items-center p-2">
+                        <!-- Кнопка с иконкой -->
+                        {{ item.file }}
+                        <a href="{{ item.url }}" class="btn btn-link icon-button" download>
+                            {% if item.type == "pdf" %}
+                                <i class="bi bi-file-earmark-pdf" style="font-size: 2rem;"></i>
+                            {% elif item.type == "word" %}
+                                <i class="bi bi-file-earmark-word" style="font-size: 2rem;"></i>
+                            {% elif item.type == "excel" %}
+                                <i class="bi bi-file-earmark-excel" style="font-size: 2rem;"></i>
+                            {% elif item.type == "powerpoint" %}
+                                <i class="bi bi-file-earmark-ppt" style="font-size: 2rem;"></i>
+                            {% elif item.type == "archive" %}
+                                <i class="bi bi-file-earmark-zip" style="font-size: 2rem;"></i>
+                            {% else %}
+                                <i class="bi bi-file-earmark" style="font-size: 2rem;"></i>
+                            {% endif %}
+                        </a>
+                        <!-- Название файла и кнопка -->
+                        <div class="flex-grow-1 ms-2 m-0">
+                            <p class="file-name m-0" title="{{ item.filename }}">{{ item.filename }}</p>
 
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span>
-          <!-- Можно заменить иконку в зависимости от типа файла -->
-          <i class="bi bi-file-earmark"></i> {{ file }}
-        </span>
-        <a href="{{ file.url }}" class="btn btn-sm btn-outline-primary" download>Скачать</a>
-      </li>
-    {% endif %}
-    {% endfor %}
-  </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
 </div>
+
+<style>
+    .files-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+    }
+
+    .file-item {
+        background-color: transparent;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        max-width: 100%;
+        overflow: hidden; /* Prevent overflow */
+    }
+
+    .file-content {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        overflow: hidden; /* Prevent overflow */
+    }
+
+    .icon-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.5rem;
+        padding: 0; /* Remove default padding */
+        border: none; /* Remove default border */
+        background: transparent; /* Remove default background */
+    }
+
+    .icon-button i {
+        font-size: 2rem;
+        cursor: pointer; /* Indicate that it's clickable */
+    }
+
+    .file-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1; /* Allow text to take available space */
+    }
+
+    .btn-sm {
+        font-size: 0.875rem;
+    }
+</style>
