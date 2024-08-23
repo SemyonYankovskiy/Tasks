@@ -78,51 +78,9 @@ def get_object_page(request, object_slug):
     # Получаем связанные задачи для данного объекта
     tasks = Task.objects.filter(objects_set=obj).prefetch_related("files", "tags", "engineers")
 
-    # Определяем типы файлов
-    files_with_types = []
-    for file in obj.files.all():
-        print(file)
-        file_extension = os.path.splitext(str(file))[-1].lower()
 
-
-
-        filename = str(file)
-        if '_._' in filename:
-            filename = filename.split('_._', 1)[-1]
-
-
-        # # Получаем первые 15 и последние 15 символов
-        # if len(file) > 30:  # Проверяем, что длина файла больше 30 символов
-        #     file_display = file[:15] + '...' + file[-10:]  # Добавляем '...' между
-        # else:
-        #     file_display = file  # Если длина меньше 30, выводим весь файл
-
-
-        if file_extension in [".pdf"]:
-            file_type = "pdf"
-        elif file_extension in [".doc", ".docx"]:
-            file_type = "word"
-        elif file_extension in [".xls", ".xlsx"]:
-            file_type = "excel"
-        elif file_extension in [".ppt", ".pptx"]:
-            file_type = "powerpoint"
-        elif file_extension in [".zip", ".rar"]:
-            file_type = "archive"
-        elif file_extension in [".jpeg", ".jpg", ".png"]:
-            file_type = "image"
-        else:
-            file_type = "generic"
-
-        files_with_types.append({
-            "file": file,
-            "filename": filename,
-            "type": file_type,
-        })
-
-    # Получаем дочерние объекты, связанные с текущим объектом (если есть)
     child_objects = get_objects_list(request).filter(parent=obj)
 
-    # Формируем контекст для передачи в шаблон
     context = {
         "object": obj,
         "tasks": tasks,
@@ -130,8 +88,6 @@ def get_object_page(request, object_slug):
         "done_count": obj.done_tasks_count,
         "not_done_count": obj.undone_tasks_count,
         "child_objects": child_objects,
-        "files_with_types": files_with_types,  # Добавляем файлы с их типами в контекст
     }
 
-    # Рендерим шаблон "object-page.html" с переданным контекстом
     return render(request, "object-page.html", context=context)

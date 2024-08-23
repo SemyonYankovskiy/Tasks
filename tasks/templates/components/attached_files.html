@@ -1,21 +1,21 @@
 <div class="attached-files mt-3">
     <div class="files-grid">
-        {% for item in files_with_types %}
-            {% if item.type != "image" %}
+
+        {% for file in files %}
+            {% if file.type != "image" %}
                 <div class="file-item">
                     <div class="file-content d-flex align-items-center p-2">
                         <!-- Кнопка с иконкой -->
-                        {{ item.file }}
-                        <a href="{{ item.url }}" class="btn btn-link icon-button" download>
-                            {% if item.type == "pdf" %}
+                        <a href="{{ file.file }}" download="{{ file.file }}" class="btn btn-link icon-button">
+                            {% if file.extension == ".pdf" %}
                                 <i class="bi bi-file-earmark-pdf" style="font-size: 2rem;"></i>
-                            {% elif item.type == "word" %}
+                            {% elif file.extension == ".doc" or file.extension == ".docx" %}
                                 <i class="bi bi-file-earmark-word" style="font-size: 2rem;"></i>
-                            {% elif item.type == "excel" %}
+                            {% elif file.extension == ".xls" or file.extension == ".xlsx" %}
                                 <i class="bi bi-file-earmark-excel" style="font-size: 2rem;"></i>
-                            {% elif item.type == "powerpoint" %}
+                            {% elif file.extension == ".ppt" or file.extension == ".pptx" %}
                                 <i class="bi bi-file-earmark-ppt" style="font-size: 2rem;"></i>
-                            {% elif item.type == "archive" %}
+                            {% elif file.extension == ".zip" or file.extension == ".rar" %}
                                 <i class="bi bi-file-earmark-zip" style="font-size: 2rem;"></i>
                             {% else %}
                                 <i class="bi bi-file-earmark" style="font-size: 2rem;"></i>
@@ -23,8 +23,7 @@
                         </a>
                         <!-- Название файла и кнопка -->
                         <div class="flex-grow-1 ms-2 m-0">
-                            <p class="file-name m-0" title="{{ item.filename }}">{{ item.filename }}</p>
-
+                            <p class="file-name m-0">{{ file }}</p>
                         </div>
                     </div>
                 </div>
