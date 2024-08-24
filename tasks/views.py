@@ -97,25 +97,28 @@ def get_object_page(request, object_slug):
 def tasks_page(request):
     user = request.user
 
-    # Проверяем, хочет ли пользователь видеть только свои задачи
     show_my_tasks_only = request.GET.get('show_my_tasks_only') == 'true'
+    sort_order = request.GET.get('sort_order', 'desc')  # По умолчанию сортировка по убыванию
 
-    # Проверка на наличие связанного инженера
     try:
         engineer = Engineer.objects.get(user=user)
     except Engineer.DoesNotExist:
         engineer = None
 
-    # Фильтрация задач
     if show_my_tasks_only:
         if engineer:
             tasks = Task.objects.filter(engineers=engineer).prefetch_related("files", "tags", "engineers")
         else:
-            tasks = Task.objects.none()  # Если нет связанного инженера, возвращаем пустой QuerySet
+            tasks = Task.objects.none()
     else:
         tasks = Task.objects.all().prefetch_related("files", "tags", "engineers")
 
-    # Подсчет выполненных и невыполненных задач
+    # Сортировка по дате создания: asc для возрастания, desc для убывания
+    if sort_order == 'asc':
+        tasks = tasks.order_by('completion_time')
+    else:
+        tasks = tasks.order_by('-completion_time')
+
     done_tasks_count = tasks.filter(is_done=True).count()
     undone_tasks_count = tasks.filter(is_done=False).count()
 
@@ -125,9 +128,11 @@ def tasks_page(request):
         "done_count": done_tasks_count,
         "not_done_count": undone_tasks_count,
         "show_my_tasks_only": show_my_tasks_only,
+        "sort_order": sort_order,
     }
 
     return render(request, 'components/tasks_page.html', context=context)
+
 
 @login_required
 def map_page(request):
