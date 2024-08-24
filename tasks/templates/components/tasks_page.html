@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container p-4">
+        <div id="tasks" class="row shadow p-4 mt-5 bg-body-tertiary rounded border-top border-3">
+            <div class="row pb-3">
+                <h4>Задачи</h4>
+            </div>
+
+            <div class="d-flex justify-content-end form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
+                       onchange="window.location.href = '?show_my_tasks_only=' + this.checked;"
+                       {% if show_my_tasks_only %}checked{% endif %}>
+                <label class="form-check-label" for="flexSwitchCheckDefault" style="font-size: 18px">
+                      Показывать только мои задачи
+                </label>
+            </div>
+
+            {% if tasks %}
+                {% include "components/task_container.html" with tasks=tasks not_done_count=not_done_count done_count=done_count %}
+            {% else %}
+                <p>Задач для отображения нет.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -3,7 +3,7 @@ from django.db.models import Count, Q, F, OuterRef, Subquery, When, Case, Value,
 from django.db.models.functions import Substr, Concat, Length
 from django.http import Http404
 from django.shortcuts import render
-from .models import Object, Task, AttachedFile
+from .models import Object, Task, AttachedFile, Engineer
 from .filters import ObjectFilter
 import os
 
@@ -91,3 +91,44 @@ def get_object_page(request, object_slug):
     }
 
     return render(request, "object-page.html", context=context)
+
+
+@login_required
+def tasks_page(request):
+    user = request.user
+
+    # Проверяем, хочет ли пользователь видеть только свои задачи
+    show_my_tasks_only = request.GET.get('show_my_tasks_only') == 'true'
+
+    # Проверка на наличие связанного инженера
+    try:
+        engineer = Engineer.objects.get(user=user)
+    except Engineer.DoesNotExist:
+        engineer = None
+
+    # Фильтрация задач
+    if show_my_tasks_only:
+        if engineer:
+            tasks = Task.objects.filter(engineers=engineer).prefetch_related("files", "tags", "engineers")
+        else:
+            tasks = Task.objects.none()  # Если нет связанного инженера, возвращаем пустой QuerySet
+    else:
+        tasks = Task.objects.all().prefetch_related("files", "tags", "engineers")
+
+    # Подсчет выполненных и невыполненных задач
+    done_tasks_count = tasks.filter(is_done=True).count()
+    undone_tasks_count = tasks.filter(is_done=False).count()
+
+    context = {
+        "tasks": tasks,
+        "task_count": tasks.count(),
+        "done_count": done_tasks_count,
+        "not_done_count": undone_tasks_count,
+        "show_my_tasks_only": show_my_tasks_only,
+    }
+
+    return render(request, 'components/tasks_page.html', context=context)
+
+@login_required
+def map_page(request):
+    return render(request, 'components/map.html')

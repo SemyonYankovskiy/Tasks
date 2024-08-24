@@ -1,6 +1,15 @@
-<div id="map" style="height: 80vh"></div>
+{% extends "base.html" %}
 
-<script>
-const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
-const map = L.map("map", { layers: [osm], minZoom: 5 }).setView([44.61, 33.5], 15);
-</script>
+{% block content %}
+
+    <div class="container">
+        <div id="map" style="height: 80vh"></div>
+    </div>
+
+
+    <script>
+        const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
+        const map = L.map("map", {layers: [osm], minZoom: 5}).setView([44.61, 33.5], 15);
+    </script>
+
+{% endblock %}

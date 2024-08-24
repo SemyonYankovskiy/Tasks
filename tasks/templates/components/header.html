@@ -3,22 +3,26 @@
     <header class="d-flex flex-wrap align-items-center justify-content-between mb-4 border border border-top-0 border-3 rounded-3 bg-light">
         {% if user.is_authenticated %}
 
-            <div class="col-md-4 d-flex align-items-center">
+            <div class="col-md-2 d-flex align-items-center">
                 <a href="{% url 'home' %}" class="btn mx-3">
                     <img class="me-3" src="{% static 'img/427227.gif' %}" alt="">
 
                 </a>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="..." aria-label="Search">
-                    <button class="btn btn-outline-primary" type="submit">Поиск</button>
-                </form>
             </div>
-            <div class="col-md-8 d-flex justify-content-end align-items-center ">
+                <div class="col-md-3 d-flex align-items-start">
+                    <form class="d-flex" role="search">
+                        <input class="form-control me-2" type="search" placeholder="..." aria-label="Search">
+                        <button class="btn btn-outline-primary" type="submit">Поиск</button>
+                    </form>
+                </div>
+
+
+            <div class="col-md-7 d-flex justify-content-end align-items-center">
             <ul class="nav nav-pills mx-5">
 
-                <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="{% url 'home' %}" class="nav-link">Объекты</a></li>
+                <li class="nav-item"><a href="{% url 'tasks' %}" class="nav-link">Задачи</a></li>
+                <li class="nav-item"><a href="{% url 'map' %}" class="nav-link disabled">Карта</a></li>
 
             </ul>
 
@@ -56,7 +60,7 @@
 
 
             <div class="col-md-4 d-flex align-items-center">
-                <a href="{% url 'home' %}" class="btn mx-3">
+                <a href="#" class="btn mx-3">
                     <img class="me-3" src="{% static 'img/427227.gif' %}" alt="">
 
                 </a>
@@ -65,9 +69,6 @@
             <div class="col-md-8 d-flex justify-content-end align-items-center ">
             <ul class="nav nav-pills mx-5">
 
-                <li class="nav-item"><a href="#" class="nav-link disabled">Features</a></li>
-                <li class="nav-item"><a href="#" class="nav-link disabled">Pricing</a></li>
-                <li class="nav-item"><a href="#" class="nav-link ">About</a></li>
 
             </ul>
 
