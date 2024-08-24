@@ -5,80 +5,66 @@
             {% if file.type != "image" %}
                 <div class="file-item">
                     <div class="file-content d-flex align-items-center p-2">
-                        <!-- Кнопка с иконкой -->
-                        <a href="{{ file.file }}" download="{{ file.file }}" class="btn btn-link icon-button">
-                            {% if file.extension == ".pdf" %}
-                                <i class="bi bi-file-earmark-pdf" style="font-size: 2rem;"></i>
-                            {% elif file.extension == ".doc" or file.extension == ".docx" %}
-                                <i class="bi bi-file-earmark-word" style="font-size: 2rem;"></i>
-                            {% elif file.extension == ".xls" or file.extension == ".xlsx" %}
-                                <i class="bi bi-file-earmark-excel" style="font-size: 2rem;"></i>
-                            {% elif file.extension == ".ppt" or file.extension == ".pptx" %}
-                                <i class="bi bi-file-earmark-ppt" style="font-size: 2rem;"></i>
-                            {% elif file.extension == ".zip" or file.extension == ".rar" %}
-                                <i class="bi bi-file-earmark-zip" style="font-size: 2rem;"></i>
-                            {% else %}
-                                <i class="bi bi-file-earmark" style="font-size: 2rem;"></i>
-                            {% endif %}
-                        </a>
-                        <!-- Название файла и кнопка -->
-                        <div class="flex-grow-1 ms-2 m-0">
-                            <p class="file-name m-0">{{ file }}</p>
-                        </div>
+                        <!-- Обработка имени файла -->
+                        {% with full_name=file.file.name|cut:"uploads/" %}
+                            {% with base_name=full_name|slice:"49:" %}
+                                {% with display_name=base_name|cut:"_._" %}
+                                    {% if display_name|length > 20 %}
+                                        <!-- Имя файла слишком длинное -->
+                                        {% with start_name=display_name|slice:":10" %}
+                                            {% with end_name=file.extension %}
+                                                <a href="{{ file.file.url }}" download="{{ display_name }}"
+                                                   class="d-flex align-items-center text-decoration-none">
+                                                    <!-- Иконка в зависимости от типа файла -->
+                                                    {% if file.extension == ".pdf" %}
+                                                        <i class="bi bi-file-earmark-pdf" style="font-size: 2rem;"></i>
+                                                    {% elif file.extension == ".doc" or file.extension == ".docx" %}
+                                                        <i class="bi bi-file-earmark-word" style="font-size: 2rem;"></i>
+                                                    {% elif file.extension == ".xls" or file.extension == ".xlsx" %}
+                                                        <i class="bi bi-file-earmark-excel"
+                                                           style="font-size: 2rem;"></i>
+                                                    {% elif file.extension == ".ppt" or file.extension == ".pptx" %}
+                                                        <i class="bi bi-file-earmark-ppt" style="font-size: 2rem;"></i>
+                                                    {% elif file.extension == ".zip" or file.extension == ".rar" %}
+                                                        <i class="bi bi-file-earmark-zip" style="font-size: 2rem;"></i>
+                                                    {% else %}
+                                                        <i class="bi bi-file-earmark" style="font-size: 2rem;"></i>
+                                                    {% endif %}
+
+                                                    <!-- Имя файла с началом и концом -->
+                                                    <span class="ms-2">{{ start_name }}...  {{ end_name }}</span>
+                                                </a>
+                                            {% endwith %}
+                                        {% endwith %}
+                                    {% else %}
+                                        <!-- Имя файла не слишком длинное -->
+                                        <a href="{{ file.file.url }}" download="{{ display_name }}"
+                                           class="d-flex align-items-center text-decoration-none">
+                                            <!-- Иконка в зависимости от типа файла -->
+                                            {% if file.extension == ".pdf" %}
+                                                <i class="bi bi-file-earmark-pdf" style="font-size: 2rem;"></i>
+                                            {% elif file.extension == ".doc" or file.extension == ".docx" %}
+                                                <i class="bi bi-file-earmark-word" style="font-size: 2rem;"></i>
+                                            {% elif file.extension == ".xls" or file.extension == ".xlsx" %}
+                                                <i class="bi bi-file-earmark-excel" style="font-size: 2rem;"></i>
+                                            {% elif file.extension == ".ppt" or file.extension == ".pptx" %}
+                                                <i class="bi bi-file-earmark-ppt" style="font-size: 2rem;"></i>
+                                            {% elif file.extension == ".zip" or file.extension == ".rar" %}
+                                                <i class="bi bi-file-earmark-zip" style="font-size: 2rem;"></i>
+                                            {% else %}
+                                                <i class="bi bi-file-earmark" style="font-size: 2rem;"></i>
+                                            {% endif %}
+
+                                            <!-- Имя файла без обрезки -->
+                                            <span class="ms-2">{{ display_name }}</span>
+                                        </a>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endwith %}
+                        {% endwith %}
                     </div>
                 </div>
             {% endif %}
         {% endfor %}
     </div>
 </div>
-
-<style>
-    .files-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 10px;
-    }
-
-    .file-item {
-        background-color: transparent;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        display: flex;
-        flex-direction: column;
-        max-width: 100%;
-        overflow: hidden; /* Prevent overflow */
-    }
-
-    .file-content {
-        display: flex;
-        align-items: center;
-        flex: 1;
-        overflow: hidden; /* Prevent overflow */
-    }
-
-    .icon-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 0.5rem;
-        padding: 0; /* Remove default padding */
-        border: none; /* Remove default border */
-        background: transparent; /* Remove default background */
-    }
-
-    .icon-button i {
-        font-size: 2rem;
-        cursor: pointer; /* Indicate that it's clickable */
-    }
-
-    .file-name {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        flex: 1; /* Allow text to take available space */
-    }
-
-    .btn-sm {
-        font-size: 0.875rem;
-    }
-</style>
