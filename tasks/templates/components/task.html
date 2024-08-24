@@ -7,7 +7,27 @@
                 <div class="container-fluid">
                     <div class="d-flex flex-row w-100 align-items-center">
                         <!-- Первый столбец -->
-                        <div class="col-md-3 d-flex align-items-center pe-3 border-end">
+                        <div class="col-md-1 d-flex justify-content-center align-items-center border-end"
+                             style="max-width: 48px">
+                            {% if tasks.is_done == False %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                        {% if task.priority == 'LOW' %} fill="#1E90FF"
+                                        {% elif task.priority == 'MEDIUM' %}  fill="#FFD700"
+                                        {% elif task.priority == 'HIGH' %}  fill="#FF6347"
+                                        {% elif task.priority == 'CRITICAL' %}  fill="#FF0000"
+                                        {% endif %}
+                                     class="bi bi-bookmarks-fill" viewBox="0 1 18 16">
+                                    <path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16Zm0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15Z"/>
+                                </svg>
+                            {% else %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#32CD32"
+                                     class="bi bi-check-circle" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                    <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+                                </svg>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-2 d-flex align-items-center pe-1 border-end">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                                  class="bi bi-calendar3 mx-3" viewBox="0 0 16 16">
                                 <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"></path>
@@ -23,7 +43,7 @@
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-end">
+                    <div class="d-flex justify-content-end px-3">
                         <div class="col-md-10 d-flex flex-wrap justify-content-end  align-items-center gap-2 mt-2">
                             {% for engineer in task.engineers.all %}
                                 <div>
@@ -41,28 +61,34 @@
         <div id="collapse{{ task.id }}" class="accordion-collapse collapse">
             <div class="accordion-body bg-white">
                 <div class="container text-center">
-                    <div class="d-flex row">
+                    <div class="d-flex row ">
                         <div class="col border-end">
-                            {% include "components/obj-gallery.html" with files=task.files.all %}
+                            {% include "components/obj-gallery.html" with files=task.files.all id=task.id type="task" %}
                         </div>
                         <div class="col">
                             {% include "components/attached_files.html" with files=task.files.all %}
                         </div>
                     </div>
-                    <div class="row mt-3 border border-dark-subtle">
-                        <p class="d-flex justify-content-left">{{ task.text }}</p>
+                    <div class="row mx-1 my-3 pt-3 d-flex align-items-center border-top">
+                        <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                                 class="bi bi-chat-left-dots" viewBox="0 0 16 16">
+                                <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                                <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                            </svg>
+                        </div>
+                        <div class="col d-flex align-items-center justify-content-start border-start"
+                             style="font-size: 18px">
+                            {{ task.text }}
+                        </div>
+
+
                     </div>
-                    <div class="row mt-3 text-muted">
-                        <div class="col">
+                    <div class="row my-3 text-muted">
+                        <div class="col d-flex flex-wrap justify-content-start  align-items-center gap-2">
                             {% for tag in task.tags.all %}
-                                <span class="badge bg-info text-dark">{{ tag.tag_name }}</span>
+                                <span class="badge bg-warning text-dark">{{ tag.tag_name }}</span>
                             {% endfor %}
-                        </div>
-                        <div class="col text-center">
-                            <span class="badge bg-success">{{ task.is_done }}</span>
-                        </div>
-                        <div class="col text-end">
-                            <span class="badge bg-warning text-dark">{{ task.priority }}</span>
                         </div>
                     </div>
                 </div>

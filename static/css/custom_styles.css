@@ -1,3 +1,13 @@
+body {
+    /*background-image: url("https://snipp.ru/themes/site/img/header-bg.png");*/
+    /*background-repeat: repeat; !* Повторяет изображение по всей площади *!*/
+    /*background-size: auto; !* Оставляет оригинальный размер изображения *!*/
+    background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),
+                url("https://snipp.ru/themes/site/img/header-bg.png");
+}
+
+
+
 .card {
     width: 300px; /* Ширина карточки */
     height: 400px; /* Высота карточки */

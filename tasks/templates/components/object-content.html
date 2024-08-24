@@ -52,7 +52,7 @@
         </div>
 
         <div class="row">
-            {% include "components/obj-gallery.html" with files=object.files.all %}
+            {% include "components/obj-gallery.html" with files=object.files.all id=object.id type="object"%}
         </div>
 
         <div class="row mt-3">

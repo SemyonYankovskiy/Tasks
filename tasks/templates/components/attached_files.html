@@ -2,7 +2,7 @@
     <div class="files-grid">
 
         {% for file in files %}
-            {% if file.type != "image" %}
+            {% if file.extension != ".jpg" and file.extension != ".jpeg" and file.extension != ".png"%}
                 <div class="file-item">
                     <div class="file-content d-flex align-items-center p-2">
                         <!-- Обработка имени файла -->
