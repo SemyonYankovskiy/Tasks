@@ -7,14 +7,14 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 from django.urls import include
 
 urlpatterns = [
-  path('tasks/', views.tasks_page, name='tasks'),  # Страница задач
-    path('map/', views.map_page, name='map'),  # Страница карты
-    path('admin/', admin.site.urls),
-    path('user/', include('user.urls', namespace='user')),
-    path('object/<slug:object_slug>/', views.get_object_page, name='show-object'),
-    path('', views.get_home, name='home'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
+                  path('tasks/', views.tasks_page, name='tasks'),  # Страница задач
+                  path('close_task/<int:task_id>/', views.close_task, name='close_task'),
+                  path('map/', views.map_page, name='map'),  # Страница карты
+                  path('admin/', admin.site.urls),
+                  path('user/', include('user.urls', namespace='user')),
+                  path('object/<slug:object_slug>/', views.get_object_page, name='show-object'),
+                  path('', views.get_home, name='home'),
+              ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:

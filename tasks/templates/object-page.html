@@ -24,8 +24,8 @@
   </div>
 
   <div id="tasks" class="row shadow p-4 mt-5 bg-body-tertiary rounded border-top border-3">
-    <div class="row pb-3">
-      <h4>Задачи</h4>
+    <div class="row pb-3 ">
+      <h4 class="d-flex  justify-content-start">Задачи</h4>
     </div>
     {% include "components/task_container.html" with tasks=tasks not_done_count=not_done_count done_count=done_count %}
   </div>

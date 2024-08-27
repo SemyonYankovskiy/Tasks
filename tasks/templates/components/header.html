@@ -9,12 +9,12 @@
 
                 </a>
             </div>
-                <div class="col-md-3 d-flex align-items-start">
-                    <form class="d-flex" role="search">
-                        <input class="form-control me-2" type="search" placeholder="..." aria-label="Search">
-                        <button class="btn btn-outline-primary" type="submit">Поиск</button>
-                    </form>
-                </div>
+            <div class="col-md-3 d-flex align-items-start">
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="..." aria-label="Search">
+                    <button class="btn btn-outline-primary" type="submit">Поиск</button>
+                </form>
+            </div>
 
 
             <div class="col-md-7 d-flex justify-content-end align-items-center">
@@ -27,13 +27,6 @@
             </ul>
 
             <div class="nav nav-item dropdown me-3">
-            {#                <a class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown"#}
-            {#                   aria-expanded="false">#}
-            {##}
-            {#                      {{ request.user.username }}#}
-            {#                </a>#}
-
-
             <div class="dropdown">
                 <button class="btn btn-outline-primary my-btn dropdown-toggle me-3" type="button"
                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -43,7 +36,12 @@
                         <path fill-rule="evenodd"
                               d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
                     </svg>
-                    {{ request.user }}
+                    {% if request.user.engineer %}
+                        {{ request.user.engineer.first_name }}
+                        {{ request.user.engineer.second_name }}
+                    {% else %}
+                        {{ request.user }}
+                    {% endif %}
                 </button>
                 <ul class="dropdown-menu dd-color">
                     <li>
