@@ -100,9 +100,11 @@
                                 <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
                             </svg>
                         </div>
-                        <div class="col d-flex align-items-center justify-content-start border-start"
+                        <div class="col d-flex flex-column align-items-start border-start"
                              style="font-size: 18px; white-space: pre-line; text-align: justify;">
-                            {{ task.text }}
+                            <span class="spoiler-text">{{ task.text }}</span>
+                            <button class="btn btn-outline-dark toggle-spoiler mt-2" style="display: none;">Показать больше
+                            </button>
                         </div>
 
 
@@ -136,3 +138,4 @@
         </div>
     </div>
 </div>
+

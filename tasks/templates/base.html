@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title%}{% endblock title %}</title>
+    <title>{% block title %}{% endblock title %}</title>
 
     <link rel="stylesheet" href="{% static 'css/custom_styles.css' %}">
 
@@ -14,15 +14,21 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+          crossorigin=""/>
 
     <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+            crossorigin=""></script>
 
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/nanogallery2@3/dist/css/nanogallery2.min.css" rel="stylesheet" type="text/css">
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/nanogallery2@3/dist/jquery.nanogallery2.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/nanogallery2@3/dist/css/nanogallery2.min.css" rel="stylesheet"
+          type="text/css">
+    <script type="text/javascript"
+            src="https://cdn.jsdelivr.net/npm/nanogallery2@3/dist/jquery.nanogallery2.min.js"></script>
 
     <style>
         * {
@@ -30,13 +36,52 @@
         }
     </style>
     <script>
-    // #product a – селектор, выбирающий элементы a в #product (вкладки, при клике на которые нужно отображать соответствующий блок)
-    $('#product a').click(function(e){
-    e.preventDefault();
-    $(this).tab('show');
-    });
+        // #product a – селектор, выбирающий элементы a в #product (вкладки, при клике на которые нужно отображать соответствующий блок)
+        $('#product a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
     </script>
 
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Получаем все элементы с классом 'spoiler-text'
+    var spoilerTextElements = document.querySelectorAll('.spoiler-text');
+    
+    spoilerTextElements.forEach(function(spoilerTextElement) {
+        var toggleSpoilerButton = spoilerTextElement.nextElementSibling;
+
+        // Получаем текст и проверяем его длину
+        var textContent = spoilerTextElement.innerText || spoilerTextElement.textContent;
+
+        if (textContent.length > 500) {
+            var visibleText = textContent.substring(0, 500) + '...';
+            spoilerTextElement.innerText = visibleText;
+
+            // Показываем кнопку спойлера
+            toggleSpoilerButton.style.display = 'block';
+
+            // Обработчик события на кнопку
+            toggleSpoilerButton.addEventListener('click', function() {
+                if (spoilerTextElement.classList.contains('spoiler')) {
+                    spoilerTextElement.classList.remove('spoiler');
+                    toggleSpoilerButton.innerText = 'Показать больше';
+                    spoilerTextElement.innerText = visibleText;
+                } else {
+                    spoilerTextElement.classList.add('spoiler');
+                    toggleSpoilerButton.innerText = 'Скрыть';
+                    spoilerTextElement.innerText = textContent;
+                }
+            });
+        } else {
+            // Если длина текста не больше 500 символов, кнопка не отображается
+            toggleSpoilerButton.style.display = 'none';
+        }
+    });
+});
+
+    </script>
 
 
 </head>
@@ -44,7 +89,7 @@
 
 <body>
 {% include "components/header.html" %}
-{% block content%}{% endblock content %}
+{% block content %}{% endblock content %}
 {% include "components/footer.html" %}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

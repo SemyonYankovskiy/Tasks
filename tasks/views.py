@@ -153,15 +153,15 @@ def close_task(request, task_id):
         task.is_done = True
         task.completion_time = datetime.now()
 
-        if comment:
-            try:
-                name = f"{request.user.engineer.first_name} {request.user.engineer.second_name}"
-            except AttributeError:
-                # Если у пользователя нет engineer, использовать имя пользователя
-                name = request.user.username
+        try:
+            name = f"{request.user.engineer.first_name} {request.user.engineer.second_name}"
+        except AttributeError:
+            # Если у пользователя нет engineer, использовать имя пользователя
+            name = request.user.username
 
-            task.text += f'\n\nЗакрыто: [{name}] {comment}'
+        update_text = f'\n\nЗакрыто: [{name}] {comment}' if comment else f'\n\nЗакрыто: [{name}]'
 
+        task.text += update_text
         task.save()
 
         return redirect('tasks')

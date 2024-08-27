@@ -76,3 +76,17 @@ body {
     text-overflow: ellipsis;
     flex: 1; /* Allow text to take available space */
 }
+
+
+
+.spoiler-text {
+    display: block;
+    max-height: 100px; /* Установите подходящую высоту для ограничения отображаемого текста */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: max-height 0.3s ease; /* Плавный переход для изменения высоты */
+}
+
+.spoiler-text.spoiler {
+    max-height: none;
+}
