@@ -167,3 +167,24 @@ def close_task(request, task_id):
         return redirect('tasks')
 
     return redirect('tasks')
+
+
+def update_task(request, task_id):
+    if request.method == 'POST':
+        task = get_object_or_404(Task, pk=task_id)
+        comment = request.POST.get('comment', '')
+
+        if comment:
+            try:
+                name = f"{request.user.engineer.first_name} {request.user.engineer.second_name}"
+            except AttributeError:
+                # Если у пользователя нет engineer, использовать имя пользователя
+                name = request.user.username
+
+            task.text += f'\n\nUPD: [{name}] {comment}'
+
+        task.save()
+
+        return redirect('tasks')
+
+    return redirect('tasks')

@@ -8,6 +8,7 @@ from django.urls import include
 
 urlpatterns = [
                   path('tasks/', views.tasks_page, name='tasks'),  # Страница задач
+                  path('upd_task/<int:task_id>/', views.update_task, name='update_task'),
                   path('close_task/<int:task_id>/', views.close_task, name='close_task'),
                   path('map/', views.map_page, name='map'),  # Страница карты
                   path('admin/', admin.site.urls),
