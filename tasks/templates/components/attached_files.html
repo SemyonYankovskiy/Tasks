@@ -11,7 +11,7 @@
                                 {% with display_name=base_name|cut:"_._" %}
                                     {% if display_name|length > 20 %}
                                         <!-- Имя файла слишком длинное -->
-                                        {% with start_name=display_name|slice:":10" %}
+                                        {% with start_name=display_name|slice:":9" %}
                                             {% with end_name=file.extension %}
                                                 <a href="{{ file.file.url }}" download="{{ display_name }}"
                                                    class="d-flex align-items-center text-decoration-none">

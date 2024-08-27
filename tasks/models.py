@@ -90,7 +90,7 @@ class Task(models.Model):
     is_done = models.BooleanField()
     completion_time = models.DateTimeField()
     header = models.CharField(max_length=128)
-    text = models.TextField()
+    text = models.TextField(blank=True)
     engineers = models.ManyToManyField("Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True)
     tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m", blank=True)
     files = models.ManyToManyField("AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True)
