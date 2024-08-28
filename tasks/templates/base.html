@@ -34,6 +34,7 @@
         * {
             font-family: MS Reference Sans Serif
         }
+
     </style>
     <script>
         // #product a – селектор, выбирающий элементы a в #product (вкладки, при клике на которые нужно отображать соответствующий блок)
@@ -43,12 +44,21 @@
         });
     </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+
 
     <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Получаем все элементы с классом 'spoiler-text'
     var spoilerTextElements = document.querySelectorAll('.spoiler-text');
-    
+
     spoilerTextElements.forEach(function(spoilerTextElement) {
         var toggleSpoilerButton = spoilerTextElement.nextElementSibling;
 
