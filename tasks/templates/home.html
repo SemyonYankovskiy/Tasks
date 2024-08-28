@@ -7,21 +7,75 @@
     <div class="container d-flex p-4 my-4 justify-content-center flex-wrap">
 
 
-       <form method="get" class="w-100 m-2">
-           <div class="dropdown">
-               <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                   Фильтры
-               </button>
-               <ul class="dropdown-menu shadow p-3 mb-5 bg-body-tertiary rounded">
-                   <!-- Рендеринг всей формы -->
-                   {{ filter.form|crispy }}
-                   <li class="mt-3">
-                       <button type="submit" class="btn btn-primary">Применить фильтры</button>
-                       <a href="{% url 'home' %}" class="btn btn-secondary">Сбросить фильтры</a>
-                   </li>
-               </ul>
-           </div>
-       </form>
+        <form method="get" class="w-100 m-2">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Фильтры</button>
+                
+                <ul class="dropdown-menu shadow p-3 mb-5 bg-body-tertiary rounded"
+                    data-popper-placement="bottom-start"
+                    style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 40px);">
+                    <!-- Рендеринг всей формы -->
+{#                    {{ filter.form|crispy }}#}
+
+                    <div id="div_id_name__icontains" class="mb-3">
+                        <label for="id_name__icontains" class="form-label">Имя объекта</label> 
+                        <input type="text" name="name__icontains" class="textinput form-control"
+                                    id="id_name__icontains">
+                    </div>
+                    
+                    <div id="div_id_tags" class="mb-3">
+                        <label for="id_tags" class="form-label">Теги</label> 
+                        
+                        
+                        <select name="tags" class="selectmultiple form-select" id="id_tags" multiple="">
+                        <option value="8">Прочее</option>
+                        <option value="9">СПД</option>
+                        <option value="10">ОГЭ</option>
+                        <option value="11">МС</option>
+                        <option value="12">АТС</option>
+                        <option value="13">ЦУС</option>
+                        <option value="14">1</option>
+                        <option value="15">Очень длинный тег с множеством символов я не помню сколько можно</option>
+                        <option value="16">еще один тег</option>
+                        <option value="17">еще один тег 2</option>
+                        <option value="18">Длинный тег</option>
+                        <option value="19">ТЕСТ</option>
+                        <option value="20">ТЕСТОВЫЙ ПРОЕКТ</option>
+                        <option value="21">Тестовый тег</option>
+                        </select>
+                    </div>
+                    
+                    
+            
+                    
+                    <div id="div_id_groups" class="mb-3">
+                        <label for="id_groups" class="form-label">Группы</label> 
+                        
+                        <select name="groups" class="selectmultiple form-select" id="id_groups" multiple="">
+                        <option value="1">Севтелеком</option>
+                        <option value="2">Тест</option>
+                        </select>
+                    </div>
+                    
+                    <div id="div_id_priority" class="mb-3">
+                        <label for="id_priority" class="form-label">Важность</label> 
+                        
+                        <select name="priority" class="select form-select" id="id_priority">
+                        <option value="" selected="">---------</option>
+                        <option value="CRITICAL">Критический</option>
+                        <option value="HIGH">Высокий</option>
+                        <option value="MEDIUM">Средний</option>
+                        <option value="LOW">Низкий</option>
+                        </select>
+                    </div>
+
+                    <li class="mt-3">
+                        <button type="submit" class="btn btn-primary">Применить фильтры</button>
+                        <a href="/" class="btn btn-secondary">Сбросить фильтры</a>
+                    </li>
+                </ul>
+            </div>
+        </form>
 
         <!-- Список объектов -->
         {% for object in objects %}
@@ -29,3 +83,4 @@
         {% endfor %}
     </div>
 {% endblock %}
+

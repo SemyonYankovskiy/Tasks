@@ -1,0 +1,77 @@
+<!-- Кнопка-триггер модального окна -->
+<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop_edit_task{{ task.id }}">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square"
+         viewBox="0 0 16 16">
+        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+        <path fill-rule="evenodd"
+              d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+    </svg>
+    Редактировать задачу
+</button>
+ {{ engineers}}{{ tags }}{{ task.id }}
+
+
+<!-- Модальное окно редактирования задачи -->
+<div class="modal fade" id="staticBackdrop_edit_task{{ task.id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="editTaskLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="editTaskLabel">Редактировать задачу</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <form id="editTaskForm" method="post" enctype="multipart/form-data" action="{% url 'edit_task' task.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="header" class="form-label">Заголовок</label>
+                        <input type="text" class="form-control" id="header" name="header" value="{{ task.header }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="text" class="form-label">Описание</label>
+                        <textarea class="form-control" id="text" name="text">{{ task.text }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="priority" class="form-label">Приоритет</label>
+                        <select class="form-select" id="priority" name="priority" required>
+                            <option value="CRITICAL" {% if task.priority == 'CRITICAL' %}selected{% endif %}>Критический</option>
+                            <option value="HIGH" {% if task.priority == 'HIGH' %}selected{% endif %}>Высокий</option>
+                            <option value="MEDIUM" {% if task.priority == 'MEDIUM' %}selected{% endif %}>Средний</option>
+                            <option value="LOW" {% if task.priority == 'LOW' %}selected{% endif %}>Низкий</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="completion_time" class="form-label">Дата завершения</label>
+                        <input type="datetime-local" class="form-control" id="completion_time" name="completion_time" value="{{ task.completion_time|date:'Y-m-d\TH:i' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="engineers" class="form-label">Инженеры</label>
+                        <select multiple class="form-select" id="engineers" name="engineers">
+                       
+                            {% for engineer in engineers %}
+                                <option value="{{ engineer.id }}" {% if engineer in task.engineers.all %}selected{% endif %}>{{ engineer }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tags" class="form-label">Теги</label>
+                        <select multiple class="form-select" id="tags" name="tags">
+                            {% for tag in tags %}
+                                <option value="{{ tag.id }}" {% if tag in task.tags.all %}selected{% endif %}>{{ tag }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="files" class="form-label">Файлы</label>
+                        <input type="file" class="form-control" id="files" name="files" multiple>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -128,7 +128,8 @@
                     {% if not tasks.is_done %}
                         {% if request.user.engineer in task.engineers.all or request.user.is_superuser %}
                             <div class="d-flex justify-content-end gap-2">
-                                {% include "components/update_task.html" with task=task %}
+                                {% include "components/edit_task.html" with task=task %}
+{#                                {% include "components/update_task.html" with task=task %}#}
                                 {% include "components/confirm_task.html" with task=task %}
                             </div>
                         {% endif %}
