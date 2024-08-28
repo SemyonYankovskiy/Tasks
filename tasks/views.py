@@ -7,8 +7,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Object, Task, AttachedFile, Engineer, Tag
 from .filters import ObjectFilter
-from .forms import TaskForm
-from django.views.decorators.http import require_POST
+
 
 def get_objects_list(request):
     # Создаем подзапрос для получения первого файла изображения (jpeg, jpg, png)
@@ -191,67 +190,3 @@ def update_task(request, task_id):
     return redirect('tasks')
 
 
-def create_task(request):
-    if request.method == 'POST':
-        form = TaskForm(request.POST, request.FILES)
-        if form.is_valid():
-            task = form.save(commit=False)
-            task.is_done = False
-            task.save()
-            form.save_m2m()  # Сохраняем связи many-to-many
-
-            # Обработка загрузки файлов
-            files = request.FILES.getlist('files')
-            for file in files:
-                attached_file = AttachedFile(file=file)
-                attached_file.save()
-                task.files.add(attached_file)
-
-            return redirect(request.META.get('HTTP_REFERER', 'index'))
-    else:
-        form = TaskForm()
-
-    engineers = Engineer.objects.all()
-    tags = Tag.objects.all()
-    context = {
-        'form': form,
-        'engineers': engineers,
-        'tags': tags
-    }
-    return render(request, 'components/create_task.html', context)
-
-
-def edit_task(request, task_id):
-    task = get_object_or_404(Task, pk=task_id)
-
-    if request.method == 'POST':
-        form = TaskForm(request.POST, request.FILES, instance=task)
-        if form.is_valid():
-            updated_task = form.save(commit=False)
-            updated_task.is_done = False
-            updated_task.save()
-            form.save_m2m()  # Сохраняем связи many-to-many
-
-            # Обработка загрузки файлов
-            files = request.FILES.getlist('files')
-            for file in files:
-                attached_file = AttachedFile(file=file)
-                attached_file.save()
-                updated_task.files.add(attached_file)
-
-            # После успешного сохранения возвращаемся на предыдущую страницу
-            return redirect(request.META.get('HTTP_REFERER', 'index'))
-    else:
-        form = TaskForm(instance=task)
-
-    engineers = Engineer.objects.all()
-    tags = Tag.objects.all()
-    context = {
-        'form': form,
-        'task': task,
-        'engineers': engineers,
-        'tags': tags
-    }
-    print("engineers",engineers)
-    print("tags",tags)
-    return render(request, 'edit_task.html', context)

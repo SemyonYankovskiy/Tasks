@@ -9,7 +9,6 @@
     </svg>
     Редактировать задачу
 </button>
- {{ engineers}}{{ tags }}{{ task.id }}
 
 
 <!-- Модальное окно редактирования задачи -->
@@ -21,52 +20,11 @@
                 <h1 class="modal-title fs-5" id="editTaskLabel">Редактировать задачу</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
             </div>
-            <form id="editTaskForm" method="post" enctype="multipart/form-data" action="{% url 'edit_task' task.id %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="header" class="form-label">Заголовок</label>
-                        <input type="text" class="form-control" id="header" name="header" value="{{ task.header }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="text" class="form-label">Описание</label>
-                        <textarea class="form-control" id="text" name="text">{{ task.text }}</textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="priority" class="form-label">Приоритет</label>
-                        <select class="form-select" id="priority" name="priority" required>
-                            <option value="CRITICAL" {% if task.priority == 'CRITICAL' %}selected{% endif %}>Критический</option>
-                            <option value="HIGH" {% if task.priority == 'HIGH' %}selected{% endif %}>Высокий</option>
-                            <option value="MEDIUM" {% if task.priority == 'MEDIUM' %}selected{% endif %}>Средний</option>
-                            <option value="LOW" {% if task.priority == 'LOW' %}selected{% endif %}>Низкий</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="completion_time" class="form-label">Дата завершения</label>
-                        <input type="datetime-local" class="form-control" id="completion_time" name="completion_time" value="{{ task.completion_time|date:'Y-m-d\TH:i' }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="engineers" class="form-label">Инженеры</label>
-                        <select multiple class="form-select" id="engineers" name="engineers">
-                       
-                            {% for engineer in engineers %}
-                                <option value="{{ engineer.id }}" {% if engineer in task.engineers.all %}selected{% endif %}>{{ engineer }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="tags" class="form-label">Теги</label>
-                        <select multiple class="form-select" id="tags" name="tags">
-                            {% for tag in tags %}
-                                <option value="{{ tag.id }}" {% if tag in task.tags.all %}selected{% endif %}>{{ tag }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="files" class="form-label">Файлы</label>
-                        <input type="file" class="form-control" id="files" name="files" multiple>
-                    </div>
-                </div>
+            <form>
+                
+                ...
+                
+                
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                     <button type="submit" class="btn btn-primary">Сохранить</button>

@@ -1,81 +1,27 @@
-<button type="button " class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop1">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-         class="bi bi-pencil-square" viewBox="0 0 16 16">
-        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-        <path fill-rule="evenodd"
-              d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-    </svg>
+<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop_create_task">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-square" viewBox="0 0 16 16">
+  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+  <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+</svg>
     Создать задачу
 </button>
 
 
-<!-- Модальное окно -->
-<div class="modal fade" id="staticBackdrop1" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-     aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<!-- Модальное окно создания задачи -->
+<div class="modal fade" id="staticBackdrop_create_task" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="editTaskLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="staticBackdropLabel">Создать новую задачу</h1>
+                <h1 class="modal-title fs-5" id="editTaskLabel">Редактировать задачу</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
             </div>
-            <form id="taskForm" action="{% url 'create_task' %}" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="header" class="form-label">Заголовок</label>
-                        <input type="text" class="form-control" id="header" name="header" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="text" class="form-label">Описание</label>
-                        <textarea class="form-control" id="text" name="text"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="priority" class="form-label">Приоритет</label>
-                        <select class="form-select" id="priority" name="priority" required>
-                            <option value="CRITICAL">Критический</option>
-                            <option value="HIGH">Высокий</option>
-                            <option value="MEDIUM">Средний</option>
-                            <option value="LOW">Низкий</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="completion_time" class="form-label">Дата завершения</label>
-                        <input type="datetime-local" class="form-control" id="completion_time" name="completion_time"
-                               required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="engineers" class="form-label">Инженеры</label>
-                        <select multiple class="form-select" id="engineers" name="engineers">
-                            <option value="100">Инженер 1</option>
-                            <option value="101">Инженер 2</option>
-                            <option value="102">Инженер 3</option>
-                            <option value="103">Инженер 4</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="tags" class="form-label">Теги</label>
-                        <select multiple class="form-select" id="tags" name="tags">
-                            <option value="8">Прочее</option>
-                            <option value="9">СПД</option>
-                            <option value="10">ОГЭ</option>
-                            <option value="11">МС</option>
-                            <option value="12">АТС</option>
-                            <option value="13">ЦУС</option>
-                            <option value="14">1</option>
-                            <option value="15">Очень длинный тег с множеством символов я не помню сколько можно</option>
-                            <option value="16">еще один тег</option>
-                            <option value="17">еще один тег 2</option>
-                            <option value="18">Длинный тег</option>
-                            <option value="19">ТЕСТ</option>
-                            <option value="20">ТЕСТОВЫЙ ПРОЕКТ</option>
-                            <option value="21">Тестовый тег</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="files" class="form-label">Файлы</label>
-                        <input type="file" class="form-control" id="files" name="files" multiple>
-                    </div>
-                </div>
+            <form>
+
+                ...
+
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                     <button type="submit" class="btn btn-primary">Сохранить</button>
@@ -84,4 +30,3 @@
         </div>
     </div>
 </div>
-
