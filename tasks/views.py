@@ -1,12 +1,13 @@
-from datetime import timezone, datetime
+from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, F, OuterRef, Subquery, When, Case, Value, CharField
 from django.db.models.functions import Substr, Concat, Length
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Object, Task, AttachedFile, Engineer, Tag
+from .models import Object, Task, AttachedFile, Engineer
 from .filters import ObjectFilter
+from django.core.paginator import Paginator
 
 
 def get_objects_list(request):
@@ -48,14 +49,40 @@ def get_home(request):
     # Применяем фильтр к запросу
     filtered_objects = filter.qs
 
+    # Получаем номер страницы из запроса
+    page_number = request.GET.get('page')
+
+    # Используем функцию пагинации
+    pagination_data = paginate_queryset(filtered_objects, page_number)
+
     # Передаем отфильтрованные объекты в контекст
     context = {
-        "objects": filtered_objects,
+        "pagination_data": pagination_data,
         "filter": filter,  # Передаем фильтр в контекст для отображения в шаблоне
     }
 
     return render(request, "home.html", context=context)
 
+def paginate_queryset(queryset, page_number, per_page=4):
+    paginator = Paginator(queryset, per_page)
+    page_obj = paginator.get_page(page_number)
+
+    total_pages = paginator.num_pages
+    current_page = page_obj.number
+
+    end_show_ellipsis = current_page < total_pages - 3
+    end_show_last_page_link = current_page <= total_pages - 3
+    start_show_ellipsis = current_page > 4
+    start_show_first_page_link = current_page >= 4
+
+    return {
+        "page_obj": page_obj,
+        "end_show_ellipsis": end_show_ellipsis,
+        "end_show_last_page_link": end_show_last_page_link,
+        "start_show_ellipsis": start_show_ellipsis,
+        "start_show_first_page_link": start_show_first_page_link,
+        "last_page_number": total_pages
+    }
 
 @login_required
 def get_object_page(request, object_slug):
@@ -168,25 +195,25 @@ def close_task(request, task_id):
 
     return redirect('tasks')
 
-
-def update_task(request, task_id):
-    if request.method == 'POST':
-        task = get_object_or_404(Task, pk=task_id)
-        comment = request.POST.get('comment', '')
-
-        if comment:
-            try:
-                name = f"{request.user.engineer.first_name} {request.user.engineer.second_name}"
-            except AttributeError:
-                # Если у пользователя нет engineer, использовать имя пользователя
-                name = request.user.username
-
-            task.text += f'\n\nUPD: [{name}] {comment}'
-
-        task.save()
-
-        return redirect('tasks')
-
-    return redirect('tasks')
+#
+# def update_task(request, task_id):
+#     if request.method == 'POST':
+#         task = get_object_or_404(Task, pk=task_id)
+#         comment = request.POST.get('comment', '')
+#
+#         if comment:
+#             try:
+#                 name = f"{request.user.engineer.first_name} {request.user.engineer.second_name}"
+#             except AttributeError:
+#                 # Если у пользователя нет engineer, использовать имя пользователя
+#                 name = request.user.username
+#
+#             task.text += f'\n\nUPD: [{name}] {comment}'
+#
+#         task.save()
+#
+#         return redirect('tasks')
+#
+#     return redirect('tasks')
 
 

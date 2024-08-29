@@ -90,3 +90,34 @@ body {
 .spoiler-text.spoiler {
     max-height: none;
 }
+
+
+
+
+.pagination {
+  display: inline-block;
+}
+.pagination a {
+    border-radius: 5px;
+  color: black;
+  float: left;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: background-color .3s;
+  border: 1px solid #ddd;
+}
+.pagination a.active {
+    border-radius: 5px;
+  background-color: rgba(75, 0, 255, 0);
+  color: #070707;
+  border: 2px solid #2f85e8;
+}
+
+.pagination a.next_prev {
+    border-radius: 5px;
+  background-color: rgba(47, 133, 232, 0);
+  color: #070707;
+  border: 2px solid rgba(47, 133, 232, 0);
+}
+
+.pagination a:hover:not(.active) {background-color: #ddd;}

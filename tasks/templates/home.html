@@ -4,68 +4,66 @@
 {% block title %}TASKS Главная{% endblock title %}
 
 {% block content %}
-    <div class="container d-flex p-4 my-4 justify-content-center flex-wrap">
-
-
-        <form method="get" class="w-100 m-2">
+    <div class="container">
+        <form method="get" class="w-100 mx-4">
             <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Фильтры</button>
-                
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">Фильтры
+                </button>
+
                 <ul class="dropdown-menu shadow p-3 mb-5 bg-body-tertiary rounded"
                     data-popper-placement="bottom-start"
                     style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 40px);">
                     <!-- Рендеринг всей формы -->
-{#                    {{ filter.form|crispy }}#}
+                    {#                    {{ filter.form|crispy }}#}
 
                     <div id="div_id_name__icontains" class="mb-3">
-                        <label for="id_name__icontains" class="form-label">Имя объекта</label> 
+                        <label for="id_name__icontains" class="form-label">Имя объекта</label>
                         <input type="text" name="name__icontains" class="textinput form-control"
-                                    id="id_name__icontains">
+                               id="id_name__icontains">
                     </div>
-                    
+
                     <div id="div_id_tags" class="mb-3">
-                        <label for="id_tags" class="form-label">Теги</label> 
-                        
-                        
+                        <label for="id_tags" class="form-label">Теги</label>
+
+
                         <select name="tags" class="selectmultiple form-select" id="id_tags" multiple="">
-                        <option value="8">Прочее</option>
-                        <option value="9">СПД</option>
-                        <option value="10">ОГЭ</option>
-                        <option value="11">МС</option>
-                        <option value="12">АТС</option>
-                        <option value="13">ЦУС</option>
-                        <option value="14">1</option>
-                        <option value="15">Очень длинный тег с множеством символов я не помню сколько можно</option>
-                        <option value="16">еще один тег</option>
-                        <option value="17">еще один тег 2</option>
-                        <option value="18">Длинный тег</option>
-                        <option value="19">ТЕСТ</option>
-                        <option value="20">ТЕСТОВЫЙ ПРОЕКТ</option>
-                        <option value="21">Тестовый тег</option>
+                            <option value="8">Прочее</option>
+                            <option value="9">СПД</option>
+                            <option value="10">ОГЭ</option>
+                            <option value="11">МС</option>
+                            <option value="12">АТС</option>
+                            <option value="13">ЦУС</option>
+                            <option value="14">1</option>
+                            <option value="15">Очень длинный тег с множеством символов я не помню сколько можно</option>
+                            <option value="16">еще один тег</option>
+                            <option value="17">еще один тег 2</option>
+                            <option value="18">Длинный тег</option>
+                            <option value="19">ТЕСТ</option>
+                            <option value="20">ТЕСТОВЫЙ ПРОЕКТ</option>
+                            <option value="21">Тестовый тег</option>
                         </select>
                     </div>
-                    
-                    
-            
-                    
+
+
                     <div id="div_id_groups" class="mb-3">
-                        <label for="id_groups" class="form-label">Группы</label> 
-                        
+                        <label for="id_groups" class="form-label">Группы</label>
+
                         <select name="groups" class="selectmultiple form-select" id="id_groups" multiple="">
-                        <option value="1">Севтелеком</option>
-                        <option value="2">Тест</option>
+                            <option value="1">Севтелеком</option>
+                            <option value="2">Тест</option>
                         </select>
                     </div>
-                    
+
                     <div id="div_id_priority" class="mb-3">
-                        <label for="id_priority" class="form-label">Важность</label> 
-                        
+                        <label for="id_priority" class="form-label">Важность</label>
+
                         <select name="priority" class="select form-select" id="id_priority">
-                        <option value="" selected="">---------</option>
-                        <option value="CRITICAL">Критический</option>
-                        <option value="HIGH">Высокий</option>
-                        <option value="MEDIUM">Средний</option>
-                        <option value="LOW">Низкий</option>
+                            <option value="" selected="">---------</option>
+                            <option value="CRITICAL">Критический</option>
+                            <option value="HIGH">Высокий</option>
+                            <option value="MEDIUM">Средний</option>
+                            <option value="LOW">Низкий</option>
                         </select>
                     </div>
 
@@ -77,10 +75,68 @@
             </div>
         </form>
 
-        <!-- Список объектов -->
-        {% for object in objects %}
+    </div>
+
+
+    <!-- Список объектов -->
+    <div class="container d-flex p-3 justify-content-center flex-wrap">
+
+        {% for object in pagination_data.page_obj %}
             {% include "components/object-preview.html" with img_preview=object.img_preview title=object.name desc=object.short_description priority=object.priority groups=object.groups child_count=object.child_count slug=object.slug %}
         {% endfor %}
     </div>
+
+
+    <!-- Пагинация -->
+    {% if pagination_data.page_obj.has_other_pages %}
+        <div class="pagination container d-flex justify-content-center">
+
+        
+        <a href="{% if pagination_data.page_obj.has_previous %}?page={{ pagination_data.page_obj.previous_page_number }}{% else %}#{% endif %}"
+           class="mx-3 next_prev">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                 class="bi bi-caret-left" viewBox="0 0 16 16">
+                <path d="M10 12.796V3.204L4.519 8 10 12.796zm-.659.753-5.48-4.796a1 1 0 0 1 0-1.506l5.48-4.796A1 1 0 0 1 11 3.204v9.592a1 1 0 0 1-1.659.753z"/>
+            </svg>
+        </a>
+
+
+        {% if pagination_data.start_show_last_page_link %}
+            <a href="?page=1">1</a>
+            {% if pagination_data.start_show_ellipsis %}
+                <span>...</span>
+            {% endif %}
+        {% endif %}
+
+
+        {% for p in pagination_data.page_obj.paginator.page_range %}
+            {% if pagination_data.page_obj.number == p %}
+                <a class="active">{{ p }}</a>
+            {% elif p >= pagination_data.page_obj.number|add:-2 and p <= pagination_data.page_obj.number|add:2 %}
+                <a href="?page={{ p }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+
+        {% if pagination_data.end_show_last_page_link %}
+            {% if pagination_data.end_show_ellipsis %}
+                <span>...</span>
+            {% endif %}
+            <a href="?page={{ pagination_data.last_page_number }}">{{ pagination_data.last_page_number }}</a>
+        {% endif %}
+        
+
+        <a href="{% if pagination_data.page_obj.has_next %}?page={{ pagination_data.page_obj.next_page_number }}{% else %}#{% endif %}"
+           class="mx-3 next_prev">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                 class="bi bi-caret-right-fill" viewBox="0 0 16 16">
+                <path d="M6 12.796V3.204L11.481 8 6 12.796zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753z"/>
+            </svg>
+        </a>
+        </div>
+    {% endif %}
+
+        
+
 {% endblock %}
 
