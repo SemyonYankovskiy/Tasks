@@ -4,7 +4,9 @@
             <h4>Задачи</h4>
 
         </div>
-        <div class="row ">
+        
+        {% if show_my_tasks_only or sort_order %}
+        	 <div class="row ">
             <div class="col-md-8"></div>
             <div class="col-md-4">
                 <div class="form-check form-switch">
@@ -30,9 +32,11 @@
                 </div>
             </div>
         </div>
+        {% endif %}
+
 
         <div class="d-flex justify-content-center">
-            {% include "components/create_task.html" %}
+            {% include "components/task/create_task.html" %}
         </div>
 
 {% if tasks %}
@@ -61,7 +65,7 @@
             <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
                 {% for task in tasks %}
                     {% if task.is_done == False %}
-                        {% include "components/task.html" with task=task %}
+                        {% include "components/task/task.html" with task=task %}
                     {% endif %}
                 {% endfor %}
             </div>
@@ -71,13 +75,13 @@
 
                 {% for task in tasks %}
                     {% if task.is_done == True %}
-                        {% include "components/task.html" with task=task %}
+                        {% include "components/task/task.html" with task=task %}
                     {% endif %}
                 {% endfor %}
             </div>
 
 
-            {% include "components/pagination.html" with pagination_data=tasks %}
+            {% include "components/home/home_pagination.html" with pagination_data=tasks %}
 
         </div>
 

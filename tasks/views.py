@@ -13,10 +13,10 @@ from django.core.paginator import Paginator
 @login_required
 def get_home(request):
     # Создаем фильтр с параметрами запроса
-    filter = ObjectFilter(request.GET, queryset=get_objects_list(request))
+    user_filter = ObjectFilter(request.GET, queryset=get_objects_list(request))
 
     # Применяем фильтр к запросу
-    filtered_objects = filter.qs
+    filtered_objects = user_filter.qs
 
     # Получаем номер страницы из запроса
     page_number = request.GET.get('page')
@@ -27,10 +27,10 @@ def get_home(request):
     # Передаем отфильтрованные объекты в контекст
     context = {
         "pagination_data": pagination_data,
-        "filter": filter,  # Передаем фильтр в контекст для отображения в шаблоне
+        "filter": user_filter,  # Передаем фильтр в контекст для отображения в шаблоне
     }
 
-    return render(request, "home.html", context=context)
+    return render(request, "components/home/home.html", context=context)
 
 
 def get_objects_list(request):
@@ -120,14 +120,14 @@ def get_object_page(request, object_slug):
 
     }
 
-    return render(request, "object-page.html", context=context)
+    return render(request, "components/object/object-page.html", context=context)
 
 
 @login_required
 def tasks_page(request):
     user = request.user
     filtered_task = get_filtered_tasks(user, request)
-    return render(request, 'components/tasks_page.html', {"tasks": filtered_task})
+    return render(request, 'components/task/tasks_page.html', {"tasks": filtered_task})
 
 
 def get_filtered_tasks(user, request, obj=None):
@@ -174,7 +174,7 @@ def get_filtered_tasks(user, request, obj=None):
 
 @login_required
 def map_page(request):
-    return render(request, 'components/map.html')
+    return render(request, 'components/templates/map.html')
 
 
 def close_task(request, task_id):

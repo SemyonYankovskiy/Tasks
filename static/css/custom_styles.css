@@ -7,7 +7,7 @@ body {
 }
 
 
-
+/*Стили для карточек object_preview*/
 .card {
     width: 300px; /* Ширина карточки */
     height: 400px; /* Высота карточки */
@@ -32,6 +32,8 @@ body {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Добавление тени при наведении */
 }
 
+
+/*Стили для прикрепленных файлов*/
 .files-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -78,7 +80,7 @@ body {
 }
 
 
-
+/*Стили для спойлеров*/
 .spoiler-text {
     display: block;
     max-height: 100px; /* Установите подходящую высоту для ограничения отображаемого текста */
@@ -93,7 +95,7 @@ body {
 
 
 
-
+/*Стили для пагинации*/
 .pagination {
   display: inline-block;
 }

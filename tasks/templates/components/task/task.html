@@ -84,10 +84,10 @@
                     {% if task.files.all %}
                         <div class="d-flex row ">
                             <div class="col border-end">
-                                {% include "components/obj-gallery.html" with files=task.files.all id=task.id type="task" %}
+                                {% include "components/files/gallery.html" with files=task.files.all id=task.id type="task" %}
                             </div>
                             <div class="col">
-                                {% include "components/attached_files.html" with files=task.files.all %}
+                                {% include "components/files/attached_files.html" with files=task.files.all %}
                             </div>
                         </div>
                     {% endif %}
@@ -128,9 +128,9 @@
                     {% if not tasks.is_done %}
                         {% if request.user.engineer in task.engineers.all or request.user.is_superuser %}
                             <div class="d-flex justify-content-end gap-2">
-                                {% include "components/edit_task.html" with task=task %}
+                                {% include "components/task/edit_task.html" with task=task %}
 {#                                {% include "components/update_task.html" with task=task %}#}
-                                {% include "components/confirm_task.html" with task=task %}
+                                {% include "components/task/confirm_task.html" with task=task %}
                             </div>
                         {% endif %}
                     {% endif %}

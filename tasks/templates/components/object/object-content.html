@@ -57,11 +57,11 @@
 
 
         <div class="row">
-            {% include "components/obj-gallery.html" with files=object.files.all id=object.id type="object" %}
+            {% include "components/files/gallery.html" with files=object.files.all id=object.id type="object" %}
         </div>
 
         <div class="row my-3">
-            {% include "components/attached_files.html" with files=object.files.all %}
+            {% include "components/files/attached_files.html" with files=object.files.all %}
 
         </div>
 
