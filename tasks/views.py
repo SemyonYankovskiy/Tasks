@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, F, OuterRef, Subquery, When, Case, Value, CharField
 from django.db.models.functions import Substr, Concat, Length
@@ -8,6 +7,30 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Object, Task, AttachedFile, Engineer
 from .filters import ObjectFilter
 from django.core.paginator import Paginator
+
+
+
+@login_required
+def get_home(request):
+    # Создаем фильтр с параметрами запроса
+    filter = ObjectFilter(request.GET, queryset=get_objects_list(request))
+
+    # Применяем фильтр к запросу
+    filtered_objects = filter.qs
+
+    # Получаем номер страницы из запроса
+    page_number = request.GET.get('page')
+
+    # Используем функцию пагинации
+    pagination_data = paginate_queryset(filtered_objects, page_number)
+
+    # Передаем отфильтрованные объекты в контекст
+    context = {
+        "pagination_data": pagination_data,
+        "filter": filter,  # Передаем фильтр в контекст для отображения в шаблоне
+    }
+
+    return render(request, "home.html", context=context)
 
 
 def get_objects_list(request):
@@ -41,28 +64,6 @@ def get_objects_list(request):
     return objects
 
 
-@login_required
-def get_home(request):
-    # Создаем фильтр с параметрами запроса
-    filter = ObjectFilter(request.GET, queryset=get_objects_list(request))
-
-    # Применяем фильтр к запросу
-    filtered_objects = filter.qs
-
-    # Получаем номер страницы из запроса
-    page_number = request.GET.get('page')
-
-    # Используем функцию пагинации
-    pagination_data = paginate_queryset(filtered_objects, page_number)
-
-    # Передаем отфильтрованные объекты в контекст
-    context = {
-        "pagination_data": pagination_data,
-        "filter": filter,  # Передаем фильтр в контекст для отображения в шаблоне
-    }
-
-    return render(request, "home.html", context=context)
-
 def paginate_queryset(queryset, page_number, per_page=4):
     paginator = Paginator(queryset, per_page)
     page_obj = paginator.get_page(page_number)
@@ -84,8 +85,10 @@ def paginate_queryset(queryset, page_number, per_page=4):
         "last_page_number": total_pages
     }
 
+
 @login_required
 def get_object_page(request, object_slug):
+    user = request.user
     # Получаем основной объект
     obj = (
         Object.objects.filter(slug=object_slug)
@@ -104,20 +107,17 @@ def get_object_page(request, object_slug):
     if obj is None:
         raise Http404()
 
-    # Получаем связанные задачи для данного объекта
-    tasks = Task.objects.filter(objects_set=obj).prefetch_related("files", "tags", "engineers")
-
+    # Получаем связанные задачи с учетом фильтров
+    filtered_tasks_data = get_filtered_tasks(user, request, obj=obj)
 
     child_objects = get_objects_list(request).filter(parent=obj)
 
-
     context = {
         "object": obj,
-        "tasks": tasks,
+        "tasks": filtered_tasks_data,
         "task_count": obj.done_tasks_count + obj.undone_tasks_count,
-        "done_count": obj.done_tasks_count,
-        "not_done_count": obj.undone_tasks_count,
         "child_objects": child_objects,
+
     }
 
     return render(request, "object-page.html", context=context)
@@ -126,7 +126,11 @@ def get_object_page(request, object_slug):
 @login_required
 def tasks_page(request):
     user = request.user
+    filtered_task = get_filtered_tasks(user, request)
+    return render(request, 'components/tasks_page.html', {"tasks": filtered_task})
 
+
+def get_filtered_tasks(user, request, obj=None):
     show_my_tasks_only = request.GET.get('show_my_tasks_only') == 'true'
     sort_order = request.GET.get('sort_order', 'desc')  # По умолчанию сортировка по убыванию
 
@@ -137,39 +141,41 @@ def tasks_page(request):
 
     if show_my_tasks_only:
         if engineer:
-            tasks = Task.objects.filter(engineers=engineer).prefetch_related("files", "tags", "engineers")
+            tasks = Task.objects.filter(engineers=engineer)
         else:
             tasks = Task.objects.none()
     else:
-        tasks = Task.objects.all().prefetch_related("files", "tags", "engineers")
+        tasks = Task.objects.all()
 
-    # Сортировка по дате создания: asc для возрастания, desc для убывания
+    # Если передан объект, фильтруем задачи по этому объекту
+    if obj:
+        tasks = tasks.filter(objects_set=obj)
+
+    # Применение prefetch_related для оптимизации запросов
+    tasks = tasks.prefetch_related("files", "tags", "engineers")
+
+    # Сортировка по дате завершения: asc для возрастания, desc для убывания
     if sort_order == 'asc':
         tasks = tasks.order_by('completion_time')
     else:
         tasks = tasks.order_by('-completion_time')
 
     done_tasks_count = tasks.filter(is_done=True).count()
-    undone_tasks_count = tasks.filter(is_done=False).count()
+    not_done_count = tasks.filter(is_done=False).count()
 
-    context = {
+    return {
         "tasks": tasks,
-        "task_count": tasks.count(),
         "done_count": done_tasks_count,
-        "not_done_count": undone_tasks_count,
+        "not_done_count": not_done_count,
         "show_my_tasks_only": show_my_tasks_only,
         "sort_order": sort_order,
     }
-
-    return render(request, 'components/tasks_page.html', context=context)
 
 
 @login_required
 def map_page(request):
     return render(request, 'components/map.html')
 
-
-# views.py
 
 def close_task(request, task_id):
     if request.method == 'POST':
@@ -194,26 +200,3 @@ def close_task(request, task_id):
         return redirect('tasks')
 
     return redirect('tasks')
-
-#
-# def update_task(request, task_id):
-#     if request.method == 'POST':
-#         task = get_object_or_404(Task, pk=task_id)
-#         comment = request.POST.get('comment', '')
-#
-#         if comment:
-#             try:
-#                 name = f"{request.user.engineer.first_name} {request.user.engineer.second_name}"
-#             except AttributeError:
-#                 # Если у пользователя нет engineer, использовать имя пользователя
-#                 name = request.user.username
-#
-#             task.text += f'\n\nUPD: [{name}] {comment}'
-#
-#         task.save()
-#
-#         return redirect('tasks')
-#
-#     return redirect('tasks')
-
-

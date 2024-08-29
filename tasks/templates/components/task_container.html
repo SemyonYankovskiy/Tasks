@@ -1,41 +1,88 @@
-<div class="container">
+<div id="tasks" class="row shadow p-4 mt-5 bg-body-tertiary rounded border-top border-3">
 
-    <div class="d-flex justify-content-center">
-        {% include "components/create_task.html" %}
-    </div>
+<div class="pb-3 d-flex justify-content-between">
+            <h4>Задачи</h4>
 
-    <div>
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="tab1-tab" data-bs-toggle="tab" href="#tab1" role="tab" aria-controls="tab1" aria-selected="true">
-                    Активные ({{ not_done_count }})
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="tab2-tab" data-bs-toggle="tab" href="#tab2" role="tab" aria-controls="tab2" aria-selected="false">
-                    Завершенные ({{ done_count }})
-                </a>
-            </li>
-        </ul>
-    </div>
+        </div>
+        <div class="row ">
+            <div class="col-md-8"></div>
+            <div class="col-md-4">
+                <div class="form-check form-switch">
+                    <!-- Переключатель "Показывать только мои задачи" -->
+                    <input class="form-check-input form-check-lg" type="checkbox" role="switch"
+                           id="flexSwitchCheckDefault"
+                           onchange="window.location.href = '?show_my_tasks_only=' + this.checked + '&sort_order={{ sort_order }}';"
+                           {% if  show_my_tasks_only %}checked{% endif %}>
+                    <label class="form-check-label" for="flexSwitchCheckDefault"
+                           style="font-size: 18px; margin-right: 10px;">
+                          Показывать только мои задачи
+                    </label>
+                </div>
 
-    <div class="tab-content mt-4" id="myTabContent">
-        <!-- Вкладка активных задач -->
-        <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
-            {% for tasks in tasks %}
-                {% if tasks.is_done == False %}
-                    {% include "components/task.html" with task=tasks %}
-                {% endif %}
-            {% endfor %}
+                <div class="form-check form-switch">
+                    <!-- Переключатель порядка сортировки задач -->
+                    <input class="form-check-input form-check-lg" type="checkbox" role="switch" id="sortSwitch"
+                           onchange="window.location.href = '?sort_order=' + (this.checked ? 'asc' : 'desc') + '&show_my_tasks_only={{ show_my_tasks_only }}';"
+                           {% if  sort_order == 'asc' %}checked{% endif %}>
+                    <label class="form-check-label" for="sortSwitch" style="font-size: 18px;">
+                          {% if  sort_order == 'asc' %}Старые вначале{% else %}Старые вначале{% endif %}
+                    </label>
+                </div>
+            </div>
         </div>
 
-        <!-- Вкладка завершенных задач -->
-        <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
-            {% for tasks in tasks %}
-                {% if tasks.is_done == True %}
-                    {% include "components/task.html" with task=tasks %}
-                {% endif %}
-            {% endfor %}
+        <div class="d-flex justify-content-center">
+            {% include "components/create_task.html" %}
         </div>
-    </div>
+
+{% if tasks %}
+
+
+
+        <div>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="tab1-tab" data-bs-toggle="tab" href="#tab1" role="tab"
+                       aria-controls="tab1" aria-selected="true">
+                            Активные ({{ not_done_count }})
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="tab2-tab" data-bs-toggle="tab" href="#tab2" role="tab" aria-controls="tab2"
+                       aria-selected="false">
+                        Завершенные ({{ done_count }})
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="tab-content mt-4" id="myTabContent">
+            <!-- Вкладка активных задач -->
+            <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+                {% for task in tasks %}
+                    {% if task.is_done == False %}
+                        {% include "components/task.html" with task=task %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <!-- Вкладка завершенных задач -->
+            <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+
+                {% for task in tasks %}
+                    {% if task.is_done == True %}
+                        {% include "components/task.html" with task=task %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+
+            {% include "components/pagination.html" with pagination_data=tasks %}
+
+        </div>
+
+
+{% else %}
+    <div class="d-flex justify-content-left mt-3">Задач для отображения нет.</div>
+{% endif %}
 </div>

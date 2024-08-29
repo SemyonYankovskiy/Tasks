@@ -9,7 +9,7 @@
                         <!-- Первый столбец -->
                         <div class="col-md-1 d-flex justify-content-center align-items-center border-end"
                              style="max-width: 48px">
-                            {% if tasks.is_done == False %}
+                            {% if task.is_done == False %}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                                         {% if task.priority == 'LOW' %} fill="#1E90FF"
                                         {% elif task.priority == 'MEDIUM' %}  fill="#FFD700"

@@ -18,18 +18,18 @@
         {% include "components/object-preview.html" with img_preview=object.img_preview title=object.name desc=object.short_description slug=object.slug priority=object.priority groups=object.groups%}
 
       {% empty %}
-
       {% endfor %}
     </div>
+  
   </div>
-
-  <div id="tasks" class="row shadow p-4 mt-5 bg-body-tertiary rounded border-top border-3">
-    <div class="row pb-3 ">
-      <h4 class="d-flex  justify-content-start">Задачи</h4>
-    </div>
-    {% include "components/task_container.html" with tasks=tasks not_done_count=not_done_count done_count=done_count %}
-  </div>
-
 </div>
+    
+  <div class="container p-4">
+      {% include "components/task_container.html" with tasks=tasks.tasks not_done_count=tasks.not_done_count done_count=tasks.done_count show_my_tasks_only=tasks.show_my_tasks_only sort_order=tasks.sort_order %}
+
+  </div>
+  
+
+
 
 {% endblock %}

@@ -1,7 +1,6 @@
 import os
 import re
 import uuid
-from mimetypes import guess_type
 from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -126,15 +125,16 @@ class Engineer(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.second_name}"
 
+
 def upload_directory_path(instance, filename):
     # файл будет загружен в MEDIA_ROOT/user_<id>/<filename>
     current_date = datetime.now()
     return f"uploads/{current_date.year}/{current_date.month}/{current_date.day}/{uuid.uuid4()}_._{filename}"
 
+
 class AttachedFile(models.Model):
     file = models.FileField(upload_to=upload_directory_path, max_length=254)
     extension = models.CharField(max_length=10, blank=True)  # Поле для хранения расширения файла
-
 
     class Meta:
         db_table = "attached_files"
