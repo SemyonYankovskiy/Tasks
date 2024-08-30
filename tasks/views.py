@@ -174,7 +174,7 @@ def get_filtered_tasks(user, request, obj=None):
 
 @login_required
 def map_page(request):
-    return render(request, 'components/templates/map.html')
+    return render(request, 'components/map/map.html')
 
 
 def close_task(request, task_id):
