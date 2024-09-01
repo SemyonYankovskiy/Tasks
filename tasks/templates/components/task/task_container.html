@@ -68,6 +68,7 @@
                         {% include "components/task/task.html" with task=task %}
                     {% endif %}
                 {% endfor %}
+            {% include "components/pagination.html" with pagination_data=tasks %}
             </div>
 
             <!-- Вкладка завершенных задач -->
@@ -78,10 +79,11 @@
                         {% include "components/task/task.html" with task=task %}
                     {% endif %}
                 {% endfor %}
+            {% include "components/pagination.html" with pagination_data=tasks %}
             </div>
 
 
-            {% include "components/home/home_pagination.html" with pagination_data=tasks %}
+
 
         </div>
 
