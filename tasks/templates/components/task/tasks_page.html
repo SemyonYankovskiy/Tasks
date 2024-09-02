@@ -1,16 +1,3 @@
-{#{% extends "base.html" %}#}
-{#{% load crispy_forms_tags %}#}
-{##}
-{#{% block title %}Задачи{% endblock title %}#}
-{##}
-{#{% block content %}#}
-{#    <div class="container p-4">#}
-{##}
-{#                {% include "components/task/task_container.html" with tasks=tasks.tasks not_done_count=tasks.not_done_count done_count=tasks.done_count show_my_tasks_only=tasks.show_my_tasks_only sort_order=tasks.sort_order %}#}
-{##}
-{#    </div>#}
-{#{% endblock %}#}
-
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 
@@ -19,68 +6,8 @@
 {% block content %}
     <div class="container p-4">
 
-    {% if done_tasks.page_obj  and undone_tasks.page_obj %}
-
-
-
-        <div>
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" id="tab1-tab" data-bs-toggle="tab" href="#tab1" role="tab"
-                       aria-controls="tab1" aria-selected="true">
-                            Активные ({{ not_done_count }})
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="tab2-tab" data-bs-toggle="tab" href="#tab2" role="tab" aria-controls="tab2"
-                       aria-selected="false">
-                        Завершенные ({{ done_count }})
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <div class="tab-content mt-4" id="myTabContent">
-            <!-- Вкладка активных задач -->
-            <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
-                {% for task in undone_tasks.page_obj %}
-
-                        {% include "components/task/task.html" with task=task %}
-
-                {% endfor %}
-            {% include "components/pagination.html" with pagination_data=undone_tasks %}
-            </div>
-
-            <!-- Вкладка завершенных задач -->
-            <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
-
-                {% for task in done_tasks.page_obj %}
-
-                        {% include "components/task/task.html" with task=task %}
-
-                {% endfor %}
-{#            {% include "components/pagination.html" with pagination_data=done_tasks %}#}
-            </div>
-
-
-
-
-        </div>
-
-
-{% else %}
-    <div class="d-flex justify-content-left mt-3">Задач для отображения нет.</div>
-{% endif %}
-
-{##}
-{#                {% for task in tasks.page_obj %}#}
-{##}
-{#                        {% include "components/task/task.html" with task=task  %}#}
-{##}
-{#                {% endfor %}#}
+                {% include "components/task/task_container.html" with tasks=tasks.tasks not_done_count=tasks.not_done_count done_count=tasks.done_count show_my_tasks_only=tasks.show_my_tasks_only sort_order=tasks.sort_order %}
 
     </div>
-
-{#    {% include "components/pagination.html" with pagination_data=tasks %}#}
 {% endblock %}
 
