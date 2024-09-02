@@ -1,12 +1,15 @@
 from datetime import datetime
+from urllib.parse import urlencode
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, F, OuterRef, Subquery, When, Case, Value, CharField
 from django.db.models.functions import Substr, Concat, Length
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Object, Task, AttachedFile, Engineer
 from .filters import ObjectFilter
 from django.core.paginator import Paginator
+
 
 
 @login_required
@@ -21,12 +24,20 @@ def get_home(request):
     page_number = request.GET.get('page')
 
     # Используем функцию пагинации
-    pagination_data = paginate_queryset(filtered_objects, page_number)
+    pagination_data = paginate_queryset(filtered_objects, page_number, per_page=1)
+
+
+
+    filter_data = {key: value for key, value in request.GET.items() if key != 'page'}
+
+    # Формируем строку с параметрами фильтра
+    filter_url = urlencode(filter_data, doseq=True)
 
     # Передаем отфильтрованные объекты в контекст
     context = {
         "pagination_data": pagination_data,
         "filter": user_filter,  # Передаем фильтр в контекст для отображения в шаблоне
+        "filter_data": filter_url,
     }
 
     return render(request, "components/home/home.html", context=context)
@@ -75,10 +86,6 @@ def paginate_queryset(queryset, page_number, per_page=4):
     start_show_ellipsis = current_page > 4
     start_show_first_page_link = current_page >= 4
 
-    print(current_page)
-    print(start_show_ellipsis)
-    print(start_show_first_page_link)
-
     return {
         "page_obj": page_obj,
         "end_show_ellipsis": end_show_ellipsis,
@@ -111,9 +118,7 @@ def get_object_page(request, object_slug):
         raise Http404()
 
     # Получаем связанные задачи с учетом фильтров
-    filtered_tasks_data = get_filtered_tasks(request,
-                                             # obj=obj
-                                             )
+    filtered_tasks_data = get_filtered_tasks(request, obj=obj)
 
     child_objects = get_objects_list(request).filter(parent=obj)
 
@@ -128,10 +133,19 @@ def get_object_page(request, object_slug):
     return render(request, "components/object/object-page.html", context=context)
 
 
+@login_required
+def tasks_page(request):
+
+    filtered_task = get_filtered_tasks(request)
+
+    return render(request, 'components/task/tasks_page.html', {"tasks": filtered_task})
+
+
 def get_filtered_tasks(request, obj=None):
     user = request.user
     show_my_tasks_only = request.GET.get('show_my_tasks_only') == 'true'
     sort_order = request.GET.get('sort_order', 'desc')  # По умолчанию сортировка по убыванию
+
     try:
         engineer = Engineer.objects.get(user=user)
     except Engineer.DoesNotExist:
@@ -145,54 +159,30 @@ def get_filtered_tasks(request, obj=None):
     else:
         tasks = Task.objects.all()
 
+    # Если передан объект, фильтруем задачи по этому объекту
+    if obj:
+        tasks = tasks.filter(objects_set=obj)
+
     # Применение prefetch_related для оптимизации запросов
     tasks = tasks.prefetch_related("files", "tags", "engineers")
 
-    # Разделение задач на выполненные и невыполненные
-    done_tasks = tasks.filter(is_done=True)
-    undone_tasks = tasks.filter(is_done=False)
-
-    # Сортировка выполненных задач
+    # Сортировка по дате завершения: asc для возрастания, desc для убывания
     if sort_order == 'asc':
-        done_tasks = done_tasks.order_by('completion_time')
-        undone_tasks = undone_tasks.order_by('completion_time')
+        tasks = tasks.order_by('completion_time')
     else:
-        done_tasks = done_tasks.order_by('-completion_time')
-        undone_tasks = undone_tasks.order_by('-completion_time')
+        tasks = tasks.order_by('-completion_time')
 
-    done_tasks_count = done_tasks.count()
-    not_done_count = undone_tasks.count()
-
-    # # Если передан объект, фильтруем задачи по этому объекту
-    # if obj:
-    #     done_tasks = done_tasks.filter(objects_set=obj)
-    #     undone_tasks = undone_tasks.filter(objects_set=obj)
-
-    # Получаем номер страницы из запроса
-    page_number = request.GET.get('page')
-
-    # Пагинация выполненных задач
-    done_pagination_data = paginate_queryset(done_tasks, page_number, per_page=2)
-
-    # Пагинация невыполненных задач
-    undone_pagination_data = paginate_queryset(undone_tasks, page_number, per_page=2)
+    done_tasks_count = tasks.filter(is_done=True).count()
+    not_done_count = tasks.filter(is_done=False).count()
 
     context = {
-        "done_tasks": done_pagination_data,
-        "undone_tasks": undone_pagination_data,
+        "tasks": tasks,
         "done_count": done_tasks_count,
         "not_done_count": not_done_count,
         "show_my_tasks_only": show_my_tasks_only,
         "sort_order": sort_order,
     }
-
     return context
-
-
-@login_required
-def tasks_page(request):
-    context = get_filtered_tasks(request)
-    return render(request, 'components/task/tasks_page.html', context=context)
 
 
 @login_required

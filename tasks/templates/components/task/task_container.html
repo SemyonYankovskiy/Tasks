@@ -1,12 +1,12 @@
 <div id="tasks" class="row shadow p-4 mt-5 bg-body-tertiary rounded border-top border-3">
 
-<div class="pb-3 d-flex justify-content-between">
-            <h4>Задачи</h4>
+    <div class="pb-3 d-flex justify-content-between">
+        <h4>Задачи</h4>
 
-        </div>
-        
-        {% if show_my_tasks_only or sort_order %}
-        	 <div class="row ">
+    </div>
+
+    {% if show_my_tasks_only or sort_order %}
+        <div class="row ">
             <div class="col-md-8"></div>
             <div class="col-md-4">
                 <div class="form-check form-switch">
@@ -24,22 +24,22 @@
                 <div class="form-check form-switch">
                     <!-- Переключатель порядка сортировки задач -->
                     <input class="form-check-input form-check-lg" type="checkbox" role="switch" id="sortSwitch"
-                           onchange="window.location.href = '?sort_order=' + (this.checked ? 'asc' : 'desc') + '&show_my_tasks_only={{ show_my_tasks_only }}';"
-                           {% if  sort_order == 'asc' %}checked{% endif %}>
+                           onchange="window.location.href = '?sort_order=' + (this.checked ? 'desc' : 'asc') + '&show_my_tasks_only={{ show_my_tasks_only }}';"
+                           {% if sort_order == 'desc' %}checked{% endif %}>
                     <label class="form-check-label" for="sortSwitch" style="font-size: 18px;">
-                          {% if  sort_order == 'asc' %}Старые вначале{% else %}Старые вначале{% endif %}
+                          {% if sort_order == 'desc' %}Новые вначале{% else %}Старые вначале{% endif %}
                     </label>
                 </div>
             </div>
         </div>
-        {% endif %}
+    {% endif %}
 
 
-        <div class="d-flex justify-content-center">
-            {% include "components/task/create_task.html" %}
-        </div>
+    <div class="d-flex justify-content-center">
+        {% include "components/task/create_task.html" %}
+    </div>
 
-{% if tasks %}
+    {% if tasks %}
 
 
 
@@ -48,7 +48,7 @@
                 <li class="nav-item">
                     <a class="nav-link active" id="tab1-tab" data-bs-toggle="tab" href="#tab1" role="tab"
                        aria-controls="tab1" aria-selected="true">
-                            Активные ({{ not_done_count }})
+                        Активные ({{ not_done_count }})
                     </a>
                 </li>
                 <li class="nav-item">
@@ -68,7 +68,6 @@
                         {% include "components/task/task.html" with task=task %}
                     {% endif %}
                 {% endfor %}
-            {% include "components/pagination.html" with pagination_data=tasks %}
             </div>
 
             <!-- Вкладка завершенных задач -->
@@ -79,16 +78,13 @@
                         {% include "components/task/task.html" with task=task %}
                     {% endif %}
                 {% endfor %}
-            {% include "components/pagination.html" with pagination_data=tasks %}
             </div>
-
-
-
+        
 
         </div>
 
 
-{% else %}
-    <div class="d-flex justify-content-left mt-3">Задач для отображения нет.</div>
-{% endif %}
+    {% else %}
+        <div class="d-flex justify-content-left mt-3">Задач для отображения нет.</div>
+    {% endif %}
 </div>
