@@ -1,4 +1,6 @@
 from datetime import datetime
+from urllib.parse import urlencode
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, F, OuterRef, Subquery, When, Case, Value, CharField
 from django.db.models.functions import Substr, Concat, Length
@@ -22,12 +24,20 @@ def get_home(request):
     page_number = request.GET.get('page')
 
     # Используем функцию пагинации
-    pagination_data = paginate_queryset(filtered_objects, page_number)
+    pagination_data = paginate_queryset(filtered_objects, page_number, per_page=1)
+
+
+
+    filter_data = {key: value for key, value in request.GET.items() if key != 'page'}
+
+    # Формируем строку с параметрами фильтра
+    filter_url = urlencode(filter_data, doseq=True)
 
     # Передаем отфильтрованные объекты в контекст
     context = {
         "pagination_data": pagination_data,
         "filter": user_filter,  # Передаем фильтр в контекст для отображения в шаблоне
+        "filter_data": filter_url,
     }
 
     return render(request, "components/home/home.html", context=context)
@@ -108,7 +118,7 @@ def get_object_page(request, object_slug):
         raise Http404()
 
     # Получаем связанные задачи с учетом фильтров
-    filtered_tasks_data = get_filtered_tasks(user, request, obj=obj)
+    filtered_tasks_data = get_filtered_tasks(request, obj=obj)
 
     child_objects = get_objects_list(request).filter(parent=obj)
 
@@ -125,12 +135,14 @@ def get_object_page(request, object_slug):
 
 @login_required
 def tasks_page(request):
-    user = request.user
-    filtered_task = get_filtered_tasks(user, request)
+
+    filtered_task = get_filtered_tasks(request)
+
     return render(request, 'components/task/tasks_page.html', {"tasks": filtered_task})
 
 
-def get_filtered_tasks(user, request, obj=None):
+def get_filtered_tasks(request, obj=None):
+    user = request.user
     show_my_tasks_only = request.GET.get('show_my_tasks_only') == 'true'
     sort_order = request.GET.get('sort_order', 'desc')  # По умолчанию сортировка по убыванию
 
@@ -163,18 +175,19 @@ def get_filtered_tasks(user, request, obj=None):
     done_tasks_count = tasks.filter(is_done=True).count()
     not_done_count = tasks.filter(is_done=False).count()
 
-    return {
+    context = {
         "tasks": tasks,
         "done_count": done_tasks_count,
         "not_done_count": not_done_count,
         "show_my_tasks_only": show_my_tasks_only,
         "sort_order": sort_order,
     }
+    return context
 
 
 @login_required
 def map_page(request):
-    return render(request, 'components/templates/map.html')
+    return render(request, 'components/map/map.html')
 
 
 def close_task(request, task_id):
