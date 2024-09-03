@@ -2,14 +2,14 @@ from datetime import datetime
 from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db.models import Count, Q, F, OuterRef, Subquery, When, Case, Value, CharField
 from django.db.models.functions import Substr, Concat, Length
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Object, Task, AttachedFile, Engineer
-from .filters import ObjectFilter
-from django.core.paginator import Paginator
 
+from .filters import ObjectFilter
+from .models import Object, Task, AttachedFile, Engineer, Tag, ObjectGroup
 
 
 @login_required
@@ -24,10 +24,20 @@ def get_home(request):
     page_number = request.GET.get('page')
 
     # Используем функцию пагинации
-    pagination_data = paginate_queryset(filtered_objects, page_number, per_page=1)
+    pagination_data = paginate_queryset(filtered_objects, page_number, per_page=4)
 
+    # Получаем теги, связанные с объектами
+    tags = Tag.objects.filter(objects_set__isnull=False)
 
+    tags = [
+        {"id": tag.id, "label": tag.tag_name} for tag in tags
+    ]
+    # Получаем группы, связанные с объектами
+    groups = ObjectGroup.objects.filter(objects_set__isnull=False)
 
+    groups = [
+        {"id": group.id, "label": group.name} for group in groups
+    ]
     filter_data = {key: value for key, value in request.GET.items() if key != 'page'}
 
     # Формируем строку с параметрами фильтра
@@ -36,8 +46,12 @@ def get_home(request):
     # Передаем отфильтрованные объекты в контекст
     context = {
         "pagination_data": pagination_data,
-        "filter": user_filter,  # Передаем фильтр в контекст для отображения в шаблоне
         "filter_data": filter_url,
+        "tags_json": tags,
+        "current_tags": request.GET.getlist("tags"),
+
+        "groups_json": groups,
+        "current_groups": request.GET.getlist("groups")
     }
 
     return render(request, "components/home/home.html", context=context)
@@ -135,7 +149,6 @@ def get_object_page(request, object_slug):
 
 @login_required
 def tasks_page(request):
-
     filtered_task = get_filtered_tasks(request)
 
     return render(request, 'components/task/tasks_page.html', {"tasks": filtered_task})

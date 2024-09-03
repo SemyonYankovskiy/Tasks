@@ -1,0 +1,40 @@
+<script src="https://cdn.jsdelivr.net/npm/vue@^2"></script>
+<!-- include vue-treeselect & its styles. you can change the version tag to better suit your needs. -->
+<script src="https://cdn.jsdelivr.net/npm/@riophae/vue-treeselect@^0.4.0/dist/vue-treeselect.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@riophae/vue-treeselect@^0.4.0/dist/vue-treeselect.min.css">
+
+
+<div id="objects-tree-select_{{ select_name }}">
+    <treeselect name="{{ select_name }}" v-model="value" :multiple="true" :options="options" />
+</div>
+
+<script>
+    // console.log("{{ current_options|safe }}")
+    Vue.component('treeselect', VueTreeselect.Treeselect)
+    new Vue({
+      el: '#objects-tree-select_{{ select_name }}',
+      data: {
+        value: {{ current_options|safe }},
+        options: {{objects_structure_json | safe}},
+      },
+    })
+//
+// options: [ {
+//   id: 'a',
+//   label: 'a',
+//   children: [ {
+//     id: 'aa',
+//     label: 'aa',
+//   }, {
+//     id: 'ab',
+//     label: 'ab',
+//   } ],
+// }, {
+//   id: 'b',
+//   label: 'b',
+// }, {
+//   id: 'c',
+//   label: 'c',
+// } ],
+</script>
+

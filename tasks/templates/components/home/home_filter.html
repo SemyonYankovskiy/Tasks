@@ -1,74 +1,56 @@
 <form method="get" class="w-100 mx-4">
-            <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">Фильтры
-                </button>
-
-        <ul class="dropdown-menu dropdown-menu-custom shadow p-3 mb-5 rounded"
-{#            data-popper-placement="bottom-start"#}
-{#            style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 40px);"#}
-        >
-            <!-- Рендеринг всей формы -->
-            {#                                        {{ filter.form.as_p }}#}
-            <div id="div_id_name__icontains" class="mb-3">
-                <label for="id_name__icontains" class="form-label">Имя объекта</label>
-                <input type="text" name="name__icontains" class="textinput form-control"
-                       id="id_name__icontains">
-            </div>
-            <div class="row">
+    <div class="">
+        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample"
+                aria-expanded="false" aria-controls="collapseExample">
+            Фильтры
+        </button>
 
 
-                <div id="div_id_tags" class="col mb-3">
-                    <label for="id_tags" class="form-label">Теги</label>
+        <div class="collapse" id="collapseExample">
+            <div class="p-5 border border-2 rounded-2" style="background-color: rgba(255,255,255,0.52); border-color: #d2d2d2">
+                <div id="div_id_name__icontains" class="mb-3">
+                    <label for="id_name__icontains" class="form-label">Имя объекта</label>
+                    <input type="text" name="name" class="textinput form-control" value="{{ request.GET.name }}"
+                           id="id_name__icontains">
+                </div>
+                <div class="row">
+
+                    <div id="div_id_tags" class="col mb-3">
+                        <label for="id_tags" class="form-label">Теги</label>
+                        {% include 'tree-select.html' with select_name='tags' current_options=current_tags objects_structure_json=tags_json %}
+                    </div>
 
 
-                    <select name="tags" class="selectmultiple form-select" id="id_tags" multiple="">
-                        <option value="8">Прочее</option>
-                        <option value="9">СПД</option>
-                        <option value="10">ОГЭ</option>
-                        <option value="11">МС</option>
-                        <option value="12">АТС</option>
-                        <option value="13">ЦУС</option>
-                        <option value="14">1</option>
-                        <option value="15">Очень длинный тег с множеством символов я не помню сколько можно</option>
-                        <option value="16">еще один тег</option>
-                        <option value="17">еще один тег 2</option>
-                        <option value="18">Длинный тег</option>
-                        <option value="19">ТЕСТ</option>
-                        <option value="20">ТЕСТОВЫЙ ПРОЕКТ</option>
-                        <option value="21">Тестовый тег</option>
-                    </select>
+                    <div id="div_id_groups" class="col mb-3">
+                        <label for="id_groups" class="form-label">Группы</label>
+                        {% include 'tree-select.html' with select_name='groups' current_options=current_groups objects_structure_json=groups_json %}
+                    </div>
+
+
+                    <div id="div_id_priority" class="col mb-3">
+                        <label for="id_priority" class="form-label">Важность</label>
+
+                        <select name="priority" class="select form-select" id="id_priority">
+                            <option value="" selected=""> </option>
+                            <option value="CRITICAL">Критический</option>
+                            <option value="HIGH">Высокий</option>
+                            <option value="MEDIUM">Средний</option>
+                            <option value="LOW">Низкий</option>
+                        </select>
+                    </div>
+
                 </div>
 
 
-                <div id="div_id_groups" class="col mb-3">
-                    <label for="id_groups" class="form-label">Группы</label>
-
-                    <select name="groups" class="selectmultiple form-select" id="id_groups" multiple="">
-                        <option value="1">Севтелеком</option>
-                        <option value="2">Тест</option>
-                    </select>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Применить фильтры</button>
+                    <a href="/" class="btn btn-secondary">Сбросить фильтры</a>
                 </div>
 
-                <div id="div_id_priority" class="col mb-3">
-                    <label for="id_priority" class="form-label">Важность</label>
-
-                    <select name="priority" class="select form-select" id="id_priority">
-                        <option value="" selected="">---------</option>
-                        <option value="CRITICAL">Критический</option>
-                        <option value="HIGH">Высокий</option>
-                        <option value="MEDIUM">Средний</option>
-                        <option value="LOW">Низкий</option>
-                    </select>
-                </div>
 
             </div>
 
 
-            <li class="mt-3">
-                <button type="submit" class="btn btn-primary">Применить фильтры</button>
-                <a href="/" class="btn btn-secondary">Сбросить фильтры</a>
-            </li>
-        </ul>
+        </div>
     </div>
 </form>

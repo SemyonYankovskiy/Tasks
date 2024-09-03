@@ -2,6 +2,7 @@ import os
 import re
 import uuid
 from datetime import datetime
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, MinValueValidator
@@ -26,7 +27,7 @@ class UserObjectGroup(models.Model):
 
 
 class ObjectGroup(models.Model):
-    name = models.CharField(max_length=128)
+    name = models.CharField(max_length=128, unique=True)
     users = models.ManyToManyField(get_user_model(), related_name="object_groups", through=UserObjectGroup)
 
     class Meta:
