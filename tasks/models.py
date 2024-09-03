@@ -14,8 +14,8 @@ class UserObjectGroup(models.Model):
     group = models.ForeignKey("ObjectGroup", on_delete=models.CASCADE)
 
     class Permission(models.TextChoices):
-        R = 'R', "Только чтение"
-        W = 'RW', "Чтение/Запись"
+        R = "R", "Только чтение"
+        W = "RW", "Чтение/Запись"
 
     permission = models.CharField(choices=Permission.choices, max_length=10)
 
@@ -39,19 +39,25 @@ class ObjectGroup(models.Model):
 
 class Object(models.Model):
     class Priority(models.TextChoices):
-        CRITICAL = 'CRITICAL', "Критический"
-        HIGH = 'HIGH', "Высокий"
-        MEDIUM = 'MEDIUM', "Средний"
+        CRITICAL = "CRITICAL", "Критический"
+        HIGH = "HIGH", "Высокий"
+        MEDIUM = "MEDIUM", "Средний"
         LOW = "LOW", "Низкий"
 
     priority = models.CharField(choices=Priority.choices, max_length=10)
-    parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, related_name="children")
+    parent = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.SET_NULL, related_name="children"
+    )
     name = models.CharField(max_length=64)
     address = models.ForeignKey("Address", on_delete=models.CASCADE)
     description = models.TextField(blank=True)
-    tasks = models.ManyToManyField("Task", related_name="objects_set", db_table="objects_tasks_m2m", blank=True)
+    tasks = models.ManyToManyField(
+        "Task", related_name="objects_set", db_table="objects_tasks_m2m", blank=True
+    )
     tags = models.ManyToManyField("Tag", related_name="objects_set", db_table="objects_tags_m2m", blank=True)
-    files = models.ManyToManyField("AttachedFile", related_name="objects_set", db_table="objects_files_m2m", blank=True)
+    files = models.ManyToManyField(
+        "AttachedFile", related_name="objects_set", db_table="objects_files_m2m", blank=True
+    )
     groups = models.ManyToManyField("ObjectGroup", related_name="objects_set", db_table="objects_groups_m2m")
     slug = models.SlugField(max_length=255, unique=True, db_index=True)
 
@@ -74,16 +80,18 @@ class Object(models.Model):
             # Loop through the parents to check if self is already on the chain
             while current_parent:
                 if current_parent == self:
-                    raise ValidationError("ВИЧ-инфекция в дереве наследования объектов. Твой выбранный родитель это твой же потомок, инцест осуждаем")
+                    raise ValidationError(
+                        "ВИЧ-инфекция в дереве наследования объектов. Твой выбранный родитель это твой же потомок, инцест осуждаем"
+                    )
                 # Move up the chain
                 current_parent = current_parent.parent
 
 
 class Task(models.Model):
     class Priority(models.TextChoices):
-        CRITICAL = 'CRITICAL', "Критический"
-        HIGH = 'HIGH', "Высокий"
-        MEDIUM = 'MEDIUM', "Средний"
+        CRITICAL = "CRITICAL", "Критический"
+        HIGH = "HIGH", "Высокий"
+        MEDIUM = "MEDIUM", "Средний"
         LOW = "LOW", "Низкий"
 
     priority = models.CharField(choices=Priority.choices, max_length=10)
@@ -91,9 +99,13 @@ class Task(models.Model):
     completion_time = models.DateTimeField()
     header = models.CharField(max_length=128)
     text = models.TextField(blank=True)
-    engineers = models.ManyToManyField("Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True)
+    engineers = models.ManyToManyField(
+        "Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True
+    )
     tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m", blank=True)
-    files = models.ManyToManyField("AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True)
+    files = models.ManyToManyField(
+        "AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True
+    )
 
     # slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
 
@@ -144,7 +156,7 @@ class AttachedFile(models.Model):
         return self.file.name
 
     def is_image(self) -> bool:
-        return self.extension in ['.jpeg', '.jpg', '.png']
+        return self.extension in [".jpeg", ".jpg", ".png"]
 
     def save(self, *args, **kwargs):
         if self.file:

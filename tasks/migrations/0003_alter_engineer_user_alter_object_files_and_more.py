@@ -65,8 +65,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="userobjectgroup",
             name="permission",
-            field=models.CharField(
-                choices=[("R", "Только чтение"), ("RW", "Чтение/Запись")], max_length=10
-            ),
+            field=models.CharField(choices=[("R", "Только чтение"), ("RW", "Чтение/Запись")], max_length=10),
         ),
     ]

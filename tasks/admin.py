@@ -13,4 +13,4 @@ admin.site.register(Engineer)
 
 @admin.register(Object)
 class ObjectAdmin(admin.ModelAdmin):
-    prepopulated_fields = {"slug": ("name", )}
+    prepopulated_fields = {"slug": ("name",)}
