@@ -1,8 +1,10 @@
+{% load static %}
 <div class="accordion" id="accordionPanelsStayOpenExample">
     <div class="accordion-item bg-light border rounded shadow-sm mx-3 my-3">
         <h2 class="accordion-header">
-            <button class="accordion-button collapsed d-flex" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#collapse{{ task.id }}" aria-expanded="false" aria-controls="collapse{{ task.id }}">
+            <button class="accordion-button {% if not expanded %}collapsed{% endif %} d-flex" type="button" data-bs-toggle="collapse"
+                    style="background-color: white"
+                    data-bs-target="#collapse{{ task.id }}" aria-expanded="{% if expanded %}true{% else %}false{% endif %}" aria-controls="collapse{{ task.id }}">
 
                 <div class="container-fluid">
                     <div class="d-flex flex-row w-100 align-items-center">
@@ -17,13 +19,13 @@
                                         {% elif task.priority == 'CRITICAL' %}  fill="#FF0000"
                                         {% endif %}
                                      class="bi bi-bookmarks-fill" viewBox="0 1 18 16">
-                                    <path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16Zm0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15Z"/>
+                                    <path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16Zm0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15Z"></path>
                                 </svg>
                             {% else %}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#32CD32"
                                      class="bi bi-check-circle" viewBox="0 0 16 16">
-                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                    <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                                    <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"></path>
                                 </svg>
                             {% endif %}
                         </div>
@@ -48,8 +50,8 @@
                             <div class="d-flex flex-wrap justify-content-left  align-items-center gap-2 mt-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                                      class="bi bi-compass" viewBox="0 0 16 16">
-                                    <path d="M8 16.016a7.5 7.5 0 0 0 1.962-14.74A1 1 0 0 0 9 0H7a1 1 0 0 0-.962 1.276A7.5 7.5 0 0 0 8 16.016zm6.5-7.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
-                                    <path d="m6.94 7.44 4.95-2.83-2.83 4.95-4.949 2.83 2.828-4.95z"/>
+                                    <path d="M8 16.016a7.5 7.5 0 0 0 1.962-14.74A1 1 0 0 0 9 0H7a1 1 0 0 0-.962 1.276A7.5 7.5 0 0 0 8 16.016zm6.5-7.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"></path>
+                                    <path d="m6.94 7.44 4.95-2.83-2.83 4.95-4.949 2.83 2.828-4.95z"></path>
                                 </svg>
                                 {% if task.objects_set.all %}
                                     {% for obj in task.objects_set.all %}
@@ -78,7 +80,7 @@
 
             </button>
         </h2>
-        <div id="collapse{{ task.id }}" class="accordion-collapse collapse">
+        <div id="collapse{{ task.id }}" class="accordion-collapse collapse {% if expanded %}show{% endif %}">
             <div class="accordion-body bg-white">
                 <div class="container text-center">
                     {% if task.files.all %}
@@ -92,17 +94,18 @@
                         </div>
                     {% endif %}
 
+        {# ТЕКСТ ЗАДАЧИ #}
                     <div class="row mx-1 my-3 pt-3 d-flex align-items-center border-top">
                         <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                                  class="bi bi-chat-left-dots" viewBox="0 0 16 16">
-                                <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                                <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                                <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"></path>
+                                <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"></path>
                             </svg>
                         </div>
                         <div class="col d-flex flex-column align-items-start border-start"
                              style="font-size: 18px; white-space: pre-line; text-align: justify;">
-                            <span class="spoiler-text">{{ task.text }}</span>
+                            <span class="{% if not expanded %}spoiler-text{% endif %}">{{ task.text }}</span>
                             <button class="btn btn-outline-dark toggle-spoiler mt-2" style="display: none;">Показать больше
                             </button>
                         </div>
@@ -114,8 +117,8 @@
                             <div class="col d-flex flex-wrap justify-content-start  align-items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                                      class="bi bi-tags mx-3" viewBox="0 0 16 16">
-                                    <path d="M3 2v4.586l7 7L14.586 9l-7-7H3zM2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586V2z"/>
-                                    <path d="M5.5 5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm0 1a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM1 7.086a1 1 0 0 0 .293.707L8.75 15.25l-.043.043a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 0 7.586V3a1 1 0 0 1 1-1v5.086z"/>
+                                    <path d="M3 2v4.586l7 7L14.586 9l-7-7H3zM2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586V2z"></path>
+                                    <path d="M5.5 5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm0 1a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM1 7.086a1 1 0 0 0 .293.707L8.75 15.25l-.043.043a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 0 7.586V3a1 1 0 0 1 1-1v5.086z"></path>
                                 </svg>
                                 {% for tag in task.tags.all %}
                                     <span class="badge bg-info-subtle text-dark">{{ tag.tag_name }}</span>
@@ -127,16 +130,16 @@
 
                     {% if not task.is_done %}
                         {% if request.user.engineer in task.engineers.all or request.user.is_superuser %}
-                            <div class="d-flex justify-content-end gap-2">
+                            <div class="text-end gap-2">
                                 {% include "components/task/edit_task.html" with task=task %}
 {#                                {% include "components/update_task.html" with task=task %}#}
-                                {% include "components/task/confirm_task.html" with task=task %}
+                                {% include "components/task/confirm_task.html" with task_id=task.id %}
                             </div>
                         {% endif %}
                     {% endif %}
+
                 </div>
             </div>
         </div>
     </div>
 </div>
-

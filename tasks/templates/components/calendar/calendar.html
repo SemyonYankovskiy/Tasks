@@ -35,12 +35,29 @@
     {#                    }#}
     {#                },#}
 
+
+    <!-- Модальное окно -->
+    <div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+          </div>
+          <div id="task-content" class="modal-body">
+            ...
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
+        // const myModal = document.getElementById('taskModal');
+        const myModal = new bootstrap.Modal('#taskModal', {})
 
         document.addEventListener('DOMContentLoaded', function () {
-            var calendarEl = document.getElementById('calendar');
-            var todayDate = new Date().toISOString().split('T')[0]; // Текущая дата в формате YYYY-MM-DD
-            var calendar = new FullCalendar.Calendar(calendarEl, {
+            const calendarEl = document.getElementById('calendar');
+            const todayDate = new Date().toISOString().split('T')[0]; // Текущая дата в формате YYYY-MM-DD
+            const calendar = new FullCalendar.Calendar(calendarEl, {
                 locale: 'ru',
 
                 dayMaxEventRows: true, // for all non-TimeGrid views
@@ -59,18 +76,25 @@
                 initialView: 'dayGridMonth',
                 themeSystem: "bootstrap5",
                 businessHours: [
-                  {
-                    daysOfWeek: [ 1, 2, 3, 4, 5 ],
-                    startTime: '08:30',
-                    endTime: '17:30'
-                  },
+                    {
+                        daysOfWeek: [1, 2, 3, 4, 5],
+                        startTime: '08:30',
+                        endTime: '17:30'
+                    },
                 ],
+
+                eventClick: function (info) {
+                    myModal.show();
+                    $("#task-content").load("/ajax/tasks/"+info.event.id+"/")
+                },
+
                 events: [
                     {% for task in tasks %}
                         {
                             title: '{{ task.header }}',
                             start: '{{ task.completion_time|date:"Y-m-d" }}',
-                            url: '{% url 'tasks' %}',
+                            id: '{{ task.id }}',
+                            {#url: '{% url 'tasks' %}',#}
 
                             classNames: ['event', 'badge',
                                 {% if task.is_done %}
@@ -84,7 +108,6 @@
                                         'text-bg-info',
                                     {% elif task.priority == 'LOW' %}
                                         'text-bg-primary',
-
                                     {% endif %}
                                 {% endif %}]
                         },

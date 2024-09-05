@@ -19,6 +19,7 @@ urlpatterns = [
                   path("user/", include("user.urls", namespace="user")),
                   path("object/<slug:object_slug>/", views.get_object_page, name="show-object"),
                   path("", views.get_home, name="home"),
+                  path("ajax/tasks/<int:task_id>/", views.get_task_view, name="ajax-show-task"),
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

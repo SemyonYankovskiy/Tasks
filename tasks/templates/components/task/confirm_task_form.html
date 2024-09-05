@@ -1,0 +1,18 @@
+<form action="{% url 'close_task' task_id %}" method="post">
+    {% csrf_token %}
+    <input name="from_url"
+           value="{% if request.path == '/tasks/' %}{% url 'tasks' %}
+                    {% elif 'object' in request.path %}{{ request.path }}
+                    {% else %}{% url 'calendar' %}{% endif %}"
+           hidden>
+    <div>
+        <div class="mb-3">
+            <label for="comment" class="form-label">Комментарий к задаче</label>
+            <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Подтвердить</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+    </div>
+</form>

@@ -3,8 +3,9 @@ from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, F
-from django.http import Http404
-from django.shortcuts import render, get_object_or_404, redirect
+from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 
 from .filters import ObjectFilter
 from .models import Object, Task, Tag, ObjectGroup
@@ -96,26 +97,40 @@ def tasks_page(request):
 
 
 @login_required
+def get_task_view(request, task_id: int):
+    task = get_object_or_404(Task, pk=task_id)
+    return render(
+        request,
+        "components/task/task.html",
+        {"task": task, "expanded": True, "form_type": "collapse"},
+    )
+
+
+@login_required
 def map_page(request):
     return render(request, "components/map/map.html")
 
 
 @login_required
 def calendar(request):
-    tasks = Task.objects.all().values("header", "completion_time", "priority", "is_done")
+    tasks = Task.objects.all().values("id", "header", "completion_time", "priority", "is_done")
 
     return render(request, "components/calendar/calendar.html", {"tasks": tasks})
 
 
 @login_required
 def close_task(request, task_id):
+    redirect_to: str = reverse("tasks")
+
     if request.method == "POST":
         task = get_object_or_404(Task, pk=task_id)
         comment = request.POST.get("comment", "")
+        # Куда перенаправлять после успешного закрытия задачи
+        redirect_to = request.POST.get("from_url", redirect_to).strip()
 
         # Обновление задачи
         task.is_done = True
-        task.completion_time = datetime.now()
+        # task.completion_time = datetime.now()
 
         try:
             name = f"{request.user.engineer.first_name} {request.user.engineer.second_name}"
@@ -123,11 +138,9 @@ def close_task(request, task_id):
             # Если у пользователя нет engineer, использовать имя пользователя
             name = request.user.username
 
-        update_text = f"\n\nЗакрыто: [{name}] {comment}" if comment else f"\n\nЗакрыто: [{name}]"
+        update_text = f"\n\nЗакрыто: [{name} / {datetime.now().strftime('%d.%m.%Y %H:%M')}]\n{comment}"
 
         task.text += update_text
         task.save()
 
-        return redirect("tasks")
-
-    return redirect("tasks")
+    return HttpResponseRedirect(redirect_to)
