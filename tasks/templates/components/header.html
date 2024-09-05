@@ -3,30 +3,30 @@
     <header class="d-flex flex-wrap align-items-center justify-content-between mb-4 border border border-top-0 border-3 rounded-3 bg-light">
         {% if user.is_authenticated %}
 
-            <div class="col-md-2 d-flex align-items-center">
+            <div class="col-md-4 d-flex align-items-center">
                 <a href="{% url 'home' %}" class="btn mx-3">
                     <img class="me-3" src="{% static 'img/427227.gif' %}" alt="">
 
                 </a>
             </div>
 
-            <div class="col-md-3 d-flex align-items-start">
+{#            <div class="col-md-3 d-flex align-items-start">#}
 {#                <form class="d-flex" role="search">#}
 {#                    <input type="text" name="name__icontains" class="textinput form-control" id="id_name__icontains" placeholder="Введите название объекта" style="width: 300px">#}
 {#                    <input class="form-control me-2" type="search" placeholder="..." aria-label="Search">#}
 {#                    <button class="btn btn-outline-primary mx-2" type="submit">Поиск</button>#}
 {#                </form>#}
-            </div>
+{#            </div>#}
 
 
-            <div class="col-md-7 d-flex justify-content-end align-items-center">
+            <div class="col-md-8 d-flex justify-content-end align-items-center">
             <ul class="nav nav-pills mx-5">
 
                 <li class="nav-item"><a href="{% url 'home' %}" class="nav-link">Объекты</a></li>
                 <li class="nav-item"><a href="{% url 'tasks' %}" class="nav-link">Задачи</a></li>
                 <li class="nav-item"><a href="{% url 'calendar' %}" class="nav-link">Календарь</a></li>
                 <li class="nav-item"><a href="{% url 'map' %}" class="nav-link disabled">Карта</a></li>
-
+                <li class="nav-item"><a href="#" class="nav-link disabled">Статистика</a></li>
             </ul>
 
             <div class="nav nav-item dropdown me-3">

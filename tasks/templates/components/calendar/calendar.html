@@ -1,21 +1,39 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ object.name }}{% endblock title %}
 
 {% block content %}
 
     <!-- Календарь -->
+    {#    Basic#}
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css' rel='stylesheet'/>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js'></script>
+
+    {#    Premium#}
+    {#    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js'></script>#}
+
+    <script src='{% static 'js/fullcalendar-premium.js' %}'></script>
 
 
     <!-- Календарь -->
     <div class="container">
+        <div class="container bg-white p-5 rounded-4 border border-secondary">
+            <div class="d-flex justify-content-end">
+                {% include "components/task/create_task.html" %}
+            </div>
+            <div class="mt-4" id="calendar"></div>
 
-        <div class="bg-white p-5 rounded-4 border border-secondary" id="calendar" style="margin-top: 20px;"></div>
-
+        </div>
     </div>
 
+    {#                customButtons: {#}
+    {#                    myCustomButton: {#}
+    {#                        text: '+ Новая задача',#}
+    {#                        click: function () {#}
+    {#                            alert('clicked the custom button!');#}
+    {#                        }#}
+    {#                    }#}
+    {#                },#}
 
     <script>
 
@@ -24,24 +42,29 @@
             var todayDate = new Date().toISOString().split('T')[0]; // Текущая дата в формате YYYY-MM-DD
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 locale: 'ru',
+
+                dayMaxEventRows: true, // for all non-TimeGrid views
+                views: {
+                    timeGrid: {
+                        dayMaxEventRows: 10 // adjust to 6 only for timeGridWeek/timeGridDay
+                    }
+                },
                 firstDay: 1,
-                height: '80vh',
-                            customButtons: {
-    myCustomButton: {
-      text: '+ Новая задача',
-      click: function() {
-        alert('clicked the custom button!');
-      }
-    }
-  },
-             headerToolbar: {
-    left: 'prev,next today myCustomButton',
-    center: 'title',
-    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-  },
+                height: '70vh',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'listWeek,dayGridMonth,multiMonthYear'
+                },
                 initialView: 'dayGridMonth',
                 themeSystem: "bootstrap5",
-
+                businessHours: [
+                  {
+                    daysOfWeek: [ 1, 2, 3, 4, 5 ],
+                    startTime: '08:30',
+                    endTime: '17:30'
+                  },
+                ],
                 events: [
                     {% for task in tasks %}
                         {
@@ -50,16 +73,20 @@
                             url: '{% url 'tasks' %}',
 
                             classNames: ['event', 'badge',
-                                {% if task.priority == 'CRITICAL' %}
-                                    'text-bg-danger',
-                                {% elif task.priority == 'HIGH' %}
-                                    'text-bg-warning',
-                                {% elif task.priority == 'MEDIUM' %}
-                                    'text-bg-info',
-                                {% elif task.priority == 'LOW' %}
-                                    'text-bg-primary',
-                                {% endif %}]
+                                {% if task.is_done %}
+                                    'text-bg-success',
+                                {% else %}
+                                    {% if task.priority == 'CRITICAL' %}
+                                        'text-bg-danger',
+                                    {% elif task.priority == 'HIGH' %}
+                                        'text-bg-warning',
+                                    {% elif task.priority == 'MEDIUM' %}
+                                        'text-bg-info',
+                                    {% elif task.priority == 'LOW' %}
+                                        'text-bg-primary',
 
+                                    {% endif %}
+                                {% endif %}]
                         },
                     {% endfor %}
                 ],
@@ -70,8 +97,9 @@
                         month: 'Месяц',
                         week: 'Неделя',
                         day: 'День',
+                        year: 'Год',
                     },
-                editable: true,
+                editable: false,
                 selectable: true
             });
             calendar.render();
