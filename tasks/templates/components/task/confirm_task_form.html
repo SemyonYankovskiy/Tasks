@@ -2,7 +2,7 @@
     {% csrf_token %}
     <input name="from_url"
            value="{% if request.path == '/tasks/' %}{% url 'tasks' %}
-                    {% elif 'object' in request.path %}{{ request.path }}
+                    {% elif 'object' in request.path %}{{ request.path }}#tasks
                     {% else %}{% url 'calendar' %}{% endif %}"
            hidden>
     <div>

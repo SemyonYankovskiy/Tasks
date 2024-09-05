@@ -3,7 +3,7 @@
     <header class="d-flex flex-wrap align-items-center justify-content-between mb-4 border border border-top-0 border-3 rounded-3 bg-light">
         {% if user.is_authenticated %}
 
-            <div class="col-md-4 d-flex align-items-center">
+            <div class="col-md-2 d-flex align-items-center">
                 <a href="{% url 'home' %}" class="btn mx-3">
                     <img class="me-3" src="{% static 'img/427227.gif' %}" alt="">
 
@@ -19,7 +19,7 @@
 {#            </div>#}
 
 
-            <div class="col-md-8 d-flex justify-content-end align-items-center">
+            <div class="col-md-10 d-flex justify-content-end align-items-center">
             <ul class="nav nav-pills mx-5">
 
                 <li class="nav-item"><a href="{% url 'home' %}" class="nav-link">Объекты</a></li>
