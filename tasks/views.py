@@ -101,6 +101,13 @@ def map_page(request):
 
 
 @login_required
+def calendar(request):
+    tasks = Task.objects.all().values("header", "completion_time", "priority", "engineers", "is_done")
+
+    return render(request, "components/calendar/calendar.html", {"tasks": tasks})
+
+
+@login_required
 def close_task(request, task_id):
     if request.method == "POST":
         task = get_object_or_404(Task, pk=task_id)

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{{ object.name }}{% endblock title %}
+
+{% block content %}
+
+    <!-- Календарь -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css' rel='stylesheet'/>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js'></script>
+
+
+    <!-- Календарь -->
+    <div class="container">
+
+        <div class="bg-white p-5 rounded-4 border border-secondary" id="calendar" style="margin-top: 20px;"></div>
+
+    </div>
+
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var todayDate = new Date().toISOString().split('T')[0]; // Текущая дата в формате YYYY-MM-DD
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                locale: 'ru',
+                firstDay: 1,
+                height: '80vh',
+                            customButtons: {
+    myCustomButton: {
+      text: '+ Новая задача',
+      click: function() {
+        alert('clicked the custom button!');
+      }
+    }
+  },
+             headerToolbar: {
+    left: 'prev,next today myCustomButton',
+    center: 'title',
+    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+  },
+                initialView: 'dayGridMonth',
+                themeSystem: "bootstrap5",
+
+                events: [
+                    {% for task in tasks %}
+                        {
+                            title: '{{ task.header }}',
+                            start: '{{ task.completion_time|date:"Y-m-d" }}',
+                            url: '{% url 'tasks' %}',
+
+                            classNames: ['event', 'badge',
+                                {% if task.priority == 'CRITICAL' %}
+                                    'text-bg-danger',
+                                {% elif task.priority == 'HIGH' %}
+                                    'text-bg-warning',
+                                {% elif task.priority == 'MEDIUM' %}
+                                    'text-bg-info',
+                                {% elif task.priority == 'LOW' %}
+                                    'text-bg-primary',
+                                {% endif %}]
+
+                        },
+                    {% endfor %}
+                ],
+
+                buttonText:
+                    {
+                        today: 'Сегодня',
+                        month: 'Месяц',
+                        week: 'Неделя',
+                        day: 'День',
+                    },
+                editable: true,
+                selectable: true
+            });
+            calendar.render();
+        });
+    </script>
+{% endblock %}
