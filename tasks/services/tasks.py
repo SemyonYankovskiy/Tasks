@@ -24,7 +24,7 @@ def get_filtered_tasks(request, obj=None):
         tasks = tasks.filter(objects_set=obj)
 
     # Применение prefetch_related для оптимизации запросов
-    tasks = tasks.prefetch_related("files", "tags", "engineers")
+    tasks = tasks.prefetch_related("files", "tags", "engineers", "objects_set")
 
     # Сортировка по дате завершения: asc для возрастания, desc для убывания
     if sort_order == "asc":

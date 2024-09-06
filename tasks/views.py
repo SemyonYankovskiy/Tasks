@@ -113,8 +113,8 @@ def map_page(request):
 
 @login_required
 def calendar(request):
-    tasks = Task.objects.all().values("id", "header", "completion_time", "priority", "is_done")
-
+    #tasks = Task.objects.all().values("id", "header", "completion_time", "priority", "is_done")
+    tasks = get_filtered_tasks(request)
     return render(request, "components/calendar/calendar.html", {"tasks": tasks})
 
 

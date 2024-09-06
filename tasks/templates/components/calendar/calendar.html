@@ -14,85 +14,50 @@
 
     <script src='{% static 'js/fullcalendar-premium.js' %}'></script>
 
-    <style>
 
-.taskDone div {
-    background-color: #00CC00;
-    border-radius: 5px;
-    color: #4b4b4b;
-    text-align: center;
-    font-weight: 700;
-
-}
-.taskCrit div {
-    background-color: #FF0000;
-    border-radius: 5px;
-    color: #ffffff;
-    text-align: center;
-    font-weight: 700;
-
-}
-.taskDanger div {
-    background-color: #E97659;
-    border-radius: 5px;
-    color: #fcfcfc;
-    text-align: center;
-    font-weight: 700;
-
-}
-.taskWarning div {
-    background-color: #FFC859;
-    border-radius: 5px;
-    color: #383838;
-    text-align: center;
-    font-weight: 700;
-
-}
-.taskInfo div {
-    background-color: #7499FF;
-    border-radius: 5px;
-    color: #363636;
-    text-align: center;
-    font-weight: 700;
-
-}
-
-</style>
 
     <!-- Календарь -->
     <div class="container pt-4">
 
-            <div class="container shadow p-5 mt-5 bg-body-tertiary rounded border-top border-3">
-            <div class="d-flex justify-content-end">
-                {% include "components/task/create_task.html" %}
-            </div>
+        <div class="container shadow p-5 mt-5 bg-body-tertiary rounded border-top border-3">
+
+
+
+                <div class="d-flex justify-content-between">
+                    <div>
+                        {% include "components/task/create_task.html" %}
+                    </div>
+                    <div class="form-check form-switch d-flex gap-2 align-items-center">
+                        <!-- Переключатель "Показывать только мои задачи" -->
+                        <input class="form-check-input form-check-lg" type="checkbox" role="switch"
+                               id="flexSwitchCheckDefault"
+                               onchange="window.location.href = '?show_my_tasks_only=' + this.checked;"
+                               {% if  tasks.show_my_tasks_only %}checked{% endif %}>
+                        <label class="form-check-label" for="flexSwitchCheckDefault"
+                               style="font-size: 18px; margin-right: 10px;">Показывать только мои задачи
+                        </label>
+                    </div>
+                </div>
+
             <div class="mt-4" id="calendar"></div>
-            </div>
         </div>
     </div>
 
-    {#                customButtons: {#}
-    {#                    myCustomButton: {#}
-    {#                        text: '+ Новая задача',#}
-    {#                        click: function () {#}
-    {#                            alert('clicked the custom button!');#}
-    {#                        }#}
-    {#                    }#}
-    {#                },#}
+
 
 
     <!-- Модальное окно -->
     <div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-          </div>
-          <div id="task-content" class="modal-body">
-            ...
-          </div>
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div id="task-content" class="modal-body">
+                    ...
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <script>
@@ -130,18 +95,18 @@
 
                 eventClick: function (info) {
                     myModal.show();
-                    $("#task-content").load("/ajax/tasks/"+info.event.id+"/")
+                    $("#task-content").load("/ajax/tasks/" + info.event.id + "/")
                 },
 
                 events: [
-                    {% for task in tasks %}
+                    {% for task in tasks.tasks %}
                         {
                             title: '{{ task.header }}',
                             start: '{{ task.completion_time|date:"Y-m-d" }}',
                             id: '{{ task.id }}',
                             {#url: '{% url 'tasks' %}',#}
 
-                            classNames: [
+                            classNames: ['taskCalendar',
                                 {% if task.is_done %}
                                     'taskDone',
                                 {% else %}
