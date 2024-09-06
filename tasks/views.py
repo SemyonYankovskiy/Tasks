@@ -8,9 +8,9 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
 from .filters import ObjectFilter
-from .models import Object, Task, Tag, ObjectGroup, Engineer
-from .services.objects import get_objects_list, paginate_queryset, get_objects_tree
-from .services.tasks import get_filtered_tasks
+from .models import Object, Task, Tag, ObjectGroup
+from .services.objects import get_objects_list, paginate_queryset
+from .services.tasks import get_filtered_tasks, task_filter_params
 
 
 @login_required
@@ -25,7 +25,7 @@ def get_home(request):
     page_number = request.GET.get("page")
 
     # Используем функцию пагинации
-    pagination_data = paginate_queryset(filtered_objects, page_number, per_page=4)
+    pagination_data = paginate_queryset(filtered_objects, page_number, per_page=8)
 
     # Получаем теги, связанные с объектами
     tags = Tag.objects.filter(objects_set__isnull=False).filter(objects_set__groups__users=request.user).distinct()
@@ -50,7 +50,7 @@ def get_home(request):
         "current_tags": request.GET.getlist("tags"),
         "groups_json": groups,
         "current_groups": request.GET.getlist("groups"),
-        "params_count": len([param for key, param in request.GET.items() if param and key != "page" ])
+        "params_count": len([param for key, param in request.GET.items() if param and key != "page"])
     }
 
     return render(request, "components/home/home.html", context=context)
@@ -97,34 +97,6 @@ def get_object_page(request, object_slug):
     }
 
     return render(request, "components/object/object-page.html", context=context)
-
-
-def task_filter_params(request):
-    # Получаем теги, связанные с задачами
-    tags_qs = Tag.objects.filter(tasks__isnull=False).values("id", "tag_name")
-    tags = [{"id": tag["id"], "label": tag["tag_name"]} for tag in tags_qs]  # label обязателен
-
-    # Получаем инженеров, связанных с задачами
-    engineers_qs = list(Engineer.objects.all().values("id", "first_name", "second_name"))
-    engineers = [{"id": eng["id"], "label": f"{eng['first_name']} {eng['second_name']}"} for eng in engineers_qs]
-
-    objects_tree = get_objects_tree()
-
-    exclude_params = ["show_my_tasks_only", "sort_order", "page"]
-    filter_data = {key: value for key, value in request.GET.items() if key not in exclude_params}
-
-    # Формируем строку с параметрами фильтра
-    filter_url = urlencode(filter_data, doseq=True)
-    return {
-        "tags_json": tags,
-        "current_tags": request.GET.getlist("tags"),
-        "engineers_json": engineers,
-        "current_engineers": request.GET.getlist("engineers"),
-        "current_objects": request.GET.getlist("objects_set"),
-        "objects_json": objects_tree,
-        "filter_data": filter_url,
-        "params_count": len([param for key, param in request.GET.items() if param and key != "page" ])
-    }
 
 
 @login_required
