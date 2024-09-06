@@ -8,16 +8,16 @@
 
     <div class="row">
 
-        <div class="col-md-4 d-flex px-4 gap-2">
+        <div class="col-md-4 d-flex px-4 gap-3">
             <div>
-                <span class="btn btn-primary fs-6 text">Активные {{ not_done_count }}</span>
+                <span class=" fs-6 text">Активные ({{ not_done_count }})</span>
             </div>
             <div>
-                <span class="btn btn-success fs-6 text">Завершенные {{ done_count }}</span>
+                <span class=" fs-6 text">Завершенные ({{ done_count }})</span>
             </div>
 
         </div>
-        <div class="col-md-4 gap-2">
+        <div class="col-md-4 gap-2 border-start border-2">
             <div class="form-check form-switch">
                 <!-- Переключатель "Показывать активные задачи" -->
                 <input class="form-check-input form-check-lg" type="checkbox" role="switch"
