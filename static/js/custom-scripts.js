@@ -1,8 +1,3 @@
-// Script for handling tab clicks
-$('#product a').click(function (e) {
-    e.preventDefault();
-    $(this).tab('show');
-});
 
 
 // Script for initializing Bootstrap tooltips

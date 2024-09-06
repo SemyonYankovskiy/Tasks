@@ -4,7 +4,7 @@
         <div class="pagination container d-flex justify-content-center">
 
         
-        <a href="{% if pagination_data.page_obj.has_previous %}?page={{ pagination_data.page_obj.previous_page_number }}{% else %}#{% endif %}"
+        <a href="{% if pagination_data.page_obj.has_previous %}?page={{ pagination_data.page_obj.previous_page_number }}&{{ filter_data }}{% else %}#{% endif %}"
            class="mx-3 next_prev">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                  class="bi bi-caret-left" viewBox="0 0 16 16">
@@ -14,7 +14,7 @@
 
 
         {% if pagination_data.start_show_first_page_link %}
-            <a href="?page=1">1</a>
+            <a href="?page=1&{{ filter_data }}">1</a>
             {% if pagination_data.start_show_ellipsis %}
                 <span>...</span>
             {% endif %}
@@ -25,7 +25,7 @@
             {% if pagination_data.page_obj.number == p %}
                 <a class="active">{{ p }}</a>
             {% elif p >= pagination_data.page_obj.number|add:-2 and p <= pagination_data.page_obj.number|add:2 %}
-                <a href="?page={{ p }}">{{ p }}</a>
+                <a href="?page={{ p }}&{{ filter_data }}">{{ p }}</a>
             {% endif %}
         {% endfor %}
 
@@ -34,16 +34,17 @@
             {% if pagination_data.end_show_ellipsis %}
                 <span>...</span>
             {% endif %}
-            <a href="?page={{ pagination_data.last_page_number }}">{{ pagination_data.last_page_number }}</a>
+            <a href="?page={{ pagination_data.last_page_number }}&{{ filter_data }}">{{ pagination_data.last_page_number }}</a>
         {% endif %}
         
 
-        <a href="{% if pagination_data.page_obj.has_next %}?page={{ pagination_data.page_obj.next_page_number }}{% else %}#{% endif %}"
+        <a href="{% if pagination_data.page_obj.has_next %}?page={{ pagination_data.page_obj.next_page_number }}&{{ filter_data }}{% else %}#{% endif %}"
            class="mx-3 next_prev">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                  class="bi bi-caret-right-fill" viewBox="0 0 16 16">
                 <path d="M6 12.796V3.204L11.481 8 6 12.796zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753z"/>
             </svg>
         </a>
+
         </div>
     {% endif %}

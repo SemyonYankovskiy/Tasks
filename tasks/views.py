@@ -36,7 +36,7 @@ def get_home(request):
 
     groups = [{"id": group.id, "label": group.name} for group in groups]
 
-    exclude_params = ["show_my_tasks_only", "sort_order", "page"]
+    exclude_params = ["page"]
     filter_data = {key: value for key, value in request.GET.items() if key not in exclude_params}
 
     # Формируем строку с параметрами фильтра
@@ -79,13 +79,21 @@ def get_object_page(request, object_slug):
     # Получаем связанные задачи с учетом фильтров
     filtered_tasks_data = get_filtered_tasks(request, obj=obj)
 
+    # Получаем номер страницы из запроса
+    page_number = request.GET.get("page")
+    # Используем функцию пагинации
+    pagination_data = paginate_queryset(filtered_tasks_data["tasks"], page_number, per_page=4)
+    filtered_tasks_data["tasks"] = pagination_data["page_obj"]
+
     child_objects = get_objects_list(request).filter(parent=obj)
 
     context = {
         "object": obj,
         "tasks": filtered_tasks_data,
+        "pagination_data": pagination_data,
         "task_count": obj.done_tasks_count + obj.undone_tasks_count,
         "child_objects": child_objects,
+        "filter_data": "#tasks",
     }
 
     return render(request, "components/object/object-page.html", context=context)
@@ -102,7 +110,8 @@ def task_filter_params(request):
 
     objects_tree = get_objects_tree()
 
-    filter_data = {key: value for key, value in request.GET.items() if key != "page"}
+    exclude_params = ["show_my_tasks_only", "sort_order", "page"]
+    filter_data = {key: value for key, value in request.GET.items() if key not in exclude_params}
 
     # Формируем строку с параметрами фильтра
     filter_url = urlencode(filter_data, doseq=True)
@@ -124,10 +133,16 @@ def tasks_page(request):
 
     filter_context = task_filter_params(request)
 
+    # Получаем номер страницы из запроса
+    page_number = request.GET.get("page")
+    # Используем функцию пагинации
+    pagination_data = paginate_queryset(filtered_task["tasks"], page_number, per_page=4)
+
     return render(
         request,
         "components/task/tasks_page.html",
         {
+            "pagination_data": pagination_data,
             "tasks": filtered_task,
             **filter_context,
 
