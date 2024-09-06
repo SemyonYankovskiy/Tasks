@@ -7,28 +7,20 @@
 
 <div class="px-5 text-center container">
   <div class="row pb-3">
-      {% include "components/object/object-content.html" with object=object %}
+      {% include "components/object/object-content.html" with object=object child_objects=child_objects %}
   </div>
 
   <div>
 
-    <div class="container d-flex p-4 my-3 justify-content-center flex-wrap">
-      {% for object in child_objects %}
-
-        {% include "components/object/object-preview.html" with img_preview=object.img_preview title=object.name desc=object.short_description slug=object.slug priority=object.priority groups=object.groups%}
-
-      {% empty %}
-      {% endfor %}
-    </div>
-  
   </div>
-</div>
-    
-  <div class="container p-4">
+
       {% include "components/task/task_container.html" with tasks=tasks.tasks not_done_count=tasks.not_done_count done_count=tasks.done_count  show_active_task=tasks.show_active_task show_done_task=tasks.show_done_task %}
 
-  </div>
-  
+
+
+</div>
+    
+
 
 
 

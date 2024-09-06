@@ -93,7 +93,7 @@ def task_filter_params(request):
     filter_data = {key: value for key, value in request.GET.items() if key not in exclude_params}
 
     # Формируем строку с параметрами фильтра
-    filter_url = urlencode(filter_data, doseq=True)
+    filter_url = urlencode(filter_data, doseq=True) + "#tasks"
     return {
         "tags_json": tags,
         "current_tags": request.GET.getlist("tags"),
