@@ -102,5 +102,5 @@ def task_filter_params(request):
         "current_objects": request.GET.getlist("objects_set"),
         "objects_json": objects_tree,
         "filter_data": filter_url,
-        "params_count": len([param for key, param in request.GET.items() if key not in not_count_params])
+        "params_count": len([param for key, param in request.GET.items() if param and key not in not_count_params])
     }
