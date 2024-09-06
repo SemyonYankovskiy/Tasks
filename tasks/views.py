@@ -28,11 +28,11 @@ def get_home(request):
     pagination_data = paginate_queryset(filtered_objects, page_number, per_page=4)
 
     # Получаем теги, связанные с объектами
-    tags = Tag.objects.filter(objects_set__isnull=False).distinct()
+    tags = Tag.objects.filter(objects_set__isnull=False).filter(objects_set__groups__users=request.user).distinct()
 
     tags = [{"id": tag.id, "label": tag.tag_name} for tag in tags]
     # Получаем группы, связанные с объектами
-    groups = ObjectGroup.objects.filter(objects_set__isnull=False).distinct()
+    groups = ObjectGroup.objects.filter(objects_set__isnull=False).filter(users=request.user).distinct()
 
     groups = [{"id": group.id, "label": group.name} for group in groups]
 
@@ -50,7 +50,7 @@ def get_home(request):
         "current_tags": request.GET.getlist("tags"),
         "groups_json": groups,
         "current_groups": request.GET.getlist("groups"),
-        "params_count": len([param for param in request.GET.values() if param])
+        "params_count": len([param for key, param in request.GET.items() if param and key != "page" ])
     }
 
     return render(request, "components/home/home.html", context=context)
@@ -58,7 +58,6 @@ def get_home(request):
 
 @login_required
 def get_object_page(request, object_slug):
-    user = request.user
     # Получаем основной объект
     obj = (
         Object.objects.filter(slug=object_slug)
@@ -115,7 +114,7 @@ def task_filter_params(request):
         "current_objects": request.GET.getlist("objects_set"),
         "objects_json": objects_tree,
         "filter_data": filter_url,
-        "params_count": len([param for param in request.GET.values() if param])
+        "params_count": len([param for key, param in request.GET.items() if param and key != "page" ])
     }
 
 
@@ -153,9 +152,6 @@ def map_page(request):
 
 @login_required
 def calendar(request):
-    #tasks = Task.objects.all().values("id", "header", "completion_time", "priority", "is_done")
-
-
     tasks = get_filtered_tasks(request)
     filter_context = task_filter_params(request)
 

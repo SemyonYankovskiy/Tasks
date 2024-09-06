@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from tasks.filters import TaskFilter
 from tasks.models import Engineer, Task
 
@@ -11,7 +13,9 @@ def get_filtered_tasks(request, obj=None):
     except Engineer.DoesNotExist:
         engineer = None
 
-    tasks = TaskFilter(request.GET, queryset=Task.objects.all()).qs
+    basic_qs = Task.objects.all().filter(Q(objects_set__groups__users=request.user) | Q(engineers__user=request.user)).distinct()
+
+    tasks = TaskFilter(request.GET, queryset=basic_qs).qs
 
     if show_my_tasks_only:
         if engineer:

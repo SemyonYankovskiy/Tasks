@@ -19,6 +19,7 @@ def get_objects_list(request):
         .prefetch_related(
             "tags", "groups"
         )  # Предварительно загружаем связанные теги и группы для оптимизации запросов
+        .filter(groups__users=request.user)
         .annotate(
             img_preview=Subquery(image_subquery),  # Добавляем аннотацию с изображением
             child_count=Count("children"),  # Подсчитываем количество детей
