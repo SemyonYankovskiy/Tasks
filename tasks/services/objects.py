@@ -33,7 +33,6 @@ def get_objects_list(request):
         .distinct()  # Убираем дублирование объектов
         .order_by("parent_id", "-id")
     )
-
     return objects
 
 
@@ -57,3 +56,52 @@ def paginate_queryset(queryset, page_number, per_page=4):
         "start_show_first_page_link": start_show_first_page_link,
         "last_page_number": total_pages,
     }
+
+
+def get_objects_tree() -> list:
+    # [ {
+    #   id: 'a',
+    #   label: 'a',
+    #   children: [ {
+    #     id: 'aa',
+    #     label: 'aa',
+    #   }, {
+    #     id: 'ab',
+    #     label: 'ab',
+    #   } ],
+    # }, {
+    #   id: 'b',
+    #   label: 'b',
+    # }, {
+    #   id: 'c',
+    #   label: 'c',
+    # } ]
+
+    objects_qs = list(Object.objects.all().values("id", "name", "parent"))
+    objects = {
+        obj["id"]: obj for obj in objects_qs
+    }
+
+    for obj in objects_qs:
+        obj_id = obj["id"]
+        parent = objects[obj_id]["parent"]
+
+        if parent is not None:
+            objects[parent].setdefault("children", [])
+            if obj_id not in objects[parent]["children"]:
+                objects[parent]["children"].append(obj_id)
+
+    def transform(obj_id: int):
+        item = objects[obj_id]
+        transformed_item = {
+            'id': item['id'],
+            'label': item['name']
+        }
+        if item.get('children'):
+            transformed_item['children'] = [transform(child) for child in item["children"]]
+        return transformed_item
+
+    # Применяем преобразование к корневым элементам
+    return [transform(obj_id) for obj_id in objects if objects[obj_id]["parent"] is None]
+
+

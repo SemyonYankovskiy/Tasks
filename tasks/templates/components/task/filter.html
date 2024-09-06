@@ -1,0 +1,75 @@
+<form method="get" class="w-100 mx-4">
+    <div>
+        <button class="btn btn-secondary position-relative" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseExample"
+                aria-expanded="false" aria-controls="collapseExample">
+            Фильтры
+            {% if params_count %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ params_count }}</span>
+            {% endif %}
+
+        </button>
+
+
+        <div class="collapse" id="collapseExample">
+            <div class="p-5 border border-2 rounded-2"
+                 style="background-color: rgba(255,255,255,0.52); border-color: #d2d2d2">
+                <div id="div_id_name__icontains" class="mb-3">
+                    <label for="id_name__icontains" class="form-label">Поиск задачи</label>
+                    <input type="text" name="search" class="textinput form-control" value="{{ request.GET.search }}"
+                           id="id_name__icontains">
+                </div>
+
+                <div class="row">
+                    <div id="div_id_engineers" class="col mb-3">
+                        <label for="id_engineers" class="form-label">Объекты</label>
+                        {% include 'tree-select.html' with select_name='objects_set' current_options=current_objects objects_structure_json=objects_json %}
+                    </div>
+
+
+                    <div id="div_id_tags" class="col mb-3">
+                        <label for="id_tags" class="form-label">Теги</label>
+                        {% include 'tree-select.html' with select_name='tags' current_options=current_tags objects_structure_json=tags_json %}
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div id="div_id_engineers" class="col mb-3">
+                        <label for="id_engineers" class="form-label">Инженеры</label>
+                        {% include 'tree-select.html' with select_name='engineers' current_options=current_engineers objects_structure_json=engineers_json %}
+                    </div>
+
+                    <div id="div_id_priority" class="col mb-3">
+                        <label for="id_priority" class="form-label">Важность</label>
+                        <select name="priority" class="select form-select" id="id_priority">
+                            <option value="" {% if not request.GET.priority %}selected{% endif %}>-</option>
+                            <option value="CRITICAL" {% if request.GET.priority == 'CRITICAL' %}selected{% endif %}>
+                                Критический
+                            </option>
+                            <option value="HIGH" {% if request.GET.priority == 'HIGH' %}selected{% endif %}>Высокий
+                            </option>
+                            <option value="MEDIUM" {% if request.GET.priority == 'MEDIUM' %}selected{% endif %}>
+                                Средний
+                            </option>
+                            <option value="LOW" {% if request.GET.priority == 'LOW' %}selected{% endif %}>Низкий
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+
+
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Применить фильтры</button>
+                    <a href="{{ request.path }}" class="btn btn-secondary">Сбросить фильтры</a>
+                </div>
+
+
+            </div>
+
+
+        </div>
+    </div>
+</form>

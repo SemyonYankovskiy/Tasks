@@ -1,23 +1,23 @@
+from tasks.filters import TaskFilter
 from tasks.models import Engineer, Task
 
 
 def get_filtered_tasks(request, obj=None):
-    user = request.user
     show_my_tasks_only = request.GET.get("show_my_tasks_only") == "true"
     sort_order = request.GET.get("sort_order", "desc")  # По умолчанию сортировка по убыванию
 
     try:
-        engineer = Engineer.objects.get(user=user)
+        engineer = Engineer.objects.get(user=request.user)
     except Engineer.DoesNotExist:
         engineer = None
 
+    tasks = TaskFilter(request.GET, queryset=Task.objects.all()).qs
+
     if show_my_tasks_only:
         if engineer:
-            tasks = Task.objects.filter(engineers=engineer)
+            tasks = tasks.filter(engineers=engineer)
         else:
-            tasks = Task.objects.none()
-    else:
-        tasks = Task.objects.all()
+            tasks = tasks.none()
 
     # Если передан объект, фильтруем задачи по этому объекту
     if obj:

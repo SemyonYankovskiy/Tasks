@@ -6,7 +6,10 @@
 {% block content %}
     <div class="container p-4">
 
-        {% include "components/task/task_container.html" with tasks=tasks.tasks not_done_count=tasks.not_done_count done_count=tasks.done_count show_my_tasks_only=tasks.show_my_tasks_only sort_order=tasks.sort_order %}
+        <div class="d-flex">
+            {% include "components/task/filter.html" %}
+        </div>
+        {% include "components/task/task_container.html" with filter_data=filter_data tasks=tasks.tasks not_done_count=tasks.not_done_count done_count=tasks.done_count show_my_tasks_only=tasks.show_my_tasks_only sort_order=tasks.sort_order %}
 
     </div>
 {% endblock %}

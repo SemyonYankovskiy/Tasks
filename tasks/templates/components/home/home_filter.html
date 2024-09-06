@@ -1,16 +1,19 @@
 <form method="get" class="w-100 mx-4">
     <div class="">
-        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample"
+        <button class="btn btn-secondary position-relative" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample"
                 aria-expanded="false" aria-controls="collapseExample">
             Фильтры
+                        {% if params_count %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ params_count }}</span>
+            {% endif %}
         </button>
 
 
         <div class="collapse" id="collapseExample">
             <div class="p-5 border border-2 rounded-2" style="background-color: rgba(255,255,255,0.52); border-color: #d2d2d2">
                 <div id="div_id_name__icontains" class="mb-3">
-                    <label for="id_name__icontains" class="form-label">Имя объекта</label>
-                    <input type="text" name="name" class="textinput form-control" value="{{ request.GET.name }}"
+                    <label for="id_name__icontains" class="form-label">Поиск объекта</label>
+                    <input type="text" name="search" class="textinput form-control" value="{{ request.GET.search }}"
                            id="id_name__icontains">
                 </div>
                 <div class="row">
@@ -43,7 +46,7 @@
 
                 <div class="mt-3">
                     <button type="submit" class="btn btn-primary">Применить фильтры</button>
-                    <a href="/" class="btn btn-secondary">Сбросить фильтры</a>
+                    <a href="{{ request.path }}" class="btn btn-secondary">Сбросить фильтры</a>
                 </div>
 
 

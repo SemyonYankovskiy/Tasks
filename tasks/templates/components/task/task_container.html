@@ -1,4 +1,4 @@
-<div id="tasks" class="row shadow p-4 mt-5 bg-body-tertiary rounded border-top border-3">
+<div id="tasks" class="row shadow p-4 mt-3 bg-body-tertiary rounded border-top border-3">
 
     <div class="pb-3 d-flex justify-content-between">
         <h4>Задачи</h4>
@@ -13,7 +13,7 @@
                     <!-- Переключатель "Показывать только мои задачи" -->
                     <input class="form-check-input form-check-lg" type="checkbox" role="switch"
                            id="flexSwitchCheckDefault"
-                           onchange="window.location.href = '?show_my_tasks_only=' + this.checked + '&sort_order={{ sort_order }}';"
+                           onchange="window.location.href = '?{{ filter_data }}&show_my_tasks_only=' + this.checked + '&sort_order={{ sort_order }}';"
                            {% if  show_my_tasks_only %}checked{% endif %}>
                     <label class="form-check-label" for="flexSwitchCheckDefault"
                            style="font-size: 18px; margin-right: 10px;">
@@ -24,7 +24,7 @@
                 <div class="form-check form-switch">
                     <!-- Переключатель порядка сортировки задач -->
                     <input class="form-check-input form-check-lg" type="checkbox" role="switch" id="sortSwitch"
-                           onchange="window.location.href = '?sort_order=' + (this.checked ? 'desc' : 'asc') + '&show_my_tasks_only={{ show_my_tasks_only }}';"
+                           onchange="window.location.href = '?{{ filter_data }}&sort_order=' + (this.checked ? 'desc' : 'asc') + '&show_my_tasks_only={{ show_my_tasks_only }}';"
                            {% if sort_order == 'desc' %}checked{% endif %}>
                     <label class="form-check-label" for="sortSwitch" style="font-size: 18px;">
                           {% if sort_order == 'desc' %}Новые вначале{% else %}Старые вначале{% endif %}

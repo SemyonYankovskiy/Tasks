@@ -5,7 +5,7 @@
 
 
 <div id="objects-tree-select_{{ select_name }}">
-    <treeselect name="{{ select_name }}" v-model="value" :multiple="true" :options="options" />
+    <treeselect name="{{ select_name }}" v-model="value"  :flat="true" :multiple="true" :options="options" />
 </div>
 
 <script>
@@ -14,8 +14,8 @@
     new Vue({
       el: '#objects-tree-select_{{ select_name }}',
       data: {
-        value: {{ current_options|safe }},
-        options: {{objects_structure_json | safe}},
+        value: {{ current_options|default:"[]"|safe }},
+        options: {{objects_structure_json|default:"[]"|safe }},
       },
     })
 //
