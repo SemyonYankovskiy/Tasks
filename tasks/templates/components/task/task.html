@@ -2,14 +2,17 @@
 <div class="accordion" id="accordionPanelsStayOpenExample">
     <div class="accordion-item bg-light border rounded shadow-sm mx-3 my-3">
         <h2 class="accordion-header">
-            <button class="accordion-button {% if not expanded %}collapsed{% endif %} d-flex" type="button" data-bs-toggle="collapse"
+            <button class="accordion-button {% if not expanded %}collapsed{% endif %} d-flex" type="button"
+                    data-bs-toggle="collapse"
                     style="background-color: white"
-                    data-bs-target="#collapse{{ task.id }}" aria-expanded="{% if expanded %}true{% else %}false{% endif %}" aria-controls="collapse{{ task.id }}">
+                    data-bs-target="#collapse{{ task.id }}"
+                    aria-expanded="{% if expanded %}true{% else %}false{% endif %}"
+                    aria-controls="collapse{{ task.id }}">
 
                 <div class="container-fluid">
                     <div class="d-flex flex-row w-100 align-items-center">
                         <!-- Первый столбец -->
-                        <div class="col-md-1 d-flex justify-content-center align-items-center border-end"
+                        <div class="col-md-1 d-flex justify-content-center align-items-center "
                              style="max-width: 48px">
                             {% if task.is_done == False %}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
@@ -29,7 +32,8 @@
                                 </svg>
                             {% endif %}
                         </div>
-                        <div class="col-md-2 d-flex align-items-center pe-1 border-end">
+
+                        <div class="col-md-2 d-flex align-items-center pe-1 border-end border-start">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                                  class="bi bi-calendar3 mx-3" viewBox="0 0 16 16">
                                 <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"></path>
@@ -38,6 +42,7 @@
                             <span>{{ task.completion_time }}</span>
 
                         </div>
+
 
                         <!-- Второй столбец -->
                         <div class="col-md-9 d-flex justify-content-left align-items-center px-3">
@@ -56,7 +61,7 @@
                                 {% if task.objects_set.all %}
                                     {% for obj in task.objects_set.all %}
 
-                                        <span class="badge text-bg-light">{{ obj.name }}</span>
+                                        <span class="badge bg-dark-subtle text-black">{{ obj.name }}</span>
 
                                     {% endfor %}
                                 {% else %}
@@ -94,7 +99,7 @@
                         </div>
                     {% endif %}
 
-        {# ТЕКСТ ЗАДАЧИ #}
+                    {# ТЕКСТ ЗАДАЧИ #}
                     <div class="row mx-1 my-3 pt-3 d-flex align-items-center border-top">
                         <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
@@ -106,7 +111,8 @@
                         <div class="col d-flex flex-column align-items-start border-start"
                              style="font-size: 18px; white-space: pre-line; text-align: justify;">
                             <span class="{% if not expanded %}spoiler-text{% endif %}">{{ task.text }}</span>
-                            <button class="btn btn-outline-dark toggle-spoiler mt-2" style="display: none;">Показать больше
+                            <button class="btn btn-outline-dark toggle-spoiler mt-2" style="display: none;">Показать
+                                больше
                             </button>
                         </div>
 
@@ -121,7 +127,7 @@
                                     <path d="M5.5 5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm0 1a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM1 7.086a1 1 0 0 0 .293.707L8.75 15.25l-.043.043a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 0 7.586V3a1 1 0 0 1 1-1v5.086z"></path>
                                 </svg>
                                 {% for tag in task.tags.all %}
-                                    <span class="badge bg-info-subtle text-dark">{{ tag.tag_name }}</span>
+                                    <span class="badge bg-primary-subtle text-dark">{{ tag.tag_name }}</span>
                                 {% endfor %}
                             </div>
                         </div>
@@ -132,7 +138,7 @@
                         {% if request.user.engineer in task.engineers.all or request.user.is_superuser %}
                             <div class="text-end gap-2">
                                 {% include "components/task/edit_task.html" with task=task %}
-{#                                {% include "components/update_task.html" with task=task %}#}
+                                {#                                {% include "components/update_task.html" with task=task %}#}
                                 {% include "components/task/confirm_task.html" with task_id=task.id %}
                             </div>
                         {% endif %}

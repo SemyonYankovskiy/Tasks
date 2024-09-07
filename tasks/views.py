@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, F
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
 from .filters import ObjectFilter
@@ -42,11 +42,14 @@ def get_home(request):
     # Формируем строку с параметрами фильтра
     filter_url = urlencode(filter_data, doseq=True)
 
+    random_icon = get_random_icon(request)
+
     # Передаем отфильтрованные объекты в контекст
     context = {
         "pagination_data": pagination_data,
         "filter_data": filter_url,
         "tags_json": tags,
+        "random_icon": random_icon,
         "current_tags": request.GET.getlist("tags"),
         "groups_json": groups,
         "current_groups": request.GET.getlist("groups"),
@@ -54,6 +57,30 @@ def get_home(request):
     }
 
     return render(request, "components/home/home.html", context=context)
+
+
+from django.shortcuts import render
+from django.conf import settings
+import os
+import random
+
+
+@login_required
+def get_random_icon(request):
+    # Папка с иконками
+    icon_directory = os.path.join(settings.BASE_DIR, 'static/img/lazy')
+
+    # Получаем список файлов в папке
+    icon_pull = os.listdir(icon_directory)
+    print(icon_pull)
+    # Если файлы есть, выбираем случайную иконку
+    icon = random.choice(icon_pull) if icon_pull else None
+
+    # Формируем путь для шаблона
+    icon_path = f'img/lazy/{icon}' if icon else None
+
+    return icon_path
+
 
 
 @login_required
@@ -87,9 +114,12 @@ def get_object_page(request, object_slug):
 
     child_objects = get_objects_list(request).filter(parent=obj)
 
+    random_icon = get_random_icon(request)
+
     context = {
         "object": obj,
         "tasks": filtered_tasks_data,
+        "random_icon": random_icon,
         "pagination_data": pagination_data,
         "task_count": obj.done_tasks_count + obj.undone_tasks_count,
         "child_objects": child_objects,
@@ -110,11 +140,14 @@ def tasks_page(request):
     # Используем функцию пагинации
     pagination_data = paginate_queryset(filtered_task["tasks"], page_number, per_page=4)
 
+    random_icon = get_random_icon(request)
+
     return render(
         request,
         "components/task/tasks_page.html",
         {
             "pagination_data": pagination_data,
+            "random_icon": random_icon,
             "tasks": filtered_task,
             **filter_context,
 
@@ -139,10 +172,11 @@ def map_page(request):
 
 @login_required
 def calendar(request):
+    random_icon = get_random_icon(request)
     tasks = get_filtered_tasks(request)
     filter_context = task_filter_params(request)
 
-    return render(request, "components/calendar/calendar.html", {"tasks": tasks, **filter_context,})
+    return render(request, "components/calendar/calendar.html", {"tasks": tasks, **filter_context, "random_icon": random_icon})
 
 
 @login_required

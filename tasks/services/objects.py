@@ -17,13 +17,14 @@ def get_objects_list(request):
     objects = (
         Object.objects.all()  # Получаем все объекты
         .prefetch_related(
-            "tags", "groups"
+            "tags", "groups",
         )  # Предварительно загружаем связанные теги и группы для оптимизации запросов
         .filter(groups__users=request.user)
         .annotate(
             img_preview=Subquery(image_subquery),  # Добавляем аннотацию с изображением
-            child_count=Count("children"),  # Подсчитываем количество детей
-            description_length=Length("description"),  # Получаем длину полного описания
+            child_count=Count('children', distinct=True),  # Подсчёт уникальных детей
+            description_length=Length('description'),  # Длина описания
+            tasks_count=Count('tasks', distinct=True),  # Подсчёт уникальных задач
             short_description=Case(
                 When(description_length__gt=53, then=Concat(Substr("description", 1, 50), Value("..."))),
                 default="description",  # В противном случае используем полное описание
@@ -104,5 +105,3 @@ def get_objects_tree() -> list:
 
     # Применяем преобразование к корневым элементам
     return [transform(obj_id) for obj_id in objects if objects[obj_id]["parent"] is None]
-
-

@@ -1,9 +1,42 @@
-body {
-    /*background-image: url("https://snipp.ru/themes/site/img/header-bg.png");*/
-    /*background-repeat: repeat; !* Повторяет изображение по всей площади *!*/
-    /*background-size: auto; !* Оставляет оригинальный размер изображения *!*/
-    background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),
+/*body {*/
+/*    !*background-image: url("https://snipp.ru/themes/site/img/header-bg.png");*!*/
+/*    !*background-repeat: repeat; !* Повторяет изображение по всей площади *!*!*/
+/*    !*background-size: auto; !* Оставляет оригинальный размер изображения *!*!*/
+/*    background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),*/
+/*                url("https://snipp.ru/themes/site/img/header-bg.png");*/
+/*}*/
+
+body{
+    background: linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255));
+}
+
+.headerBackground{
+    /*background-color: #0255a6;*/
+     background: linear-gradient(rgba(0, 181, 253, 0.44), rgba(207, 1, 255, 0.44)),
                 url("https://snipp.ru/themes/site/img/header-bg.png");
+}
+
+
+.headerContainer {
+    display: flex;
+    flex-direction: column;
+    height: 200px; /* Or set to a specific height as needed */
+}
+
+.headerTop {
+     background: linear-gradient(rgba(0, 181, 253, 0.44), rgba(207, 1, 255, 0.44)),
+                url("https://snipp.ru/themes/site/img/header-bg.png");
+    height: 70%;
+    display: flex;
+    flex-direction: column;
+}
+
+.headerBottom {
+    background-color: rgba(246, 245, 245, 0.01); /* white background */
+    height: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 
@@ -15,6 +48,7 @@ body {
     flex-direction: column;
     overflow: hidden; /* Обрезать содержимое, выходящее за пределы карточки */
     margin: 1rem; /* Отступ между карточками */
+    box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); /* Добавление тени при наведении */
 }
 
 .card-img-top {
@@ -25,6 +59,7 @@ body {
 
 .card-body {
     flex: 1; /* Позволяет содержимому карточки занимать оставшееся пространство */
+
 }
 
 .card:hover {
