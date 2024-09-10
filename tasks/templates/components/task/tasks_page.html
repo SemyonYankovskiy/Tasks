@@ -10,6 +10,7 @@
 {#            {% include "components/task/filter.html" %}#}
 {#        </div>#}
         <div class=" mt-4 px-2">
+
             {% include "components/task/task_container.html" with filter_data=filter_data tasks=pagination_data.page_obj not_done_count=tasks.not_done_count done_count=tasks.done_count show_my_tasks_only=tasks.show_my_tasks_only sort_order=tasks.sort_order show_active_task=tasks.show_active_task show_done_task=tasks.show_done_task %}
 
         </div>

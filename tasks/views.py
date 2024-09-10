@@ -1,14 +1,17 @@
 from datetime import datetime
 from urllib.parse import urlencode
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, F
+from django.db.transaction import atomic
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 
 from .filters import ObjectFilter
-from .models import Object, Task, Tag, ObjectGroup
+from .forms import AddTaskForm
+from .models import Object, Task, Tag, ObjectGroup, AttachedFile
 from .services.objects import get_objects_list, paginate_queryset
 from .services.tasks import get_filtered_tasks, task_filter_params
 
@@ -72,7 +75,7 @@ def get_random_icon(request):
 
     # Получаем список файлов в папке
     icon_pull = os.listdir(icon_directory)
-    print(icon_pull)
+
     # Если файлы есть, выбираем случайную иконку
     icon = random.choice(icon_pull) if icon_pull else None
 
@@ -205,3 +208,27 @@ def close_task(request, task_id):
         task.save()
 
     return HttpResponseRedirect(redirect_to)
+
+
+@login_required
+@atomic
+def create_task(request):
+    if request.method == 'POST':
+        form = AddTaskForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            task = form.save(commit=False)  # Сохраняем задачу, но не коммитим
+            task.save()  # Сохраняем задачу в БД
+            form.save_m2m()  # Сохраняем M2M данные
+
+            # Проходимся по файлам и сохраняем их
+            for file in request.FILES.getlist("files"):
+                task.files.add(AttachedFile.objects.create(file=file))
+            task.save()
+
+            messages.add_message(request, messages.SUCCESS, f"Задача '{form.cleaned_data['header']}' успешно создана")
+            return redirect("tasks")
+        else:
+            messages.add_message(request, messages.WARNING, form.errors)
+
+    return redirect("tasks")

@@ -22,12 +22,12 @@ def get_filtered_tasks(request, obj=None):
     except Engineer.DoesNotExist:
         engineer = None
 
-
-
-    basic_qs = Task.objects.all().filter(Q(objects_set__groups__users=request.user) | Q(engineers__user=request.user)).distinct()
+    if request.user.is_superuser:
+        basic_qs = Task.objects.all().distinct()
+    else:
+        basic_qs = Task.objects.all().filter(Q(objects_set__groups__users=request.user) | Q(engineers__user=request.user)).distinct()
 
     tasks = TaskFilter(request.GET, queryset=basic_qs).qs
-
 
 
     if show_my_tasks_only:
@@ -79,7 +79,7 @@ def get_filtered_tasks(request, obj=None):
 
 def task_filter_params(request):
     # Получаем теги, связанные с задачами
-    tags_qs = Tag.objects.filter(tasks__isnull=False).values("id", "tag_name")
+    tags_qs = Tag.objects.filter(tasks__isnull=False).values("id", "tag_name").distinct()
     tags = [{"id": tag["id"], "label": tag["tag_name"]} for tag in tags_qs]  # label обязателен
 
     # Получаем инженеров, связанных с задачами

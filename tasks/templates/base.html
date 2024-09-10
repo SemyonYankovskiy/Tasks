@@ -47,6 +47,17 @@
 
 <body>
 {% include "components/header.html" %}
+
+{% if messages %}
+<div class="container d-flex flex-wrap flex-column gap-2">
+    {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'debug' %}secondary{% else %}{{ message.tags }}{% endif %}" role="alert">
+          {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 {% block content %}{% endblock content %}
 {% include "components/footer.html" %}
 

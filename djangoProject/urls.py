@@ -8,7 +8,7 @@ from django.urls import path
 from tasks import views
 
 urlpatterns = [
-                  # path('create-task/', views.create_task, name='create_task'),
+                  path('create-task/', views.create_task, name='create_task'),
                   # path('edit-task/<int:task_id>/', views.edit_task, name='edit_task'),
                   path("tasks/", views.tasks_page, name="tasks"),  # Страница задач
                   path("close_task/<int:task_id>/", views.close_task, name="close_task"),
