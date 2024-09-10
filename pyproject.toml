@@ -1,0 +1,21 @@
+[tool.poetry]
+package-mode = false
+version = "0.1.0"
+description = ""
+authors = ["syankovskiy <semyon21@mail.ru>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django = "^5.1.1"
+django-filter = "^24.3"
+django-crispy-forms = "^2.3"
+crispy-bootstrap5 = "^2024.2"
+
+
+[tool.poetry.group.dev.dependencies]
+django-debug-toolbar = "^4.4.6"
+black = {extras = ["d"], version = "^24.8.0"}
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
