@@ -217,10 +217,7 @@ def create_task(request):
         form = AddTaskForm(request.POST, request.FILES)
 
         if form.is_valid():
-            task = form.save(commit=False)  # Сохраняем задачу, но не коммитим
-            task.save()  # Сохраняем задачу в БД
-            form.save_m2m()  # Сохраняем M2M данные
-
+            task = form.save()  # Сохраняем задачу, но не коммитим
             # Проходимся по файлам и сохраняем их
             for file in request.FILES.getlist("files"):
                 task.files.add(AttachedFile.objects.create(file=file))
@@ -232,3 +229,5 @@ def create_task(request):
             messages.add_message(request, messages.WARNING, form.errors)
 
     return redirect("tasks")
+
+

@@ -14,15 +14,13 @@ class AddTaskForm(forms.ModelForm):
                   'objects_create']
 
     def save(self, commit=True):
-        instance = super().save(commit=False)
-
-        def save_m2m():
-            self.cleaned_data['engineers_create'].update(tasks=instance)
-            self.cleaned_data['tags_create'].update(tasks=instance)
-            self.cleaned_data['objects_create'].update(tasks=instance)
+        instance: Task = super().save(commit=False)
 
         if commit:
             instance.save()
-            save_m2m()
+
+        instance.tags.set(self.cleaned_data['tags_create'])
+        instance.engineers.set(self.cleaned_data['engineers_create'])
+        instance.objects_set.set(self.cleaned_data['objects_create'])
 
         return instance
