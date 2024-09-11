@@ -82,7 +82,6 @@
                     </div>
                 </div>
 
-
             </button>
         </h2>
         <div id="collapse{{ task.id }}" class="accordion-collapse collapse {% if expanded %}show{% endif %}">
@@ -102,13 +101,13 @@
                     {# ТЕКСТ ЗАДАЧИ #}
                     {% if task.text %}
                         <div class="row mx-1 my-2 pt-3 d-flex align-items-center border-top">
-                        <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                                 class="bi bi-chat-left-dots" viewBox="0 0 16 16">
-                                <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"></path>
-                                <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"></path>
-                            </svg>
-                        </div>
+                            <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                                     class="bi bi-chat-left-dots" viewBox="0 0 16 16">
+                                    <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"></path>
+                                    <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"></path>
+                                </svg>
+                            </div>
                         <div class="col d-flex flex-column align-items-start border-start"
                              style="font-size: 18px; white-space: pre-line; text-align: justify;">
                             <span class="{% if not expanded %}spoiler-text{% endif %}">{{ task.text }}</span>
@@ -116,11 +115,10 @@
                                 больше
                             </button>
                         </div>
+                        </div>
                     {% endif %}
 
 
-
-                    </div>
                     {% if task.tags.all %}
                         <div class="row my-3 text-muted">
                             <div class="col d-flex flex-wrap justify-content-start  align-items-center gap-2">
@@ -140,8 +138,7 @@
                     {% if not task.is_done %}
                         {% if request.user.engineer in task.engineers.all or request.user.is_superuser %}
                             <div class="text-end gap-2">
-                                {% include "components/task/edit_task.html" with task=task %}
-                                {#                                {% include "components/update_task.html" with task=task %}#}
+                                {% include "components/task/edit_task_button.html" with task_id=task.id %}
                                 {% include "components/task/confirm_task.html" with task_id=task.id %}
                             </div>
                         {% endif %}

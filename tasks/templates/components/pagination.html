@@ -1,10 +1,10 @@
+<!-- Пагинация -->
+{% if pagination_data.page_obj.has_other_pages %}
+    <div class="pagination container d-flex justify-content-center">
 
-    <!-- Пагинация -->
-    {% if pagination_data.page_obj.has_other_pages %}
-        <div class="pagination container d-flex justify-content-center">
 
-        
-        <a href="{% if pagination_data.page_obj.has_previous %}?page={{ pagination_data.page_obj.previous_page_number }}&{{ filter_data }}{% else %}#{% endif %}"
+        <a href="{% if pagination_data.page_obj.has_previous %}?page={{ pagination_data.page_obj.previous_page_number }}&
+            {{ filter_data }}{% else %}#{% endif %}"
            class="mx-3 next_prev">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                  class="bi bi-caret-left" viewBox="0 0 16 16">
@@ -36,9 +36,10 @@
             {% endif %}
             <a href="?page={{ pagination_data.last_page_number }}&{{ filter_data }}">{{ pagination_data.last_page_number }}</a>
         {% endif %}
-        
 
-        <a href="{% if pagination_data.page_obj.has_next %}?page={{ pagination_data.page_obj.next_page_number }}&{{ filter_data }}{% else %}#{% endif %}"
+
+        <a href="{% if pagination_data.page_obj.has_next %}?page={{ pagination_data.page_obj.next_page_number }}&
+            {{ filter_data }}{% else %}#{% endif %}"
            class="mx-3 next_prev">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
                  class="bi bi-caret-right-fill" viewBox="0 0 16 16">
@@ -46,5 +47,5 @@
             </svg>
         </a>
 
-        </div>
-    {% endif %}
+    </div>
+{% endif %}

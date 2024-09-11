@@ -10,10 +10,10 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 
 from .filters import ObjectFilter
-from .forms import AddTaskForm
+from .forms import AddTaskForm, EditTaskForm
 from .models import Object, Task, Tag, ObjectGroup, AttachedFile
 from .services.objects import get_objects_list, paginate_queryset
-from .services.tasks import get_filtered_tasks, task_filter_params
+from .services.tasks import get_filtered_tasks, task_filter_params, get_m2m_fields_for_tasks
 
 
 @login_required
@@ -85,21 +85,20 @@ def get_random_icon(request):
     return icon_path
 
 
-
 @login_required
 def get_object_page(request, object_slug):
     # Получаем основной объект
     obj = (
         Object.objects.filter(slug=object_slug)
-        .prefetch_related("files", "tags", "groups")
-        .annotate(
+            .prefetch_related("files", "tags", "groups")
+            .annotate(
             parent_name=F("parent__name"),
             parent_slug=F("parent__slug"),
             done_tasks_count=Count("id", filter=Q(tasks__is_done=True)),
             undone_tasks_count=Count("id", filter=Q(tasks__is_done=False)),
         )
-        .filter(groups__users=request.user)
-        .first()
+            .filter(groups__users=request.user)
+            .first()
     )
 
     # Если объект не найден, выбрасываем исключение 404 (страница не найдена)
@@ -179,7 +178,8 @@ def calendar(request):
     tasks = get_filtered_tasks(request)
     filter_context = task_filter_params(request)
 
-    return render(request, "components/calendar/calendar.html", {"tasks": tasks, **filter_context, "random_icon": random_icon})
+    return render(request, "components/calendar/calendar.html",
+                  {"tasks": tasks, **filter_context, "random_icon": random_icon})
 
 
 @login_required
@@ -219,7 +219,7 @@ def create_task(request):
         if form.is_valid():
             task = form.save()  # Сохраняем задачу, но не коммитим
             # Проходимся по файлам и сохраняем их
-            for file in request.FILES.getlist("files"):
+            for file in request.FILES.getlist("files[]"):
                 task.files.add(AttachedFile.objects.create(file=file))
             task.save()
 
@@ -231,3 +231,53 @@ def create_task(request):
     return redirect("tasks")
 
 
+@login_required
+@atomic
+def get_task_edit_form(request, task_id: int):
+    task = get_object_or_404(Task, pk=task_id)
+    fields = get_m2m_fields_for_tasks()
+
+    context = {
+        "task": task,
+        **fields,
+        "current_engineers": list(task.engineers.all().values_list("id", flat=True)),
+        "current_tags_edit": list(task.tags.all().values_list("id", flat=True)),
+        "current_objects_edit": list(task.objects_set.all().values_list("id", flat=True)),
+    }
+    return render(request, 'components/task/edit_task_form.html', context)
+
+
+@login_required
+@atomic
+def edit_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id)
+
+    if request.method == 'POST':
+        form = EditTaskForm(request.POST, request.FILES, instance=task)
+        if form.is_valid():
+            updated_task = form.save(commit=False)
+            updated_task.is_done = form.cleaned_data.get('is_done', False)
+            updated_task.save()
+            form.save_m2m()
+
+            # Обработка файлов
+            files = request.FILES.getlist('files')
+            for file in files:
+                attached_file = AttachedFile(file=file)
+                attached_file.save()
+                updated_task.files.add(attached_file)
+
+            messages.add_message(request, messages.SUCCESS, f"Задача '{form.cleaned_data['header']}' отредактирована")
+            return redirect("tasks")
+        else:
+            messages.add_message(request, messages.WARNING, form.errors)
+            return redirect("tasks")
+    else:
+        form = EditTaskForm(instance=task)
+
+        # Передаем текущее состояние полей задачи
+        context = {
+            'form': form,
+            'task': task,
+        }
+        return render(request, 'components/task/edit_task_button.html', context)

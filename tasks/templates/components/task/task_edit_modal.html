@@ -1,0 +1,26 @@
+<!-- Модальное окно редактирования задачи -->
+<div class="modal fade" id="taskEditModal" data-bs-backdrop="static" data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="editTaskLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="editTaskLabel">Редактировать задачу</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+
+            {# Здесь будет загружена форма редактирования #}
+            <div id="task-edit-form"></div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const myModal = new bootstrap.Modal('#taskEditModal', {})
+    function showEditModal(taskID) {
+        myModal.show();
+        $("#task-edit-form").load("/ajax/tasks/" + taskID + "/edit")
+    }
+</script>
