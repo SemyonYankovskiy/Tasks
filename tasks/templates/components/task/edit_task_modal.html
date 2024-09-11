@@ -19,8 +19,11 @@
 
 <script>
     const myModal = new bootstrap.Modal('#taskEditModal', {})
+
     function showEditModal(taskID) {
         myModal.show();
         $("#task-edit-form").load("/ajax/tasks/" + taskID + "/edit")
     }
 </script>
+
+

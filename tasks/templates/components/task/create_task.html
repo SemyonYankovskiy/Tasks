@@ -41,7 +41,7 @@
                         <!-- Время завершения -->
                         <div class="mb-3 col-3">
                             <label for="taskCompletionTime" class="form-label">Время завершения</label>
-                            <input type="date" class="form-control" id="taskCompletionTime" name="completion_time"
+                            <input type="datetime-local" class="form-control" id="taskCompletionTime" name="completion_time"
                                    required>
                         </div>
                     </div>
@@ -121,6 +121,7 @@
     </div>
 </div>
 
+
 <style>
     .fileuploader-input-button {
         background-color: var(--bs-blue) !important;
@@ -142,57 +143,8 @@
         $('#taskFiles').fileuploader({
             addMore: true,
             limit: 10,
-            captions: {
-                button: function (options) {
-                    return 'Browse ' + (options.limit == 1 ? 'file' : 'files');
-                },
-                feedback: function (options) {
-                    return 'Выберите ' + (options.limit == 1 ? 'файл' : 'файлы') + ' to upload';
-                },
-                feedback2: function (options) {
-                    return options.length + ' ' + (options.length > 1 ? 'файлы были выбраны' : 'файл был выбран');
-                },
-                confirm: 'Confirm',
-                cancel: 'Cancel',
-                name: 'Name',
-                type: 'Type',
-                size: 'Size',
-                dimensions: 'Dimensions',
-                duration: 'Duration',
-                crop: 'Crop',
-                rotate: 'Rotate',
-                sort: 'Sort',
-                download: 'Download',
-                remove: 'Delete',
-                drop: 'Drop the files here to Upload',
-                paste: '<div class="fileuploader-pending-loader"></div> Pasting a file, click here to cancel.',
-                removeConfirmation: 'Are you sure you want to remove this file?',
-                errors: {
-                    filesLimit: function (options) {
-                        return 'Only ${limit} ' + (options.limit == 1 ? 'file' : 'files') + ' can be uploaded.'
-                    },
-                    filesType: 'Only ${extensions} files are allowed to be uploaded.',
-                    fileSize: '${name} is too large! Please choose a file up to ${fileMaxSize}MB.',
-                    filesSizeAll: 'The chosen files are too large! Please select files up to ${maxSize} MB.',
-                    fileName: 'A file with the same name ${name} is already selected.',
-                    remoteFile: 'Remote files are not allowed.',
-                    folderUpload: 'Folders are not allowed.'
-                }
-            }
         });
     });
-
-    async function deleteText() {
-        $('.mb-3').each((el, value) => {
-            const index = value.innerHTML.indexOf('© innostudio.de • Fileuploader');
-            if (index > 0) {
-                value.innerHTML = value.innerHTML.replace('© innostudio.de • Fileuploader', '')
-            } else {
-                setTimeout(deleteText, 400)
-            }
-        })
-    }
-
-    $(document).ready(deleteText);
-
+    
 </script>
+

@@ -1,3 +1,11 @@
+{% load static %}
+<!-- font -->
+<link href="{% static 'fileuploader/font/font-fileuploader.css' %}" media="all" rel="stylesheet">
+<!-- css -->
+<link href="{% static 'fileuploader/jquery.fileuploader.min.css' %}" media="all" rel="stylesheet">
+<!-- js -->
+<script src="{% static 'fileuploader/jquery.fileuploader.min.js' %}" type="text/javascript"></script>
+
 <form method="POST" action="{% url "edit_task" task.id %}" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="p-3">
@@ -47,21 +55,21 @@
         <!-- Выбор инженеров -->
         <div class="mb-3">
             <label for="taskEngineers_edit_{{ task.id }}" class="form-label">Инженеры</label>
-            {% include 'tree-select-task.html' with select_name='engineers_edit' current_options=current_engineers task_id=task.id objects_structure_json=engineers_json %}
+            {% include 'tree-select.html' with select_name='engineers_edit' current_options=current_engineers task_id=task.id objects_structure_json=engineers_json %}
 
         </div>
 
         <!-- Выбор тегов  -->
         <div class="mb-3">
             <label for="taskTags_edit_{{ task.id }}" class="form-label">Теги</label>
-            {% include 'tree-select-task.html' with select_name='tags_edit' current_options=current_tags_edit task_id=task.id objects_structure_json=tags_json %}
+            {% include 'tree-select.html' with select_name='tags_edit' current_options=current_tags_edit task_id=task.id objects_structure_json=tags_json %}
 
         </div>
 
         <!-- Выбор объектов  -->
         <div class="mb-3">
             <label for="taskObj_edit_{{ task.id }}" class="form-label">Объекты</label>
-            {% include 'tree-select-task.html' with select_name='objects_edit' current_options=current_objects_edit task_id=task.id objects_structure_json=objects_json %}
+            {% include 'tree-select.html' with select_name='objects_edit' current_options=current_objects_edit task_id=task.id objects_structure_json=objects_json %}
 
         </div>
 
@@ -79,3 +87,36 @@
         <button type="submit" class="btn btn-primary">Сохранить</button>
     </div>
 </form>
+
+
+<script>
+    $(document).ready(function () {
+        $('#taskFilesEdit').fileuploader({
+            addMore: true,
+            limit: 10,
+        {% if task.files.all %}
+            files: [
+                {% for f in task.files.all %}
+                    {
+                        name: '{{ f.file.name }}', // file name
+                        size: {{f.file.size}}, // file size in bytes
+                        type: 'image/png', // file MIME type
+                        file: '{{ f.file.url }}', // file path
+                        local: '{{ f.file.url }}', // file path in listInput (optional)
+                        data: {
+                            thumbnail: '{{ f.file.url }}', // item custom thumbnail; if false will disable the thumbnail (optional)
+                            readerCrossOrigin: 'anonymous', // fix image cross-origin issue (optional)
+                            readerForce: true, // prevent the browser cache of the image (optional)
+                            readerSkip: true, // skip file from reading by rendering a thumbnail (optional)
+                            popup: true, // remove the popup for this file (optional)
+                            listProps: {}, // custom key: value attributes in the fileuploader's list (optional)
+                            your_own_attribute: 'your own value'
+                        }
+                    },
+                {% endfor %}
+            ],
+        {% endif %}
+        });
+    });
+
+</script>

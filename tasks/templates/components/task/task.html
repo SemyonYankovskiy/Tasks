@@ -108,13 +108,13 @@
                                     <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"></path>
                                 </svg>
                             </div>
-                        <div class="col d-flex flex-column align-items-start border-start"
-                             style="font-size: 18px; white-space: pre-line; text-align: justify;">
-                            <span class="{% if not expanded %}spoiler-text{% endif %}">{{ task.text }}</span>
-                            <button class="btn btn-outline-dark toggle-spoiler mt-2" style="display: none;">Показать
-                                больше
-                            </button>
-                        </div>
+                            <div class="col d-flex flex-column align-items-start border-start"
+                                 style="font-size: 18px; white-space: pre-line; text-align: justify;">
+                                <span class="{% if not expanded %}spoiler-text{% endif %}">{{ task.text }}</span>
+                                <button class="btn btn-outline-dark toggle-spoiler mt-2" style="display: none;">Показать
+                                    больше
+                                </button>
+                            </div>
                         </div>
                     {% endif %}
 
@@ -138,7 +138,11 @@
                     {% if not task.is_done %}
                         {% if request.user.engineer in task.engineers.all or request.user.is_superuser %}
                             <div class="text-end gap-2">
-                                {% include "components/task/edit_task_button.html" with task_id=task.id %}
+
+
+                                {{ task.id }}
+
+                                {% include "components/task/edit_task.html" with task_id=task.id %}
                                 {% include "components/task/confirm_task.html" with task_id=task.id %}
                             </div>
                         {% endif %}
