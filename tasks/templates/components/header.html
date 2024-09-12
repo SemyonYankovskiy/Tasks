@@ -47,7 +47,7 @@
                             <li class="nav-item">
                                 <a href="{% url 'map' %}" class="nav-link p-0 disabled">
                                     <img width="32" height="32" src="{% static 'img/map.svg' %}"
-                                         class="bi d-block mx-auto mb-3" alt="map" />
+                                         class="bi d-block mx-auto mb-3" alt="map" style="opacity: 50%"/>
                                 </a>
                                 <div class="d-flex flex-column">
                                     <span class="m-0 p-0 text-black-50" style="font-size: 1rem">Карта</span>
@@ -56,12 +56,23 @@
                             <li class="nav-item">
                                 <a href="#" class="nav-link p-0 disabled">
                                     <img width="32" height="32" src="{% static 'img/graph-up.svg' %}"
-                                         class="bi d-block mx-auto mb-3" alt="stat"/>
+                                         class="bi d-block mx-auto mb-3" alt="stat" style="opacity: 50%"/>
                                 </a>
                                 <div class="d-flex flex-column">
                                     <span class="m-0 p-0 text-black-50" style="font-size: 1rem">Статистика</span>
                                 </div>
                             </li>
+                             {% if user.is_staff  %}
+                            <li class="nav-item">
+                                <a href="/admin" class="nav-link p-0">
+                                    <img width="32" height="32" src="{% static 'img/gear.svg' %}"
+                                         class="bi d-block mx-auto mb-3" alt="stat" />
+                                </a>
+                                <div class="d-flex flex-column">
+                                    <span class="m-0 p-0 text-black" style="font-size: 1rem">Админ панель</span>
+                                </div>
+                            </li>
+                            {% endif %}
                         </ul>
 
                         <div class="nav nav-item dropdown me-3">
@@ -96,7 +107,8 @@
                     <div class="col-md-1"></div>
                     <div class="col-md-3 d-flex align-items-center">
                         <a href="#" class="btn mx-3">
-                            <img   class="me-3" src="{% static 'img/chpic.su_-_Brilevsky_120.png' %}" alt=""  style="max-height: 150px; max-width: 150px">
+                            <img class="me-3" src="{% static 'img/chpic.su_-_Brilevsky_120.png' %}" alt=""
+                                 style="max-height: 150px; max-width: 150px">
                         </a>
                     </div>
                     <div class="col-md-7 d-flex justify-content-end align-items-center">
@@ -108,7 +120,7 @@
                         </div>
 
                     </div>
-                     <div class="col-md-1"></div>
+                    <div class="col-md-1"></div>
                 {% endif %}
             </header>
         </div>
