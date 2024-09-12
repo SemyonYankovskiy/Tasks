@@ -42,7 +42,6 @@ class EditTaskForm(forms.ModelForm):
         if commit:
             instance.save()
 
-        instance.files.set(self.cleaned_data["files"])
         instance.tags.set(self.cleaned_data['tags_edit'])
         instance.engineers.set(self.cleaned_data['engineers_edit'])
         instance.objects_set.set(self.cleaned_data['objects_edit'])

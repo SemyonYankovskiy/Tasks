@@ -155,6 +155,10 @@ class AttachedFile(models.Model):
     def __str__(self):
         return self.file.name
 
+    def clear_file_name(self):
+        return re.search(r'.+\/\S{8}-\S{4}-\S{4}-\S{4}-\S{12}_\._(.+)', self.file.name).group(1)
+
+
     def is_image(self) -> bool:
         return self.extension in [".jpeg", ".jpg", ".png"]
 

@@ -461,9 +461,7 @@ def edit_task(request, task_id):
 
 
 def remove_unused_task_attached_files(file_uploader_data: str, task: Task, *, delete_orphan_files: bool = False):
-    """Удаляет прикрепленные к задачам файлы, которые не используются
-
-    СИЛЬНО НЕ ЕБУ КАК РАБОТАЕТ"""
+    """Удаляет прикрепленные к задачам файлы, которые не используются"""
 
     try:
         # Получаем список ОСТАВШИХСЯ прикрепленных файлов из json строчки.
@@ -481,7 +479,6 @@ def remove_unused_task_attached_files(file_uploader_data: str, task: Task, *, de
         # Создаем список URL адресов файлов, которые должны ОСТАТЬСЯ у этой задачи.
         files_urls = [f["file"] for f in not_deleted_files]
         for db_file in task.files.all():  # Смотрим уже имеющиеся файлы у задачи.
-
             # Если файла нет в списке оставшихся, то его нужно открепить от этой задачи.
             if db_file.file.url not in files_urls:
                 task.files.remove(db_file)  # Удаляем связь задачи и файла.
@@ -490,9 +487,3 @@ def remove_unused_task_attached_files(file_uploader_data: str, task: Task, *, de
                 if delete_orphan_files:
                     db_file.file.delete()
                     db_file.delete()
-
-
-
-
-
-

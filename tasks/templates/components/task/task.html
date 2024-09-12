@@ -138,10 +138,6 @@
                     {% if not task.is_done %}
                         {% if request.user.engineer in task.engineers.all or request.user.is_superuser %}
                             <div class="text-end gap-2">
-
-
-                                {{ task.id }}
-
                                 {% include "components/task/edit_task.html" with task_id=task.id %}
                                 {% include "components/task/confirm_task.html" with task_id=task.id %}
                             </div>

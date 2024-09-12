@@ -76,7 +76,7 @@
         <!-- Загрузка файлов (псевдокод для примера) -->
         <div class="mb-3">
             <label for="taskFiles_edit_{{ task.id }}" class="form-label">Файлы</label>
-            <input class="form-control" type="file" id="taskFiles" name="files" multiple>
+            <input class="form-control" type="file" id="taskFilesEdit" name="files" multiple>
         </div>
 
 
@@ -98,7 +98,7 @@
             files: [
                 {% for f in task.files.all %}
                     {
-                        name: '{{ f.file.name }}', // file name
+                        name: '{{ f.clear_file_name }}', // file name
                         size: {{f.file.size}}, // file size in bytes
                         type: 'image/png', // file MIME type
                         file: '{{ f.file.url }}', // file path
