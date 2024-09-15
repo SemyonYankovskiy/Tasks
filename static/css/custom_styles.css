@@ -6,15 +6,16 @@
 /*                url("https://snipp.ru/themes/site/img/header-bg.png");*/
 /*}*/
 
-body{
+body {
     background: linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255));
 }
 
-.headerBackground{
-    /*background-color: #0255a6;*/
-     background: linear-gradient(rgba(0, 181, 253, 0.44), rgba(207, 1, 255, 0.44)),
-                url("https://snipp.ru/themes/site/img/header-bg.png");
-}
+
+/*.headerBackground{*/
+/*    background-color: #0255a6;*/
+/*    !* background: linear-gradient(rgba(0, 181, 253, 0.44), rgba(207, 1, 255, 0.44)),*!*/
+/*    !*            url("https://snipp.ru/themes/site/img/header-bg.png");*!*/
+/*}*/
 
 
 .headerContainer {
@@ -24,15 +25,16 @@ body{
 }
 
 .headerTop {
-     background: linear-gradient(rgba(0, 181, 253, 0.44), rgba(207, 1, 255, 0.44)),
-                url("https://snipp.ru/themes/site/img/header-bg.png");
-    height: 70%;
+    /*background-color: #0255a6;*/
+    background: linear-gradient(rgba(0, 72, 253, 0.52), rgba(0, 140, 255, 0.53)),
+    url("https://snipp.ru/themes/site/img/header-bg.png");
+    height: 62%;
     display: flex;
     flex-direction: column;
 }
 
 .headerBottom {
-    background-color: rgba(246, 245, 245, 0.01); /* white background */
+    background-color: rgba(255, 0, 0, 0); /* white background */
     height: 20%;
     display: flex;
     align-items: center;
@@ -129,36 +131,59 @@ body{
 }
 
 
-
 /*Стили для пагинации*/
 .pagination {
-  display: inline-block;
+    display: inline-block;
 }
+
 .pagination a {
     border-radius: 5px;
-  color: black;
-  float: left;
-  padding: 8px 16px;
-  text-decoration: none;
-  transition: background-color .3s;
-  border: 1px solid #ddd;
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+    border: 1px solid #ddd;
 }
+
 .pagination a.active {
     border-radius: 5px;
-  background-color: rgba(75, 0, 255, 0);
-  color: #070707;
-  border: 2px solid #2f85e8;
+    background-color: rgba(75, 0, 255, 0);
+    color: #070707;
+    border: 2px solid #2f85e8;
 }
 
 .pagination a.next_prev {
     border-radius: 5px;
-  background-color: rgba(47, 133, 232, 0);
-  color: #070707;
-  border: 2px solid rgba(47, 133, 232, 0);
+    background-color: rgba(47, 133, 232, 0);
+    color: #070707;
+    border: 2px solid rgba(47, 133, 232, 0);
 }
 
-.pagination a:hover:not(.active) {background-color: #ddd;}
+.pagination a:hover:not(.active) {
+    background-color: #ddd;
+}
 
+.pagination select {
+    border-radius: 5px;
+    color: black;
+    padding: 8px 8px;
+    text-decoration: none;
+    transition: background-color .3s;
+    border: 1px solid #ddd;
+    background-color: white; /* добавляем белый фон для select */
+    cursor: pointer; /* указатель курсора при наведении */
+}
+
+.pagination select:hover {
+    background-color: #ddd; /* при наведении фон становится серым */
+}
+
+.pagination option {
+    color: black;
+    background-color: white; /* цвет фона для опций */
+    padding: 8px 16px;
+}
 
 .taskDone div {
     background-color: #00CC00;
@@ -168,10 +193,12 @@ body{
     font-weight: 700;
 
 }
+
 .taskCalendar {
     border: 1px solid #505050 !important;
     border-radius: 10px;
 }
+
 .taskCalendar:hover {
     box-shadow: 2px 1px 1px #959595;
     cursor: pointer;
@@ -183,6 +210,7 @@ body{
     text-align: center;
     font-weight: 700;
 }
+
 .taskDanger div {
     background-color: #E97659;
     border-radius: 5px;
@@ -191,6 +219,7 @@ body{
     font-weight: 700;
 
 }
+
 .taskWarning div {
     background-color: #FFC859;
     border-radius: 5px;
@@ -199,6 +228,7 @@ body{
     font-weight: 700;
 
 }
+
 .taskInfo div {
     background-color: #3a8efb;
     border-radius: 5px;

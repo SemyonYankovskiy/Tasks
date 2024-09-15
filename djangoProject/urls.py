@@ -12,6 +12,7 @@ urlpatterns = [
   path('edit-task/<int:task_id>/', views.edit_task, name='edit_task'),
   path("tasks/", views.tasks_page, name="tasks"),  # Страница задач
   path("close_task/<int:task_id>/", views.close_task, name="close_task"),
+  path("reopen_task/<int:task_id>/", views.reopen_task, name="reopen_task"),
   path("map/", views.map_page, name="map"),  # Страница карты
   path("calendar/", views.calendar, name="calendar"),  # Страница карты
   path("admin/", admin.site.urls,),

@@ -99,6 +99,7 @@ class Task(models.Model):
     completion_time = models.DateTimeField()
     header = models.CharField(max_length=128)
     text = models.TextField(blank=True)
+    completion_text = models.TextField(blank=True)
     engineers = models.ManyToManyField(
         "Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True
     )

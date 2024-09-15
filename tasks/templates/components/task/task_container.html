@@ -1,9 +1,9 @@
-<div id="tasks" class="row shadow p-4 bg-body-tertiary rounded border-top border-3 ">
+<div id="tasks" class=" p-4">
 
-    <div class="pb-2 d-flex justify-content-between px-4">
-        <h3>Задачи</h3>
-
-    </div>
+{#    <div class="pb-2 d-flex justify-content-between px-4">#}
+{#        <h3>Задачи</h3>#}
+{##}
+{#    </div>#}
 
 
     <div class="row">
@@ -81,7 +81,7 @@
         {% endif %}
     </div>
     {% if not hide_filter %}
-        <div class="d-flex mb-2 mt-1 px-4">
+        <div class="d-flex mb-2 mt-1 px-4 ">
             {% include "components/task/../filter.html" %}
         </div>
     {% endif %}
@@ -93,7 +93,7 @@
     {% if tasks %}
         <div class="mt-4" id="myTabContent">
         <!-- Вкладка активных задач -->
-        <div>
+        <div class="px-2 ">
             {% for task in tasks %}
                 {% include "components/task/task.html" %}
             {% endfor %}

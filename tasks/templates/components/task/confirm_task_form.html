@@ -1,4 +1,5 @@
-<form action="{% url 'close_task' task_id %}" method="post">
+
+<form action="{% if form_action == 'close' %}{% url 'close_task' task_id %}{% else %}{% url 'reopen_task' task_id %}{% endif %}" method="post">
     {% csrf_token %}
     <input name="from_url"
            value="{% if request.path == '/tasks/' %}{% url 'tasks' %}
@@ -7,12 +8,14 @@
            hidden>
     <div>
         <div class="mb-3">
-            <label for="comment" class="form-label">Комментарий к задаче</label>
+            <label for="comment" class="form-label" style="display: block;">Комментарий к задаче</label>
             <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Подтвердить</button>
+        <button type="submit" class="btn {% if form_action == 'close' %}btn-primary{% else %}btn-primary{% endif %}">
+            Подтвердить
+        </button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
     </div>
 </form>

@@ -9,7 +9,7 @@
                     aria-expanded="{% if expanded %}true{% else %}false{% endif %}"
                     aria-controls="collapse{{ task.id }}">
 
-                <div class="container-fluid">
+                <div class="container-fluid ">
                     <div class="d-flex flex-row w-100 align-items-center">
                         <!-- Первый столбец -->
                         <div class="col-md-1 d-flex justify-content-center align-items-center "
@@ -110,10 +110,27 @@
                             </div>
                             <div class="col d-flex flex-column align-items-start border-start"
                                  style="font-size: 18px; white-space: pre-line; text-align: justify;">
-                                <span class="{% if not expanded %}spoiler-text{% endif %}">{{ task.text }}</span>
-                                <button class="btn btn-outline-dark toggle-spoiler mt-2" style="display: none;">Показать
+                                <span class="{% if not expanded %}spoiler-text-{{ task.id }}{% endif %}">{{ task.text }}</span>
+                                <button class="btn btn-outline-dark toggle-spoiler mt-2"
+                                        style="display: none; white-space: nowrap;">Показать
                                     больше
                                 </button>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if task.completion_text %}
+                        <div class="row mx-1 my-2 pt-3 d-flex align-items-center border-top">
+                            <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                                     class="bi bi-activity" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M6 2a.5.5 0 0 1 .47.33L10 12.036l1.53-4.208A.5.5 0 0 1 12 7.5h3.5a.5.5 0 0 1 0 1h-3.15l-1.88 5.17a.5.5 0 0 1-.94 0L6 3.964 4.47 8.171A.5.5 0 0 1 4 8.5H.5a.5.5 0 0 1 0-1h3.15l1.88-5.17A.5.5 0 0 1 6 2Z"/>
+                                </svg>
+                            </div>
+                            <div class="col d-flex flex-column align-items-start border-start"
+                                 style="font-size: 18px; white-space: pre-line; text-align: justify;">
+                                <span class="">{{ task.completion_text }}</span>
+        
                             </div>
                         </div>
                     {% endif %}
@@ -139,9 +156,13 @@
                         {% if request.user.engineer in task.engineers.all or request.user.is_superuser %}
                             <div class="text-end gap-2">
                                 {% include "components/task/edit_task.html" with task_id=task.id %}
-                                {% include "components/task/confirm_task.html" with task_id=task.id %}
+                                {% include "components/task/confirm_task.html" with task_id=task.id action_type="close" %}
                             </div>
                         {% endif %}
+                    {% else %}
+                        <div class="text-end gap-2">
+                            {% include "components/task/confirm_task.html" with task_id=task.id %}
+                        </div>
                     {% endif %}
 
                 </div>

@@ -5,22 +5,19 @@
 
 {% block content %}
 
-<div class="px-5 text-center container ">
-  <div class="row pb-3">
-      {% include "components/object/object-content.html" with object=object child_objects=child_objects %}
-  </div>
+    <div class="px-5 text-center container ">
 
-  <div>
-
-  </div>
-
-      {% include "components/task/task_container.html" with hide_filter=True tasks=tasks.tasks not_done_count=tasks.not_done_count done_count=tasks.done_count show_my_tasks_only=tasks.show_my_tasks_only sort_order=tasks.sort_order  show_active_task=tasks.show_active_task show_done_task=tasks.show_done_task %}
+        {% include "components/object/object-content.html" with object=object child_objects=child_objects %}
 
 
+        <div class=" shadow rounded border-top border-3 ">
 
-</div>
-    
+            {% include "components/task/task_container.html" with hide_filter=True tasks=tasks.tasks not_done_count=tasks.not_done_count done_count=tasks.done_count show_my_tasks_only=tasks.show_my_tasks_only sort_order=tasks.sort_order  show_active_task=tasks.show_active_task show_done_task=tasks.show_done_task %}
 
+        </div>
+
+
+    </div>
 
 
 

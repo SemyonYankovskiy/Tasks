@@ -63,9 +63,9 @@ def get_home(request):
 
     # Получаем номер страницы из запроса
     page_number = request.GET.get("page")
+    per_page = request.GET.get('per_page', 8)  # Значение по умолчанию
+    pagination_data = paginate_queryset(filtered_objects, page_number, per_page)
 
-    # Используем функцию пагинации
-    pagination_data = paginate_queryset(filtered_objects, page_number, per_page=8)
 
     # Получаем теги, связанные с объектами
     tags = Tag.objects.filter(objects_set__isnull=False).filter(objects_set__groups__users=request.user).distinct()
@@ -83,7 +83,7 @@ def get_home(request):
     filter_url = urlencode(filter_data, doseq=True)
 
     random_icon = get_random_icon(request)
-
+    not_count_params = ["page", "per_page"]
     # Передаем отфильтрованные объекты в контекст
     context = {
         "pagination_data": pagination_data,
@@ -93,13 +93,15 @@ def get_home(request):
         "current_tags": request.GET.getlist("tags"),
         "groups_json": groups,
         "current_groups": request.GET.getlist("groups"),
-        "params_count": len([param for key, param in request.GET.items() if param and key != "page"])
+        'current_page': request.path,
+        "params_count": len([param for key, param in request.GET.items() if param and key not in not_count_params])
+
     }
 
     return render(request, "components/home/home.html", context=context)
 
 
-def paginate_queryset(queryset, page_number, per_page=4):
+def paginate_queryset(queryset, page_number, per_page):
     paginator = Paginator(queryset, per_page)
     page_obj = paginator.get_page(page_number)
 
@@ -118,7 +120,10 @@ def paginate_queryset(queryset, page_number, per_page=4):
         "start_show_ellipsis": start_show_ellipsis,
         "start_show_first_page_link": start_show_first_page_link,
         "last_page_number": total_pages,
+        "per_page": per_page
     }
+
+
 
 
 
@@ -180,6 +185,7 @@ def get_object_page(request, object_slug):
         "task_count": obj.done_tasks_count + obj.undone_tasks_count,
         "child_objects": child_objects,
         "filter_data": "#tasks",
+        'is_objects_page': request.path.startswith('/object/'),
     }
 
     return render(request, "components/object/object-page.html", context=context)
@@ -233,7 +239,7 @@ def get_objects_tree() -> list:
 
 
 def task_filter_params(request):
-    not_count_params = ["show_my_tasks_only", "sort_order", "page", "show_active_task", "show_done_task"]
+    not_count_params = ["show_my_tasks_only", "sort_order", "page", "show_active_task", "show_done_task", "per_page"]
 
     exclude_params = ["page"]
     filter_data = {key: value for key, value in request.GET.items() if key not in exclude_params}
@@ -325,8 +331,9 @@ def tasks_page(request):
 
     # Получаем номер страницы из запроса
     page_number = request.GET.get("page")
-    # Используем функцию пагинации
-    pagination_data = paginate_queryset(filtered_task["tasks"], page_number, per_page=4)
+    per_page = request.GET.get('per_page', 4)  # Значение по умолчанию
+    pagination_data = paginate_queryset(filtered_task["tasks"], page_number, per_page)
+
 
     random_icon = get_random_icon(request)
 
@@ -338,7 +345,7 @@ def tasks_page(request):
             "random_icon": random_icon,
             "tasks": filtered_task,
             **filter_context,
-
+            'current_page': request.path,
         },
     )
 
@@ -368,7 +375,8 @@ def calendar(request):
     filter_context = task_filter_params(request)
 
     return render(request, "components/calendar/calendar.html",
-                  {"tasks": tasks, **filter_context, "random_icon": random_icon})
+                  {"tasks": tasks, **filter_context, "random_icon": random_icon, 'current_page': request.path,})
+
 
 
 @login_required
@@ -391,10 +399,38 @@ def close_task(request, task_id):
             # Если у пользователя нет engineer, использовать имя пользователя
             name = request.user.username
 
-        update_text = (f"\n______________________________________________________________\n"
-                       f"Закрыто: [{name} / {datetime.now().strftime('%d.%m.%Y %H:%M')}]\n{comment}")
+        pattern = (f"\n\nЗакрыто: [{name} / {datetime.now().strftime('%d.%m.%Y %H:%M')}]\n")
 
-        task.text += update_text
+
+        task.completion_text += pattern + comment
+        task.save()
+
+    return HttpResponseRedirect(redirect_to)
+
+
+@login_required
+def reopen_task(request, task_id):
+    redirect_to: str = reverse("tasks")
+
+    if request.method == "POST":
+        task = get_object_or_404(Task, pk=task_id)
+        comment = request.POST.get("comment", "")
+        # Куда перенаправлять после успешного переоткрытия задачи
+        redirect_to = request.POST.get("from_url", redirect_to).strip()
+
+        # Обновление задачи
+        task.is_done = False
+        # task.completion_time = None
+
+        try:
+            name = f"{request.user.engineer.first_name} {request.user.engineer.second_name}"
+        except AttributeError:
+            # Если у пользователя нет engineer, использовать имя пользователя
+            name = request.user.username
+
+        pattern = (f"\n\nПереоткрыто: [{name} / {datetime.now().strftime('%d.%m.%Y %H:%M')}]\n")
+
+        task.completion_text += pattern + comment
         task.save()
 
     return HttpResponseRedirect(redirect_to)
