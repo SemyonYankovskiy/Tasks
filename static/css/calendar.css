@@ -1,0 +1,52 @@
+.taskDone div {
+    background-color: #00CC00;
+    border-radius: 5px;
+    color: #ffffff;
+    text-align: center;
+    font-weight: 700;
+
+}
+
+.taskCalendar {
+    border: 1px solid #505050 !important;
+    border-radius: 10px;
+}
+
+.taskCalendar:hover {
+    box-shadow: 2px 1px 1px #959595;
+    cursor: pointer;
+}
+
+.taskCrit div {
+    background-color: #ff4848;
+    color: #ffffff;
+    text-align: center;
+    font-weight: 700;
+}
+
+.taskDanger div {
+    background-color: #E97659;
+    border-radius: 5px;
+    color: #fcfcfc;
+    text-align: center;
+    font-weight: 700;
+
+}
+
+.taskWarning div {
+    background-color: #FFC859;
+    border-radius: 5px;
+    color: #383838;
+    text-align: center;
+    font-weight: 700;
+
+}
+
+.taskInfo div {
+    background-color: #3a8efb;
+    border-radius: 5px;
+    color: #ffffff;
+    text-align: center;
+    font-weight: 700;
+
+}
