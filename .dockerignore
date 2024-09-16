@@ -1,0 +1,8 @@
+*
+!djangoProject
+!static
+!tasks
+!user
+!poetry.lock
+!pyproject.toml
+!run.sh

@@ -1,0 +1,43 @@
+version: "3.11"
+
+services:
+  nginx:
+    image: nginx:1.25.5-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - "./config/nginx.conf:/etc/nginx/conf.d/default.conf:ro"
+      - "./media/:/var/www/media/:ro"
+      - "./static/:/var/www/static/:ro"
+    depends_on:
+      - backend
+
+  backend:
+    build: .
+    image: tasks:0.1
+    command: /bin/sh run.sh
+    env_file:
+      - .env
+    volumes:
+      - "./media:/app/media"
+      - "./static:/app/static"
+    depends_on:
+      database:
+        condition: service_healthy
+
+  redis:
+    image: redis:7.2.4-alpine
+
+  database:
+    image: postgres:16.4
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - "./pg_data:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 5s         # Интервал между проверками
+      timeout: 10s          # Время ожидания ответа от healthcheck
+      retries: 5            # Количество попыток перед тем, как признать контейнер недоступным
+      start_period: 30s     # Время на запуск перед началом проверки (обычно Postgres может запускаться дольше)
