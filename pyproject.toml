@@ -10,6 +10,7 @@ django = "^5.1.1"
 django-filter = "^24.3"
 psycopg2-binary = "^2.9.9"
 gunicorn = "^23.0.0"
+redis = "^5.0.8"
 
 
 [tool.poetry.group.dev.dependencies]
