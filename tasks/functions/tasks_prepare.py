@@ -15,13 +15,16 @@ def get_filtered_tasks(request, obj=None):
     show_my_tasks_only = request.GET.get("show_my_tasks_only") == "true"
     sort_order = request.GET.get("sort_order", "desc")  # По умолчанию сортировка по убыванию
 
-    # Определяем, какие задачи (активные/завершённые) нужно показать в зависимости от пути
-    if request.path.startswith("/calendar/"):
-        show_active_task = request.GET.get("show_active_task", "true") == "true"
-        show_done_task = request.GET.get("show_done_task", "true") == "true"
-    else:
-        show_active_task = request.GET.get("show_active_task", "true") == "true"
-        show_done_task = request.GET.get("show_done_task", "false") == "true"
+    # # Определяем, какие задачи (активные/завершённые) нужно показать в зависимости от пути
+    # if request.path.startswith("/calendar/"):
+    #     show_active_task = request.GET.get("show_active_task", "true") == "true"
+    #     show_done_task = request.GET.get("show_done_task", "true") == "true"
+    # else:
+    #     show_active_task = request.GET.get("show_active_task", "true") == "true"
+    #     show_done_task = request.GET.get("show_done_task", "false") == "true"
+
+    show_active_task = request.GET.get("show_active_task", "true") == "true"
+    show_done_task = request.GET.get("show_done_task", "false") == "true"
 
     # Получаем информацию об инженере, связанном с текущим пользователем
     try:
