@@ -28,7 +28,7 @@ body {
     /*background-color: #0255a6;*/
     background: linear-gradient(rgba(0, 72, 253, 0.52), rgba(0, 140, 255, 0.53)),
     url("https://snipp.ru/themes/site/img/header-bg.png");
-    height: 62%;
+    height: 59%;
     display: flex;
     flex-direction: column;
 }

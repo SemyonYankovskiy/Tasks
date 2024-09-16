@@ -8,7 +8,7 @@
 
 <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
         data-bs-target="#staticBackdrop_create_task">
-        <i class="bi bi-plus-square" style="font-size: 1.2rem"></i>
+    <i class="bi bi-plus-square" style="font-size: 1.2rem"></i>
     Создать задачу
 </button>
 
@@ -24,6 +24,8 @@
             </div>
             <form method="POST" action="{% url 'create_task' %}" enctype="multipart/form-data">
                 {% csrf_token %}
+                <!-- Скрытое поле для сохранения URL с фильтрами -->
+                <input type="hidden" name="from_url" value="{{ request.get_full_path }}">
                 <div class="modal-body p-4">
 
                     <div class="d-flex gap-2">
@@ -37,7 +39,8 @@
                         <!-- Время завершения -->
                         <div class="mb-3 col-3">
                             <label for="taskCompletionTime" class="form-label">Время завершения</label>
-                            <input type="datetime-local" class="form-control" id="taskCompletionTime" name="completion_time"
+                            <input type="datetime-local" class="form-control" id="taskCompletionTime"
+                                   name="completion_time"
                                    required>
                         </div>
                     </div>
@@ -107,6 +110,7 @@
                         <textarea class="form-control" id="taskText" name="text" rows="4"></textarea>
                     </div>
 
+
                     <!-- Загрузка файлов (псевдокод для примера) -->
                     <div class="mb-3">
                         <input class="form-control" type="file" id="taskFiles" name="files" multiple>
@@ -148,6 +152,6 @@
             limit: 10,
         });
     });
-    
+
 </script>
 

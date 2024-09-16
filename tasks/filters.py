@@ -22,5 +22,5 @@ class TaskFilter(django_filters.FilterSet):
         model = Task
         fields = ["search", "tags", "engineers", "priority", "objects_set"]
 
-    def search_filter(self, queryset, name: str, value: str):
-        return queryset.filter(Q(name__icontains=value) | Q(description__icontains=value))
+    def search_filter(self, queryset, header: str, value: str):
+        return queryset.filter(Q(header__icontains=value) | Q(text__icontains=value))

@@ -8,77 +8,100 @@
 
 <form method="POST" action="{% url "edit_task" task.id %}" enctype="multipart/form-data">
     {% csrf_token %}
-    <div class="p-3">
-        <!-- Заголовок задачи -->
-        <div class="mb-3">
-            <label for="taskHeader_edit_{{ task.id }}" class="form-label">Заголовок</label>
-            <input type="text" class="form-control" id="taskHeader_edit_{{ task.id }}" name="header"
-                   value="{{ task.header }}" required>
-        </div>
+    <input type="hidden" name="from_url" value="{{ request.get_full_path }}">
 
-        <!-- Приоритет задачи -->
-        <div class="mb-3">
-            <label for="taskPriority_edit_{{ task.id }}" class="form-label">Приоритет</label>
-            <select name="priority" class="select form-select" id="taskPriority_edit_{{ task.id }}">
-                <option value="" {% if not task.priority %}selected{% endif %}>-</option>
-                <option value="CRITICAL" {% if task.priority == 'CRITICAL' %}selected{% endif %}>
-                    Критический
-                </option>
-                <option value="HIGH" {% if task.priority == 'HIGH' %}selected{% endif %}>Высокий</option>
-                <option value="MEDIUM" {% if task.priority == 'MEDIUM' %}selected{% endif %}>Средний
-                </option>
-                <option value="LOW" {% if task.priority == 'LOW' %}selected{% endif %}>Низкий</option>
-            </select>
+    <div class="modal-body p-4">
+
+        <div class="d-flex gap-2">
+            <!-- Заголовок задачи -->
+            <div class="mb-3 w-100">
+                <label for="taskHeader_edit_{{ task.id }}" class="form-label">Заголовок</label>
+                <input type="text" class="form-control" id="taskHeader_edit_{{ task.id }}" name="header"
+                       value="{{ task.header }}" required>
+            </div>
+
+
+            <!-- Время завершения -->
+            <div class="mb-3 col-3">
+                 <label for="taskCompletionTime_edit_{{ task.id }}" class="form-label">Время завершения</label>
+            <input type="datetime-local" class="form-control" id="taskCompletionTime_edit_{{ task.id }}"
+                   name="completion_time" value="{{ task.completion_time|date:'Y-m-d\\TH:i' }}" required>
+            </div>
         </div>
 
         <!-- Статус выполнения -->
-        <div class="mb-3 form-check">
-            <input type="checkbox" class="form-check-input" id="taskIsDone_edit_{{ task.id }}"
+        <div class="mb-3 form-check form-switch">
+            <input type="checkbox" class="form-check-input" id="taskIsDone_edit_{{ task.id }}" role="switch"
                    name="is_done" {% if task.is_done %}checked{% endif %}>
             <label class="form-check-label" for="taskIsDone_edit_{{ task.id }}">Задача выполнена</label>
         </div>
 
-        <!-- Время завершения -->
-        <div class="mb-3">
-            <label for="taskCompletionTime_edit_{{ task.id }}" class="form-label">Время завершения</label>
-            <input type="datetime-local" class="form-control" id="taskCompletionTime_edit_{{ task.id }}"
-                   name="completion_time" value="{{ task.completion_time|date:'Y-m-d\\TH:i' }}" required>
+        <div class="d-flex gap-2">
+
+            <!-- Приоритет задачи -->
+            <div class="mb-3 col-2">
+                <label for="taskPriority_edit_{{ task.id }}" class="form-label">
+                    <i class="bi bi-fire" style="font-size: 1.2rem;"></i>
+                    <span>Приоритет</span>
+                </label>
+                <select name="priority" class="select form-select" id="taskPriority_edit_{{ task.id }}">
+                    <option value="" {% if not task.priority %}selected{% endif %}>-</option>
+                    <option value="CRITICAL" {% if task.priority == 'CRITICAL' %}selected{% endif %}>
+                        Критический
+                    </option>
+                    <option value="HIGH" {% if task.priority == 'HIGH' %}selected{% endif %}>Высокий</option>
+                    <option value="MEDIUM" {% if task.priority == 'MEDIUM' %}selected{% endif %}>Средний
+                    </option>
+                    <option value="LOW" {% if task.priority == 'LOW' %}selected{% endif %}>Низкий</option>
+                </select>
+            </div>
+
+            <!-- Выбор объектов  -->
+            <div class="mb-3">
+                <label for="taskObj_edit_{{ task.id }}" class="form-label">
+                    <i class="bi bi-box" style="font-size: 1.2rem;"></i>
+                    <span>Объекты</span>
+                </label>
+                {% include 'tree-select.html' with select_name='objects_edit' current_options=current_objects_edit task_id=task.id objects_structure_json=objects_json %}
+            </div>
+
         </div>
+
+        <div class="d-flex gap-2">
+            <!-- Выбор инженеров -->
+            <div class="mb-3">
+                <label for="taskEngineers_edit_{{ task.id }}" class="form-label">
+                    <i class="bi bi-people-fill" style="font-size: 1.2rem;"></i>
+                    <span>Инженеры</span>
+                </label>
+                {% include 'tree-select.html' with select_name='engineers_edit' current_options=current_engineers task_id=task.id objects_structure_json=engineers_json %}
+            </div>
+
+            <!-- Выбор тегов  -->
+            <div class="mb-3">
+                <label for="taskTags_edit_{{ task.id }}" class="form-label">
+                    <i class="bi bi-tags-fill" style="font-size: 1.2rem;"></i>
+                    <span>Теги</span>
+                </label>
+                {% include 'tree-select.html' with select_name='tags_edit' current_options=current_tags_edit task_id=task.id objects_structure_json=tags_json %}
+            </div>
+        </div>
+
 
         <!-- Текст задачи -->
         <div class="mb-3">
-            <label for="taskText_edit_{{ task.id }}" class="form-label">Описание</label>
-            <textarea class="form-control" id="taskText_edit_{{ task.id }}" name="text"
-                      rows="3">{{ task.text }}</textarea>
+            <label for="taskText_edit_{{ task.id }}" class="form-label">
+                <i class="bi bi-card-text" style="font-size: 1.2rem;"></i>
+                <span>Описание</span>
+            </label>
+            <textarea class="form-control" id="taskText_edit_{{ task.id }}" name="text" rows="4"></textarea>
         </div>
 
-        <!-- Выбор инженеров -->
-        <div class="mb-3">
-            <label for="taskEngineers_edit_{{ task.id }}" class="form-label">Инженеры</label>
-            {% include 'tree-select.html' with select_name='engineers_edit' current_options=current_engineers task_id=task.id objects_structure_json=engineers_json %}
-
-        </div>
-
-        <!-- Выбор тегов  -->
-        <div class="mb-3">
-            <label for="taskTags_edit_{{ task.id }}" class="form-label">Теги</label>
-            {% include 'tree-select.html' with select_name='tags_edit' current_options=current_tags_edit task_id=task.id objects_structure_json=tags_json %}
-
-        </div>
-
-        <!-- Выбор объектов  -->
-        <div class="mb-3">
-            <label for="taskObj_edit_{{ task.id }}" class="form-label">Объекты</label>
-            {% include 'tree-select.html' with select_name='objects_edit' current_options=current_objects_edit task_id=task.id objects_structure_json=objects_json %}
-
-        </div>
 
         <!-- Загрузка файлов (псевдокод для примера) -->
         <div class="mb-3">
-            <label for="taskFiles_edit_{{ task.id }}" class="form-label">Файлы</label>
             <input class="form-control" type="file" id="taskFilesEdit" name="files" multiple>
         </div>
-
 
     </div>
 
@@ -94,28 +117,28 @@
         $('#taskFilesEdit').fileuploader({
             addMore: true,
             limit: 10,
-        {% if task.files.all %}
-            files: [
-                {% for f in task.files.all %}
-                    {
-                        name: '{{ f.clear_file_name }}', // file name
-                        size: {{f.file.size}}, // file size in bytes
-                        type: 'image/png', // file MIME type
-                        file: '{{ f.file.url }}', // file path
-                        local: '{{ f.file.url }}', // file path in listInput (optional)
-                        data: {
-                            thumbnail: '{{ f.file.url }}', // item custom thumbnail; if false will disable the thumbnail (optional)
-                            readerCrossOrigin: 'anonymous', // fix image cross-origin issue (optional)
-                            readerForce: true, // prevent the browser cache of the image (optional)
-                            readerSkip: true, // skip file from reading by rendering a thumbnail (optional)
-                            popup: true, // remove the popup for this file (optional)
-                            listProps: {}, // custom key: value attributes in the fileuploader's list (optional)
-                            your_own_attribute: 'your own value'
-                        }
-                    },
-                {% endfor %}
-            ],
-        {% endif %}
+            {% if task.files.all %}
+                files: [
+                    {% for f in task.files.all %}
+                        {
+                            name: '{{ f.clear_file_name }}', // file name
+                            size: {{f.file.size}}, // file size in bytes
+                            type: 'image/png', // file MIME type
+                            file: '{{ f.file.url }}', // file path
+                            local: '{{ f.file.url }}', // file path in listInput (optional)
+                            data: {
+                                thumbnail: '{{ f.file.url }}', // item custom thumbnail; if false will disable the thumbnail (optional)
+                                readerCrossOrigin: 'anonymous', // fix image cross-origin issue (optional)
+                                readerForce: true, // prevent the browser cache of the image (optional)
+                                readerSkip: true, // skip file from reading by rendering a thumbnail (optional)
+                                popup: true, // remove the popup for this file (optional)
+                                listProps: {}, // custom key: value attributes in the fileuploader's list (optional)
+                                your_own_attribute: 'your own value'
+                            }
+                        },
+                    {% endfor %}
+                ],
+            {% endif %}
         });
     });
 

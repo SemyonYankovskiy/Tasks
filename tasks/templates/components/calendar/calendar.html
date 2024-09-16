@@ -18,38 +18,43 @@
 
     <!-- Календарь -->
 
-<div class="px-3 py-3">
-     <div class="container  px-5 py-4 rounded-4 border border-1">
+    <div class="px-3 py-3">
+        <div class="container  px-5 py-4 rounded-4 border border-1">
 
-{#        <div class="pb-3 d-flex justify-content-between ">#}
-{#            <h3>Календарь</h3>#}
-{##}
-{#        </div>#}
+            {#        <div class="pb-3 d-flex justify-content-between ">#}
+            {#            <h3>Календарь</h3>#}
+            {##}
+            {#        </div>#}
 
-        <div class="mb-4">
+            <div class="d-flex justify-content-between mb-4">
+
+                <div>
+                    {% include "components/filter_button.html" %}
+                </div>
+                <div class="form-check form-switch d-flex gap-2 align-items-center">
+                    <!-- Переключатель "Показывать только мои задачи" -->
+                    <input class="form-check-input form-check-lg" type="checkbox" role="switch"
+                           id="flexSwitchCheckDefault"
+                           onchange="window.location.href = '?show_my_tasks_only=' + this.checked;"
+                           {% if  tasks.show_my_tasks_only %}checked{% endif %}>
+                    <label class="form-check-label" for="flexSwitchCheckDefault"
+                           style="font-size: 18px; margin-right: 10px;">Показывать только мои задачи
+                    </label>
+                </div>
+            </div>
             {% include "components/task/../filter.html" %}
-        </div>
-        <div class="d-flex justify-content-between">
 
-            <div>
-                {% include "components/task/create_task.html" %}
-            </div>
-            <div class="form-check form-switch d-flex gap-2 align-items-center">
-                <!-- Переключатель "Показывать только мои задачи" -->
-                <input class="form-check-input form-check-lg" type="checkbox" role="switch"
-                       id="flexSwitchCheckDefault"
-                       onchange="window.location.href = '?show_my_tasks_only=' + this.checked;"
-                       {% if  tasks.show_my_tasks_only %}checked{% endif %}>
-                <label class="form-check-label" for="flexSwitchCheckDefault"
-                       style="font-size: 18px; margin-right: 10px;">Показывать только мои задачи
-                </label>
-            </div>
+            <div class="mb-4">
+
+
+                    {% include "components/task/create_task.html" %}
+
+
+
+            <div class="mt-4" id="calendar"></div>
         </div>
 
-        <div class="mt-4" id="calendar"></div>
     </div>
-
-</div>
 
 
 

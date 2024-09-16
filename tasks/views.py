@@ -177,6 +177,8 @@ def get_object_page(request, object_slug):
 
     random_icon = get_random_icon(request)
 
+    filter_context = task_filter_params(request)
+
     context = {
         "object": obj,
         "tasks": filtered_tasks_data,
@@ -184,7 +186,7 @@ def get_object_page(request, object_slug):
         "pagination_data": pagination_data,
         "task_count": obj.done_tasks_count + obj.undone_tasks_count,
         "child_objects": child_objects,
-        "filter_data": "#tasks",
+        **filter_context,
         'is_objects_page': request.path.startswith('/object/'),
     }
 
@@ -334,7 +336,6 @@ def tasks_page(request):
     per_page = request.GET.get('per_page', 4)  # Значение по умолчанию
     pagination_data = paginate_queryset(filtered_task["tasks"], page_number, per_page)
 
-
     random_icon = get_random_icon(request)
 
     return render(
@@ -386,7 +387,8 @@ def close_task(request, task_id):
     if request.method == "POST":
         task = get_object_or_404(Task, pk=task_id)
         comment = request.POST.get("comment", "")
-        # Куда перенаправлять после успешного закрытия задачи
+
+        # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
 
         # Обновление задачи
@@ -415,7 +417,7 @@ def reopen_task(request, task_id):
     if request.method == "POST":
         task = get_object_or_404(Task, pk=task_id)
         comment = request.POST.get("comment", "")
-        # Куда перенаправлять после успешного переоткрытия задачи
+        # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
 
         # Обновление задачи
@@ -439,8 +441,13 @@ def reopen_task(request, task_id):
 @login_required
 @atomic
 def create_task(request):
+    # Стандартный редирект на список задач
+    redirect_to = reverse("tasks")
+
     if request.method == 'POST':
         form = AddTaskForm(request.POST, request.FILES)
+        # Получаем URL с параметрами фильтров
+        redirect_to = request.POST.get("from_url", redirect_to).strip()
 
         if form.is_valid():
             task = form.save()  # Сохраняем задачу, но не коммитим
@@ -477,14 +484,22 @@ def get_task_edit_form(request, task_id: int):
 def edit_task(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
 
+    # Стандартный редирект на список задач
+    redirect_to = reverse("tasks")
+
     if request.method == 'POST':
         form = EditTaskForm(request.POST, request.FILES, instance=task)
+
+        # Получаем URL с параметрами фильтров
+        redirect_to = request.POST.get("from_url", redirect_to).strip()
+
         if form.is_valid():
             updated_task = form.save()
 
+            # Удаляем неиспользуемые прикрепленные файлы
             remove_unused_task_attached_files(request.POST.get("fileuploader-list-files"), updated_task)
 
-            # Обработка файлов
+            # Обработка прикрепленных файлов
             for file in request.FILES.getlist('files[]'):
                 updated_task.files.add(AttachedFile.objects.create(file=file))
             updated_task.save()
@@ -493,7 +508,9 @@ def edit_task(request, task_id):
         else:
             messages.add_message(request, messages.WARNING, form.errors)
 
-    return redirect("tasks")
+    # Редирект на исходную страницу с фильтрами
+    return redirect(redirect_to)
+
 
 
 def remove_unused_task_attached_files(file_uploader_data: str, task: Task, *, delete_orphan_files: bool = False):

@@ -62,7 +62,7 @@
                            {% if show_my_tasks_only %}checked{% endif %}>
                     <label class="form-check-label" for="showMyTasksOnlySwitch"
                            style="font-size: 18px; margin-right: 10px;">
-                        Показывать только мои задачи
+                        {% if show_my_tasks_only == 'false' %}Показывать все задачи{% else %}Показывать только мои задачи{% endif %}
                     </label>
                 </div>
 

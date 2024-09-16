@@ -1,21 +1,17 @@
 <!-- Пагинация -->
 
 
-<div class="pagination container d-flex justify-content-center align-self-center">
-    {% if pagination_data.page_obj.has_other_pages %}
+<div class="pagination container d-flex justify-content-center align-self-center align-items-center">
 
-        <a href="{% if pagination_data.page_obj.has_previous %}?page={{ pagination_data.page_obj.previous_page_number }}&
-            {{ filter_data }}&per_page={{ pagination_data.per_page }}{% else %}#{% endif %}"
-           class="mx-3 next_prev">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                 class="bi bi-caret-left" viewBox="0 0 16 16">
-                <path d="M10 12.796V3.204L4.519 8 10 12.796zm-.659.753-5.48-4.796a1 1 0 0 1 0-1.506l5.48-4.796A1 1 0 0 1 11 3.204v9.592a1 1 0 0 1-1.659.753z"/>
-            </svg>
+        <a href="{% if pagination_data.page_obj.has_previous %}?page={{ pagination_data.page_obj.previous_page_number }}
+            &per_page={{ pagination_data.per_page }}&{{ filter_data }}{% else %}#{% endif %}"
+           class="mx-3 next_prev px-2 py-1 btn {% if not pagination_data.page_obj.has_previous %}disabled{% endif %}">
+            <i class="bi bi-caret-left" style="font-size: 1.2rem;"></i>
         </a>
 
 
         {% if pagination_data.start_show_first_page_link %}
-            <a href="?page=1&{{ filter_data }}&per_page={{ pagination_data.per_page }}">1</a>
+            <a href="?page=1&per_page={{ pagination_data.per_page }}&{{ filter_data }}">1</a>
             {% if pagination_data.start_show_ellipsis %}
                 <span>...</span>
             {% endif %}
@@ -26,7 +22,7 @@
             {% if pagination_data.page_obj.number == p %}
                 <a class="active">{{ p }}</a>
             {% elif p >= pagination_data.page_obj.number|add:-2 and p <= pagination_data.page_obj.number|add:2 %}
-                <a href="?page={{ p }}&{{ filter_data }}&per_page={{ pagination_data.per_page }}">{{ p }}</a>
+                <a href="?page={{ p }}&per_page={{ pagination_data.per_page }}&{{ filter_data }}">{{ p }}</a>
             {% endif %}
         {% endfor %}
 
@@ -35,26 +31,18 @@
             {% if pagination_data.end_show_ellipsis %}
                 <span>...</span>
             {% endif %}
-            <a href="?page={{ pagination_data.last_page_number }}&{{ filter_data }}&per_page={{ pagination_data.per_page }}">{{ pagination_data.last_page_number }}</a>
+            <a href="?page={{ pagination_data.last_page_number }}&per_page={{ pagination_data.per_page }}&{{ filter_data }}">{{ pagination_data.last_page_number }}</a>
         {% endif %}
 
 
-        <a href="{% if pagination_data.page_obj.has_next %}?page={{ pagination_data.page_obj.next_page_number }}&
-            {{ filter_data }}&per_page={{ pagination_data.per_page }}{% else %}#{% endif %}"
-           class="mx-3 next_prev">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                 class="bi bi-caret-right-fill" viewBox="0 0 16 16">
-                <path d="M6 12.796V3.204L11.481 8 6 12.796zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753z"/>
-            </svg>
+        <a href="{% if pagination_data.page_obj.has_next %}?page={{ pagination_data.page_obj.next_page_number }}&per_page={{ pagination_data.per_page }}&
+            {{ filter_data }}{% else %}#{% endif %}"
+           class="mx-3 next_prev px-2 py-1 btn {% if not pagination_data.page_obj.has_next %}disabled{% endif %}">
+            <i class="bi bi-caret-right" style="font-size: 1.2rem;"></i>
         </a>
 
 
-
-    {% endif %}
-
-
-
-    <form method="GET" class="per-page-form">
+    <form method="GET" class="per-page-form h-100">
         <!-- Сохраняем текущие фильтры и страницу -->
         <input type="hidden" name="page" value="{{ pagination_data.page_obj.number }}">
         {% for key, value in request.GET.items %}
@@ -62,14 +50,8 @@
                 <input type="hidden" name="{{ key }}" value="{{ value }}">
             {% endif %}
         {% endfor %}
- 
-    
 
-        <select name="per_page" id="per_page" onchange="this.form.submit()">
-{#            <option value="4" {% if request.GET.per_page == 4 %}selected{% endif %}>4</option>#}
-{#            <option value="8" {% if request.GET.per_page == 8 %}selected{% endif %}>8</option>#}
-{#            <option value="12" {% if request.GET.per_page == 12 %}selected{% endif %}>12</option>#}
-{#            <option value="16" {% if request.GET.per_page == 16 %}selected{% endif %}>16</option>#}
+        <select name="per_page" class="h-100" id="per_page" onchange="this.form.submit()">
             <option value="4" {% if pagination_data.per_page == '4' %}selected{% endif %}>4</option>
             <option value="8" {% if pagination_data.per_page == '8' %}selected{% endif %}>8</option>
             <option value="12" {% if pagination_data.per_page == '12' %}selected{% endif %}>12</option>

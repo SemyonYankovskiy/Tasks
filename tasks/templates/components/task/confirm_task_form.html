@@ -1,11 +1,9 @@
-
-<form action="{% if form_action == 'close' %}{% url 'close_task' task_id %}{% else %}{% url 'reopen_task' task_id %}{% endif %}" method="post">
+<form id = "task-form_{{ form_action }}_{{ task_id }}" action="
+        {% if form_action == 'close' %}{% url 'close_task' task_id %}{% else %}{% url 'reopen_task' task_id %}{% endif %}"
+      method="post">
     {% csrf_token %}
-    <input name="from_url"
-           value="{% if request.path == '/tasks/' %}{% url 'tasks' %}
-                    {% elif 'object' in request.path %}{{ request.path }}#tasks
-                    {% else %}{% url 'calendar' %}{% endif %}"
-           hidden>
+    <!-- Скрытое поле для сохранения URL с фильтрами -->
+    <input type="hidden" name="from_url" value="{{ request.get_full_path }}">
     <div>
         <div class="mb-3">
             <label for="comment" class="form-label" style="display: block;">Комментарий к задаче</label>
@@ -13,9 +11,29 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn {% if form_action == 'close' %}btn-primary{% else %}btn-primary{% endif %}">
+        <button id="submit-button{{ task_id }}" type="submit" class="btn {% if form_action == 'close' %}btn-primary{% else %}btn-primary{% endif %}">
             Подтвердить
         </button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
     </div>
 </form>
+<script>
+document.getElementById('submit-button{{ task_id }}').addEventListener('click', function(event) {
+    event.preventDefault();  // Останавливаем стандартное поведение формы
+
+    // Получаем текущее значение из скрытого поля с URL
+    var form = document.getElementById('task-form_{{ form_action }}_{{ task_id }}');
+    var fromUrlField = form.querySelector('input[name="from_url"]');
+    var currentUrl = new URL(fromUrlField.value, window.location.origin);
+
+    // Принудительно добавляем параметры фильтров
+    currentUrl.searchParams.set('show_done_task', 'true');
+    currentUrl.searchParams.set('show_active_task', 'false');
+
+    // Устанавливаем модифицированный URL обратно в скрытое поле
+    fromUrlField.value = currentUrl.href;
+
+    // Теперь отправляем форму
+    form.submit();
+});
+</script>
