@@ -2,11 +2,10 @@
     <div>
 
 
-
         <div class="collapse" id="collapseExample">
             <div class=" p-4 border border-2 rounded-2"
                  style="background-color: rgba(255,255,255,0.52); border-color: #d2d2d2">
-                                <div id="div_id_header__icontains" class="text-field__group mb-3">
+                <div id="div_id_header__icontains" class="text-field__group mb-3">
                     <label for="id_header__icontains" class="text-field__label form-label"></label>
                     <input type="text" name="search" class=" text-field__input textinput form-control"
                            value="{{ request.GET.search }}"
@@ -75,47 +74,51 @@
 
 
 <style>
-.text-field__group {
-  display: flex;
-}
-/* кнопка */
-.text-field__btn {
-  display: inline-block;
-  font-weight: 400;
-  line-height: 1.5;
-  color: #000000;
-  text-align: center;
-  vertical-align: middle;
-  cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
-  background-color: #eee;
-  border: 1px solid #bdbdbd;
-  padding: .375rem .75rem;
-  font-size: 1rem;
-  border-radius: .25rem;
-  transition: background-color .15s ease-in-out;
-}
-.text-field__btn:hover {
-  background-color: #dddddd;
-}
-.text-field__group .text-field__input {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  position: relative;
-  z-index: 2;
-}
-.text-field__group .text-field__btn {
-  position: relative;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-left-width: 0;
-}
+    .text-field__group {
+        display: flex;
+    }
 
-input::placeholder {
+    /* кнопка */
+    .text-field__btn {
+        display: inline-block;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #000000;
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+        background-color: #eee;
+        border: 1px solid #bdbdbd;
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        border-radius: .25rem;
+        transition: background-color .15s ease-in-out;
+    }
 
-  opacity: 1;
+    .text-field__btn:hover {
+        background-color: #dddddd;
+    }
 
-}
+    .text-field__group .text-field__input {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        position: relative;
+        z-index: 2;
+    }
+
+    .text-field__group .text-field__btn {
+        position: relative;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left-width: 0;
+    }
+
+    input::placeholder {
+
+        opacity: 1;
+
+    }
 </style>

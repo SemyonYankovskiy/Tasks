@@ -1,14 +1,14 @@
 <div id="tasks" class=" p-4">
 
-{#    <div class="pb-2 d-flex justify-content-between px-4">#}
-{#        <h3>Задачи</h3>#}
-{##}
-{#    </div>#}
+    {#    <div class="pb-2 d-flex justify-content-between px-4">#}
+    {#        <h3>Задачи</h3>#}
+    {##}
+    {#    </div>#}
 
 
-    <div class="row">
+    <div class="row px-2">
 
-        <div class="col-md-5 d-flex mb-4 px-4 gap-3">
+        <div class="col-md-5 d-flex mb-2 px-4 gap-3">
             <div>
                 <!-- Кнопка Активные задачи -->
                 <button class="btn {% if show_active_task %}btn-primary{% else %}btn-outline-primary{% endif %} fs-6 text"
@@ -28,6 +28,19 @@
                     Активные {{ not_done_count }}
                 </button>
             </div>
+            <div>
+                <!-- Кнопка вкл/выкл все задачи -->
+                <button class="btn border-0 btn-dark fs-6 text"
+                        style="background: linear-gradient(90deg, rgba(31,93,255,0.99), rgb(53,177,0))"
+                        onclick="toggleFilter('show_active_task', {{ show_active_task|lower }}, 'show_done_task', {{ show_done_task|lower }});">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor"
+                         class="bi bi-link" viewBox="0 0 16 16">
+                        <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
+                        <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
+                    </svg>
+                </button>
+            </div>
+
             <div>
                 <!-- Кнопка Завершенные задачи -->
                 <button class="btn {% if show_done_task %}btn-success{% else %}btn-outline-success{% endif %} fs-6 text"
@@ -52,8 +65,18 @@
         </div>
         <div class="col-md-3 gap-2 "></div>
 
+
+    </div>
+
+    <div class="row d-flex px-4">
+        {% if not hide_filter %}
+        <div class="col-md-8 mt-auto">
+            {% include "components/filter_button.html" %}
+        </div>
+        {% endif %}
+
         {% if show_my_tasks_only or sort_order %}
-            <div class="col-md-4 gap-2 px-4 ">
+            <div class="col-md-4 gap-2 ps-5">
                 <div class="form-check form-switch">
                     <!-- Переключатель "Показывать только мои задачи" -->
                     <input class="form-check-input" type="checkbox" role="switch"
@@ -62,7 +85,8 @@
                            {% if show_my_tasks_only %}checked{% endif %}>
                     <label class="form-check-label" for="showMyTasksOnlySwitch"
                            style="font-size: 18px; margin-right: 10px;">
-                        {% if show_my_tasks_only == 'false' %}Показывать все задачи{% else %}Показывать только мои задачи{% endif %}
+                        {% if show_my_tasks_only == 'false' %}Показывать все задачи{% else %}Показывать только мои
+                            задачи{% endif %}
                     </label>
                 </div>
 
@@ -79,12 +103,11 @@
                 </div>
             </div>
         {% endif %}
+
+
+         {% include "components/task/../filter.html" %}
     </div>
-    {% if not hide_filter %}
-        <div class="d-flex mb-2 mt-1 px-4 ">
-            {% include "components/task/../filter.html" %}
-        </div>
-    {% endif %}
+
     <div class="d-flex justify-content-start px-4 mt-3">
         {% include "components/task/create_task.html" %}
     </div>
@@ -130,14 +153,33 @@
     }
 </script>
 <script>
-    function toggleFilter(filterName, currentValue) {
+    function toggleFilter(filterName, currentValue, secondFilterName = null, secondFilterValue = null) {
         const urlParams = new URLSearchParams(window.location.search);
 
-        // Переключаем значение фильтра: если он включён (true), выключаем его (false), и наоборот
-        if (currentValue === true) {
-            urlParams.set(filterName, "false");
+        // Если оба фильтра переданы (для средней кнопки), то переключаем оба фильтра в одно и то же состояние
+        if (secondFilterName && secondFilterValue !== null) {
+            // Если хотя бы один фильтр выключен, включаем оба
+            if (currentValue === false || secondFilterValue === false) {
+                urlParams.set(filterName, "true");
+                urlParams.set(secondFilterName, "true");
+            } else {
+                // Если оба фильтра включены, выключаем оба
+                urlParams.set(filterName, "false");
+                urlParams.set(secondFilterName, "false");
+            }
         } else {
-            urlParams.set(filterName, "true");
+            // Если включаем один фильтр (кнопки Активные или Завершенные)
+            if (currentValue === true) {
+                urlParams.set(filterName, "false");
+            } else {
+                urlParams.set(filterName, "true");
+                // Отключаем второй фильтр, если включаем этот
+                if (filterName === "show_active_task") {
+                    urlParams.set("show_done_task", "false");
+                } else if (filterName === "show_done_task") {
+                    urlParams.set("show_active_task", "false");
+                }
+            }
         }
 
         // Обновляем URL и перезагружаем страницу с новыми параметрами
