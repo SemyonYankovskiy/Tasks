@@ -52,8 +52,6 @@ if DEBUG:
 AUTH_USER_MODEL = "user.User"
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
-CRISPY_TEMPLATE_PACK = "bootstrap5"
-
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
