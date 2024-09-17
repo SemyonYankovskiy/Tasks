@@ -1,15 +1,16 @@
 from urllib.parse import urlencode
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, F
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 
 from .filters import ObjectFilter
-from .models import Object, Task, Tag, ObjectGroup
-
 from .functions.objects import get_objects_list
 from .functions.service import paginate_queryset, get_random_icon
 from .functions.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
+from .models import Object, Task, Tag, ObjectGroup
 
 
 @login_required
@@ -142,10 +143,14 @@ def get_task_view(request, task_id: int):
     """
     Рендер задачи в модальном окне
     """
+    print(request.GET)
+    from_url = request.GET.get('from_url', reverse('tasks'))  # Получаем параметр from_url или используем URL по умолчанию
     task = get_object_or_404(Task, pk=task_id)
     context = {
         "task": task,
         "expanded": True,  # параметр для аккордеона, без него будет раскрыт
+        "form_type": "collapse",
+        'from_url': from_url,  # Передаем URL с фильтрами в контекст
     }
     return render(request, "components/task/task.html", context=context)
 
@@ -169,10 +174,13 @@ def get_calendar_page(request):
 def get_task_edit_form(request, task_id: int):
     task = get_object_or_404(Task, pk=task_id)
     fields = get_m2m_fields_for_tasks()
+    print(request.GET)
+    from_url = request.GET.get('from_url', reverse('tasks'))
 
     context = {
         "task": task,
         **fields,
+        "from_url": from_url,
         "current_engineers": list(task.engineers.all().values_list("id", flat=True)),
         "current_tags_edit": list(task.tags.all().values_list("id", flat=True)),
         "current_objects_edit": list(task.objects_set.all().values_list("id", flat=True)),

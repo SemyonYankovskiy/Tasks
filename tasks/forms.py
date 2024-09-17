@@ -67,7 +67,7 @@ class EditTaskForm(forms.ModelForm):
         completion_time_only = self.cleaned_data['completion_time_only']
 
         # Объединяем дату и время в один объект datetime, который сохранится в поле completion_time модели
-        completion_time = datetime.strptime(f'{completion_date_only} {completion_time_only}', '%Y-%m-%d %H:%M')
+        completion_time = datetime.strptime(f'{completion_date_only} {completion_time_only}', '%Y-%m-%d %H:%M:%S')
 
         # Присваиваем собранное значение поля completion_time модели Task
         instance.completion_time = completion_time

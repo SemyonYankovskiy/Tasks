@@ -24,12 +24,10 @@
             </div>
             <form class="text-start" method="POST" action="{% url 'create_task' %}" enctype="multipart/form-data">
                 {% csrf_token %}
-                <!-- Скрытое поле для сохранения URL с фильтрами -->
-{#                <input type="hidden" name="from_url" value="{{ request.get_full_path }}">#}
 
-                <input type="hidden" name="from_url" value="{% if request.path == '/tasks/' %}{% url 'tasks' %}
-                                                            {% elif 'object' in request.path %}{{ request.path }}
-                                                            {% else %}{% url 'calendar' %}{% endif %}">
+                <!-- Скрытое поле для сохранения URL с фильтрами -->
+                <input type="hidden" name="from_url" value="{{ request.get_full_path }}#tasks">
+
 
                 <div class="modal-body p-4">
 

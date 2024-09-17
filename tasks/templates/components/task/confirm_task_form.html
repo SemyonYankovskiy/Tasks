@@ -1,13 +1,10 @@
-<form id="task-form_{{ form_action }}_{{ task_id }}" action="
+<form class="text-start" id="task-form_{{ form_action }}_{{ task_id }}" action="
 
         {% if form_action == 'close' %}{% url 'close_task' task_id %}{% else %}{% url 'reopen_task' task_id %}{% endif %}"
       method="post">
     {% csrf_token %}
     <!-- Скрытое поле для сохранения URL с фильтрами -->
-    {#    <input type="hidden" name="from_url" value="{{ request.get_full_path }}">#}
-    <input type="hidden" name="from_url" value="{% if request.path == '/tasks/' %}{% url 'tasks' %}
-                                                            {% elif 'object' in request.path %}{{ request.path }}
-                                                            {% else %}{% url 'calendar' %}{% endif %}">
+    <input type="hidden" name="from_url" value="{{ request.get_full_path }}#tasks">
 
     <div>
         <div class="mb-3">
@@ -32,9 +29,9 @@
         var fromUrlField = form.querySelector('input[name="from_url"]');
         var currentUrl = new URL(fromUrlField.value, window.location.origin);
 
-        // Принудительно добавляем параметры фильтров
-        currentUrl.searchParams.set('show_done_task', 'true');
-        currentUrl.searchParams.set('show_active_task', 'false');
+        {#// Принудительно добавляем параметры фильтров#}
+        {#currentUrl.searchParams.set('show_done_task', 'true');#}
+        {#currentUrl.searchParams.set('show_active_task', 'false');#}
 
         // Устанавливаем модифицированный URL обратно в скрытое поле
         fromUrlField.value = currentUrl.href;

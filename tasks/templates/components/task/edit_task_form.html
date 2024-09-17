@@ -6,20 +6,19 @@
 <!-- js -->
 <script src="{% static 'fileuploader/jquery.fileuploader.min.js' %}" type="text/javascript"></script>
 
-<form method="POST" action="{% url "edit_task" task.id %}" enctype="multipart/form-data">
+<form class="text-start" method="POST" action="{% url "edit_task" task.id %}" enctype="multipart/form-data">
     {% csrf_token %}
-    {#    <input type="hidden" name="from_url" value="{{ request.get_full_path }}">#}
 
-    <input type="hidden" name="from_url" value="{% if request.path == '/tasks/' %}{% url 'tasks' %}
-                                                            {% elif 'object' in request.path %}{{ request.path }}
-                                                            {% else %}{% url 'calendar' %}{% endif %}">
+    <!-- Поле для передачи URL с фильтрами -->
+    <input type="hidden" name="from_url" value="{{ from_url }}">
 
     <div class="modal-body p-4">
 
         <div class="d-flex gap-2">
             <!-- Заголовок задачи -->
             <div class="mb-3 w-100">
-                <label for="taskHeader_edit_{{ task.id }}" class="form-label">Заголовок<span style="color: red;"> *</span></label>
+                <label for="taskHeader_edit_{{ task.id }}" class="form-label">Заголовок<span
+                        style="color: red;"> *</span></label>
                 <input type="text" class="form-control" id="taskHeader_edit_{{ task.id }}" name="header"
                        value="{{ task.header }}" required>
             </div>
@@ -27,12 +26,14 @@
 
             <!-- Время завершения -->
             <div class="mb-3 col-3">
-                <label for="taskCompletionDate_edit_{{ task.id }}" class="form-label">Дата завершения<span style="color: red;"> *</span></label>
+                <label for="taskCompletionDate_edit_{{ task.id }}" class="form-label">Дата завершения<span
+                        style="color: red;"> *</span></label>
                 <input type="date" class="form-control" id="taskCompletionDate_edit_{{ task.id }}"
                        name="completion_date_only" value="{{ task.completion_time|date:'Y-m-d' }}" required>
             </div>
             <div class="mb-3 col-3">
-                <label for="taskCompletionTime_edit_{{ task.id }}" class="form-label">Время завершения<span style="color: red;"> *</span></label>
+                <label for="taskCompletionTime_edit_{{ task.id }}" class="form-label">Время завершения<span
+                        style="color: red;"> *</span></label>
                 <input type="time" class="form-control" id="taskCompletionTime_edit_{{ task.id }}"
                        name="completion_time_only" value="{{ task.completion_time|time:'H:i' }}" required>
             </div>
@@ -115,10 +116,11 @@
 
     </div>
 
-    <div class="p-3">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-        <button type="submit" class="btn btn-primary">Сохранить</button>
-    </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
 </form>
 
 

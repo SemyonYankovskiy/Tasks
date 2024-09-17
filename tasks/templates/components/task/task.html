@@ -161,6 +161,7 @@
                         {% endif %}
                     {% else %}
                         <div class="text-end gap-2">
+                            {% include "components/task/edit_task.html" with task_id=task.id %}
                             {% include "components/task/confirm_task.html" with task_id=task.id %}
                         </div>
                     {% endif %}
