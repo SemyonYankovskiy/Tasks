@@ -8,7 +8,11 @@
 
 <form method="POST" action="{% url "edit_task" task.id %}" enctype="multipart/form-data">
     {% csrf_token %}
-    <input type="hidden" name="from_url" value="{{ request.get_full_path }}">
+{#    <input type="hidden" name="from_url" value="{{ request.get_full_path }}">#}
+
+    <input type="hidden" name="from_url" value="{% if request.path == '/tasks/' %}{% url 'tasks' %}
+                                                            {% elif 'object' in request.path %}{{ request.path }}
+                                                            {% else %}{% url 'calendar' %}{% endif %}">
 
     <div class="modal-body p-4">
 
@@ -23,9 +27,9 @@
 
             <!-- Время завершения -->
             <div class="mb-3 col-3">
-                 <label for="taskCompletionTime_edit_{{ task.id }}" class="form-label">Время завершения</label>
-            <input type="datetime-local" class="form-control" id="taskCompletionTime_edit_{{ task.id }}"
-                   name="completion_time" value="{{ task.completion_time|date:'Y-m-d\\TH:i' }}" required>
+                <label for="taskCompletionTime_edit_{{ task.id }}" class="form-label">Время завершения</label>
+                <input type="datetime-local" class="form-control" id="taskCompletionTime_edit_{{ task.id }}"
+                       name="completion_time" value="{{ task.completion_time|date:'Y-m-d\\TH:i' }}" required>
             </div>
         </div>
 

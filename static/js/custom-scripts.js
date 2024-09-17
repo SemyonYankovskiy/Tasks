@@ -14,20 +14,28 @@ document.addEventListener('DOMContentLoaded', function() {
     var spoilerTextElements = document.querySelectorAll('.spoiler-text');
     spoilerTextElements.forEach(function(spoilerTextElement) {
         var toggleSpoilerButton = spoilerTextElement.nextElementSibling;
-        var textContent = spoilerTextElement.innerText || spoilerTextElement.textContent;
-        if (textContent.length > 500) {
+        var textContent = spoilerTextElement.textContent;
+
+        // Для подсчета длины заменяем все переносы строк на два символа
+        var contentLength = textContent.replace(/\n/g, '\n\n').length;
+
+        if (contentLength > 500) {
+            // Находим видимую часть текста (первые 500 символов)
             var visibleText = textContent.substring(0, 500) + '...';
-            spoilerTextElement.innerText = visibleText;
+
+            // Показываем укороченный текст, но с сохранением форматирования (переносы строк сохраняются)
+            spoilerTextElement.textContent = visibleText;
             toggleSpoilerButton.style.display = 'block';
+
             toggleSpoilerButton.addEventListener('click', function() {
                 if (spoilerTextElement.classList.contains('spoiler')) {
                     spoilerTextElement.classList.remove('spoiler');
                     toggleSpoilerButton.innerText = 'Показать больше';
-                    spoilerTextElement.innerText = visibleText;
+                    spoilerTextElement.textContent = visibleText;
                 } else {
                     spoilerTextElement.classList.add('spoiler');
                     toggleSpoilerButton.innerText = 'Скрыть';
-                    spoilerTextElement.innerText = textContent;
+                    spoilerTextElement.textContent = textContent;
                 }
             });
         } else {

@@ -22,10 +22,15 @@
                 <h1 class="modal-title fs-5" id="editTaskLabel">Создать задачу</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
             </div>
-            <form method="POST" action="{% url 'create_task' %}" enctype="multipart/form-data">
+            <form class="text-start" method="POST" action="{% url 'create_task' %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <!-- Скрытое поле для сохранения URL с фильтрами -->
-                <input type="hidden" name="from_url" value="{{ request.get_full_path }}">
+{#                <input type="hidden" name="from_url" value="{{ request.get_full_path }}">#}
+
+                <input type="hidden" name="from_url" value="{% if request.path == '/tasks/' %}{% url 'tasks' %}
+                                                            {% elif 'object' in request.path %}{{ request.path }}
+                                                            {% else %}{% url 'calendar' %}{% endif %}">
+
                 <div class="modal-body p-4">
 
                     <div class="d-flex gap-2">
@@ -38,9 +43,13 @@
 
                         <!-- Время завершения -->
                         <div class="mb-3 col-3">
+                            <label for="taskCompletionDate" class="form-label">Дата завершения</label>
+                            <input type="date" class="form-control" id="taskCompletionDate" name="completion_date"
+                                   required>
+                        </div>
+                        <div class="mb-3 col-3">
                             <label for="taskCompletionTime" class="form-label">Время завершения</label>
-                            <input type="datetime-local" class="form-control" id="taskCompletionTime"
-                                   name="completion_time"
+                            <input type="time" class="form-control" id="taskCompletionTime" name="completion_time"
                                    required>
                         </div>
                     </div>
