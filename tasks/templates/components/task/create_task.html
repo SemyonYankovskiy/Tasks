@@ -36,20 +36,20 @@
                     <div class="d-flex gap-2">
                         <!-- Заголовок задачи -->
                         <div class="mb-3 w-100">
-                            <label for="taskHeader" class="form-label">Заголовок</label>
+                            <label for="taskHeader" class="form-label">Заголовок<span style="color: red;"> *</span></label>
                             <input type="text" class="form-control" id="taskHeader" name="header" required>
                         </div>
 
 
                         <!-- Время завершения -->
                         <div class="mb-3 col-3">
-                            <label for="taskCompletionDate" class="form-label">Дата завершения</label>
-                            <input type="date" class="form-control" id="taskCompletionDate" name="completion_date"
+                            <label for="taskCompletionDate" class="form-label">Дата завершения<span style="color: red;"> *</span></label>
+                            <input type="date" class="form-control" id="taskCompletionDate" name="completion_date_only"
                                    required>
                         </div>
                         <div class="mb-3 col-3">
-                            <label for="taskCompletionTime" class="form-label">Время завершения</label>
-                            <input type="time" class="form-control" id="taskCompletionTime" name="completion_time"
+                            <label for="taskCompletionTime" class="form-label">Время завершения<span style="color: red;"> *</span></label>
+                            <input type="time" class="form-control" id="taskCompletionTime" name="completion_time_only"
                                    required>
                         </div>
                     </div>
@@ -66,7 +66,7 @@
                         <div class="mb-3 col-2">
                             <label for="taskPriority" class="form-label">
                                 <i class="bi bi-fire" style="font-size: 1.2rem;"></i>
-                                <span>Приоритет</span>
+                                <span>Приоритет<span style="color: red;"> *</span></span>
                             </label>
                             <select class="form-select" id="taskPriority" name="priority" required>
                                 <option value="CRITICAL" style="color: #FF0000">Критический</option>
@@ -80,7 +80,7 @@
                         <div class="mb-3">
                             <label for="taskTags" class="form-label">
                                 <i class="bi bi-box" style="font-size: 1.2rem;"></i>
-                                <span>Объекты</span>
+                                <span>Объекты<span style="color: red;"> *</span></span>
                             </label>
                             {% include 'tree-select.html' with select_name='objects_create' objects_structure_json=objects_json %}
                         </div>
@@ -92,7 +92,7 @@
                         <div class="mb-3">
                             <label for="taskEngineers" class="form-label">
                                 <i class="bi bi-people-fill" style="font-size: 1.2rem;"></i>
-                                <span>Инженеры</span>
+                                <span>Инженеры<span style="color: red;"> *</span></span>
                             </label>
                             {% include 'tree-select.html' with select_name='engineers_create' objects_structure_json=engineers_json %}
 
@@ -102,7 +102,7 @@
                         <div class="mb-3">
                             <label for="taskTags" class="form-label">
                                 <i class="bi bi-tags-fill" style="font-size: 1.2rem;"></i>
-                                <span>Теги</span>
+                                <span>Теги<span style="color: red;"> *</span></span>
                             </label>
                             {% include 'tree-select.html' with select_name='tags_create' objects_structure_json=tags_json %}
 

@@ -1,10 +1,10 @@
 from urllib.parse import urlencode
+
 from django.db.models import Q
 
 from tasks.filters import TaskFilter
-from tasks.models import Task, Tag, Engineer
-
 from tasks.functions.objects import get_objects_tree
+from tasks.models import Task, Tag, Engineer
 
 
 def get_filtered_tasks(request, obj=None):
@@ -121,7 +121,7 @@ def task_filter_params(request):
     not_count_params = ["show_my_tasks_only", "sort_order", "page", "show_active_task", "show_done_task", "per_page"]
 
     # Параметры, которые исключаются из URL
-    exclude_params = ["page"]
+    exclude_params = ["page, per_page"]
     filter_data = {key: value for key, value in request.GET.items() if key not in exclude_params}
 
     # Формируем строку с параметрами фильтра для последующего использования в шаблонах

@@ -28,10 +28,9 @@ def create_task(request):
             # Проходимся по файлам и сохраняем их
             for file in request.FILES.getlist("files[]"):
                 task.files.add(AttachedFile.objects.create(file=file))
-            task.save()
 
             messages.add_message(request, messages.SUCCESS, f"Задача '{form.cleaned_data['header']}' успешно создана")
-            return redirect("tasks")
+            return redirect(redirect_to)
         else:
             messages.add_message(request, messages.WARNING, form.errors)
 

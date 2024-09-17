@@ -66,6 +66,7 @@
             {% include "components/files/attached_files.html" with files=object.files.all %}
 
         </div>
+        {% if object.description %}
         <div class="row">
             <div class="col d-flex align-items-center justify-content-start my-4" style="max-width: 48px">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
@@ -82,7 +83,7 @@
                 </button>
             </div>
         </div>
-
+        {% endif %}
 
         {% if child_objects %}
             <div class="col d-flex align-items-center mt-4">

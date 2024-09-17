@@ -100,13 +100,9 @@ class Task(models.Model):
     header = models.CharField(max_length=128)
     text = models.TextField(blank=True)
     completion_text = models.TextField(blank=True)
-    engineers = models.ManyToManyField(
-        "Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True
-    )
-    tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m", blank=True)
-    files = models.ManyToManyField(
-        "AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True
-    )
+    engineers = models.ManyToManyField("Engineer", related_name="tasks", db_table="tasks_engineers_m2m")
+    tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m")
+    files = models.ManyToManyField("AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True)
 
     # slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
 
