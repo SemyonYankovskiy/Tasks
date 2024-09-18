@@ -45,19 +45,13 @@ class Object(models.Model):
         LOW = "LOW", "Низкий"
 
     priority = models.CharField(choices=Priority.choices, max_length=10)
-    parent = models.ForeignKey(
-        "self", null=True, blank=True, on_delete=models.SET_NULL, related_name="children"
-    )
+    parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, related_name="children")
     name = models.CharField(max_length=64)
     address = models.ForeignKey("Address", on_delete=models.CASCADE)
     description = models.TextField(blank=True)
-    tasks = models.ManyToManyField(
-        "Task", related_name="objects_set", db_table="objects_tasks_m2m", blank=True
-    )
+    tasks = models.ManyToManyField("Task", related_name="objects_set", db_table="objects_tasks_m2m", blank=True)
     tags = models.ManyToManyField("Tag", related_name="objects_set", db_table="objects_tags_m2m", blank=True)
-    files = models.ManyToManyField(
-        "AttachedFile", related_name="objects_set", db_table="objects_files_m2m", blank=True
-    )
+    files = models.ManyToManyField("AttachedFile", related_name="objects_set", db_table="objects_files_m2m", blank=True)
     groups = models.ManyToManyField("ObjectGroup", related_name="objects_set", db_table="objects_groups_m2m")
     slug = models.SlugField(max_length=255, unique=True, db_index=True)
 
@@ -81,7 +75,7 @@ class Object(models.Model):
             while current_parent:
                 if current_parent == self:
                     raise ValidationError(
-                        "ВИЧ-инфекция в дереве наследования объектов. Твой выбранный родитель это твой же потомок, инцест осуждаем"
+                        "инцест в дереве наследования объектов. Твой выбранный родитель это твой же потомок, осуждаем"
                     )
                 # Move up the chain
                 current_parent = current_parent.parent
@@ -101,7 +95,8 @@ class Task(models.Model):
     text = models.TextField(blank=True)
     completion_text = models.TextField(blank=True)
     engineers = models.ManyToManyField("Engineer", related_name="tasks", db_table="tasks_engineers_m2m")
-    tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m")
+    departments = models.ManyToManyField("Departament", related_name="tasks", db_table="tasks_departments_m2m")
+    tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m", blank=True)
     files = models.ManyToManyField("AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True)
 
     # slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
@@ -128,12 +123,23 @@ class Engineer(models.Model):
     second_name = models.CharField(max_length=128)
     position = models.CharField(max_length=256)
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, null=True, blank=True)
+    departament = models.ForeignKey("Departament", null=True, blank=True, on_delete=models.SET_NULL, related_name="engineers")
 
     class Meta:
         db_table = "engineers"
 
     def __str__(self):
         return f"{self.first_name} {self.second_name}"
+
+
+class Departament(models.Model):
+    name = models.CharField(max_length=128)
+
+    class Meta:
+        db_table = "departments"
+
+    def __str__(self):
+        return self.name
 
 
 def upload_directory_path(instance, filename):

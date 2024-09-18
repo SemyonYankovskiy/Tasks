@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 from django.db.models import Q
 
 from tasks.filters import TaskFilter
-from tasks.functions.objects import get_objects_tree
+from tasks.functions.objects import get_objects_tree, get_engineers_tree
 from tasks.models import Task, Tag, Engineer
 
 
@@ -89,17 +89,18 @@ def get_m2m_fields_for_tasks():
     tags_qs = Tag.objects.filter(tasks__isnull=False).values("id", "tag_name").distinct()
     tags = [{"id": tag["id"], "label": tag["tag_name"]} for tag in tags_qs]  # Поле label обязательно
 
-    # Получаем инженеров, связанных с задачами, и формируем список для отображения
-    engineers_qs = list(Engineer.objects.all().values("id", "first_name", "second_name"))
-    engineers = [{"id": eng["id"], "label": f"{eng['first_name']} {eng['second_name']}"} for eng in engineers_qs]
+    # # Получаем инженеров, связанных с задачами, и формируем список для отображения
+    # engineers_qs = list(Engineer.objects.all().values("id", "first_name", "second_name"))
+    # engineers = [{"id": eng["id"], "label": f"{eng['first_name']} {eng['second_name']}"} for eng in engineers_qs]
 
     # Получаем дерево объектов
     objects_tree = get_objects_tree()
+    engineers_tree = get_engineers_tree()
 
     # Возвращаем данные для использования в фильтрах
     return {
         "tags_json": tags,
-        "engineers_json": engineers,
+        "engineers_json": engineers_tree,
         "objects_json": objects_tree,
     }
 

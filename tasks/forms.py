@@ -6,9 +6,9 @@ from .models import Task, Engineer, Tag, Object
 
 
 class AddTaskForm(forms.ModelForm):
-    engineers_create = forms.ModelMultipleChoiceField(queryset=Engineer.objects.all(), required=True)
-    tags_create = forms.ModelMultipleChoiceField(queryset=Tag.objects.all(), required=True)
-    objects_create = forms.ModelMultipleChoiceField(queryset=Object.objects.all(), required=True)
+    engineers_create = forms.ModelMultipleChoiceField(queryset=Engineer.objects.all(), required=False)
+    tags_create = forms.ModelMultipleChoiceField(queryset=Tag.objects.all(), required=False)
+    objects_create = forms.ModelMultipleChoiceField(queryset=Object.objects.all(), required=False)
     completion_time_only = forms.TimeField(required=True)
     completion_date_only = forms.DateField(required=True)
 
@@ -44,9 +44,9 @@ class AddTaskForm(forms.ModelForm):
 
 class EditTaskForm(forms.ModelForm):
     # Поля для редактирования связанных объектов (engineers, tags, objects)
-    engineers_edit = forms.ModelMultipleChoiceField(queryset=Engineer.objects.all(), required=True)
-    tags_edit = forms.ModelMultipleChoiceField(queryset=Tag.objects.all(), required=True)
-    objects_edit = forms.ModelMultipleChoiceField(queryset=Object.objects.all(), required=True)
+    engineers_edit = forms.ModelMultipleChoiceField(queryset=Engineer.objects.all(), required=False)
+    tags_edit = forms.ModelMultipleChoiceField(queryset=Tag.objects.all(), required=False)
+    objects_edit = forms.ModelMultipleChoiceField(queryset=Object.objects.all(), required=False)
 
     # Отдельные поля для даты и времени завершения
     completion_time_only = forms.TimeField(required=True)

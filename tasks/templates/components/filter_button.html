@@ -1,24 +1,27 @@
 {% load static %}
 <div class="btn-group">
-            <a class="btn btn-outline-dark position-relative" type="button" data-bs-toggle="collapse"
-               data-bs-target="#collapseExample"
-               aria-expanded="false" aria-controls="collapseExample">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-filter" viewBox="0 0 16 16">
-  <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
-</svg>  Фильтры  
-                {% if params_count %}
-                    <span style="z-index: 99"
-                          class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger">{{ params_count }}</span>
-                {% endif %}
+    <a class="btn btn-outline-dark position-relative" type="button" data-bs-toggle="collapse"
+       data-bs-target="#collapseExample"
+       aria-expanded="false" aria-controls="collapseExample">
+         
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-filter"
+             viewBox="0 0 16 16">
+            <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+        </svg>
+          Фильтры  
+        {% if params_count %}
+            <span style="z-index: 99"
+                  class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger">{{ params_count }}</span>
+        {% endif %}
 
-            </a>
+    </a>
 
-            {% if params_count %}
-                <a class="btn btn-outline-dark" href="{{ request.path }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                         class="bi bi-x-square" viewBox="0 0 16 16">
-                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
-                    </svg>
-                </a>
-            {% endif %}
-        </div>
+    {% if params_count %}
+        <a class="btn btn-outline-dark" href="{{ request.path }}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                 class="bi bi-x-square" viewBox="0 0 16 16">
+                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+            </svg>
+        </a>
+    {% endif %}
+</div>

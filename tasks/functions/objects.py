@@ -1,7 +1,7 @@
 from django.db.models import Count, OuterRef, Subquery, Case, When, Value, CharField
 from django.db.models.functions import Concat, Substr, Length
 
-from tasks.models import Object, AttachedFile
+from tasks.models import Object, AttachedFile, Engineer
 
 
 def get_objects_list(request):
@@ -80,3 +80,54 @@ def get_objects_tree() -> list:
 
     # Применяем преобразование к корневым элементам (у которых нет родителя)
     return [transform(obj_id) for obj_id in objects if objects[obj_id]["parent"] is None]
+
+
+def get_engineers_tree() -> list:
+    # Запрос к базе данных для получения всех объектов с полями id, first_name, second_name и departament
+    engineers_qs = list(
+        Engineer.objects.all().values("id", "first_name", "second_name", "departament", "departament__name"))
+
+    # Словарь для департаментов
+    departments = {}
+
+    # Список для инженеров без департаментов
+    no_department_engineers = []
+
+    # Проходим по каждому инженеру из выборки
+    for engineer in engineers_qs:
+        engineer_id = engineer["id"]
+        engineer_label = engineer["first_name"] + " " + engineer["second_name"]
+        departament_id = engineer["departament"]
+        departament_label = engineer["departament__name"]
+
+        # Если у инженера нет департамента, добавляем его в список без департаментов
+        if not departament_id:
+            no_department_engineers.append({
+                "id": f"eng_{engineer_id}",
+                "label": engineer_label
+            })
+        else:
+            # Если департамент существует, проверяем, есть ли он уже в словаре департаментов
+            if departament_id not in departments:
+                departments[departament_id] = {
+                    "id": f"dep_{departament_id}",
+                    "label": departament_label,
+                    "children": []
+                }
+            # Добавляем инженера как "ребенка" в департамент
+            departments[departament_id]["children"].append({
+                "id": f"eng_{engineer_id}",
+                "label": engineer_label
+            })
+
+    # Преобразуем департаменты в список и добавляем в начало списка
+    engineers_tree = list(departments.values())
+
+    # Добавляем инженеров без департамента в конец списка
+    engineers_tree.extend(no_department_engineers)
+    return engineers_tree
+
+
+
+
+
