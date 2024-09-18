@@ -15,14 +15,6 @@ def get_filtered_tasks(request, obj=None):
     show_my_tasks_only = request.GET.get("show_my_tasks_only") == "true"
     sort_order = request.GET.get("sort_order", "desc")  # По умолчанию сортировка по убыванию
 
-    # # Определяем, какие задачи (активные/завершённые) нужно показать в зависимости от пути
-    # if request.path.startswith("/calendar/"):
-    #     show_active_task = request.GET.get("show_active_task", "true") == "true"
-    #     show_done_task = request.GET.get("show_done_task", "true") == "true"
-    # else:
-    #     show_active_task = request.GET.get("show_active_task", "true") == "true"
-    #     show_done_task = request.GET.get("show_done_task", "false") == "true"
-
     show_active_task = request.GET.get("show_active_task", "true") == "true"
     show_done_task = request.GET.get("show_done_task", "false") == "true"
 
@@ -114,14 +106,15 @@ def get_m2m_fields_for_tasks():
 
 def task_filter_params(request):
     """
-    Возвращает текущие параметры фильтра, количество примененных фильтров, поля m2mб строку с параметрами фильтра для сохранения состояния фильтра
+    Возвращает текущие параметры фильтра, количество примененных фильтров,
+    поля m2mб строку с параметрами фильтра для сохранения состояния фильтра
     """
 
     # Параметры, которые не нужно учитывать при подсчёте количества активных фильтров
     not_count_params = ["show_my_tasks_only", "sort_order", "page", "show_active_task", "show_done_task", "per_page"]
 
     # Параметры, которые исключаются из URL
-    exclude_params = ["page, per_page"]
+    exclude_params = ["page", "per_page"]
     filter_data = {key: value for key, value in request.GET.items() if key not in exclude_params}
 
     # Формируем строку с параметрами фильтра для последующего использования в шаблонах
@@ -136,4 +129,3 @@ def task_filter_params(request):
         "filter_data": filter_url,
         "params_count": len([param for key, param in request.GET.items() if param and key not in not_count_params])
     }
-

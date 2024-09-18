@@ -87,7 +87,8 @@ def get_object_page(request, object_slug):
     # Получаем номер страницы из запроса
     page_number = request.GET.get("page")
     # Используем функцию пагинации
-    pagination_data = paginate_queryset(filtered_tasks_data["tasks"], page_number, per_page=4)
+    pagination_data = paginate_queryset(filtered_tasks_data["tasks"], page_number, per_page=8)
+
     filtered_tasks_data["tasks"] = pagination_data["page_obj"]
 
     child_objects = get_objects_list(request).filter(parent=obj)
@@ -121,7 +122,7 @@ def get_tasks_page(request):
 
     # Пагинация
     page_number = request.GET.get("page")  # Получаем номер страницы из запроса
-    per_page = request.GET.get('per_page', 4)  # Получаем количество отображаемых элементов пагинации из селектора
+    per_page = request.GET.get('per_page', 8)  # Получаем количество отображаемых элементов пагинации из селектора
     pagination_data = paginate_queryset(filtered_task["tasks"], page_number,
                                         per_page)  # Тут теперь хранятся и задачи и параметры пагинатора
 
@@ -143,8 +144,9 @@ def get_task_view(request, task_id: int):
     """
     Рендер задачи в модальном окне
     """
-    print(request.GET)
-    from_url = request.GET.get('from_url', reverse('tasks'))  # Получаем параметр from_url или используем URL по умолчанию
+    # Получаем параметр from_url или используем URL по умолчанию
+    from_url = request.GET.get('from_url', reverse('tasks'))
+
     task = get_object_or_404(Task, pk=task_id)
     context = {
         "task": task,
@@ -166,8 +168,11 @@ def get_calendar_page(request):
     tasks = get_filtered_tasks(request)
     filter_context = task_filter_params(request)
 
-    return render(request, "components/calendar/calendar.html",
-                  {"tasks": tasks, **filter_context, "random_icon": random_icon, 'current_page': request.path, })
+    return render(
+        request,
+        "components/calendar/calendar.html",
+        {"tasks": tasks, **filter_context, "random_icon": random_icon, 'current_page': request.path, }
+    )
 
 
 @login_required

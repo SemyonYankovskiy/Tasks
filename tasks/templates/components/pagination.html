@@ -52,7 +52,6 @@
         {% endfor %}
 
         <select name="per_page" class="h-100" id="per_page" onchange="this.form.submit()">
-            <option value="4" {% if pagination_data.per_page == '4' %}selected{% endif %}>4</option>
             <option value="8" {% if pagination_data.per_page == '8' %}selected{% endif %}>8</option>
             <option value="12" {% if pagination_data.per_page == '12' %}selected{% endif %}>12</option>
             <option value="16" {% if pagination_data.per_page == '16' %}selected{% endif %}>16</option>
