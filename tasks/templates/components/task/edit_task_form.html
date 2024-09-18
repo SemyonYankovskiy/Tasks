@@ -6,7 +6,7 @@
 <!-- js -->
 <script src="{% static 'fileuploader/jquery.fileuploader.min.js' %}" type="text/javascript"></script>
 
-<form class="text-start" method="POST" action="{% url "edit_task" task.id %}" enctype="multipart/form-data">
+<form class="text-start bg-light" method="POST" action="{% url "edit_task" task.id %}" enctype="multipart/form-data">
     {% csrf_token %}
 
     <!-- Поле для передачи URL с фильтрами -->

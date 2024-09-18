@@ -22,7 +22,8 @@
                 <h1 class="modal-title fs-5" id="editTaskLabel">Создать задачу</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
             </div>
-            <form class="text-start" method="POST" action="{% url 'create_task' %}" enctype="multipart/form-data">
+            <form class="text-start bg-light" method="POST" action="{% url 'create_task' %}"
+                  enctype="multipart/form-data">
                 {% csrf_token %}
 
                 <!-- Скрытое поле для сохранения URL с фильтрами -->
@@ -34,22 +35,25 @@
                     <div class="d-flex gap-2">
                         <!-- Заголовок задачи -->
                         <div class="mb-3 w-100">
-                            <label for="taskHeader" class="form-label">Заголовок<span style="color: red;"> *</span></label>
+                            <label for="taskHeader" class="form-label">Заголовок<span
+                                    style="color: red;"> *</span></label>
                             <input type="text" class="form-control" id="taskHeader" name="header" required>
                         </div>
 
 
                         <!-- Время завершения -->
                         <div class="mb-3 col-3">
-                            <label for="taskCompletionDate" class="form-label">Дата завершения<span style="color: red;"> *</span></label>
+                            <label for="taskCompletionDate" class="form-label">Дата завершения<span style="color: red;"> *</span></label>
                             <input type="date" class="form-control" id="taskCompletionDate" name="completion_date_only"
-                                   required>
+                                   value="{{ default_date }}" required>
                         </div>
                         <div class="mb-3 col-3">
-                            <label for="taskCompletionTime" class="form-label">Время завершения<span style="color: red;"> *</span></label>
+                            <label for="taskCompletionTime" class="form-label">Время завершения<span
+                                    style="color: red;"> *</span></label>
                             <input type="time" class="form-control" id="taskCompletionTime" name="completion_time_only"
-                                   required>
+                                   value="{{ default_time }}" required>
                         </div>
+
                     </div>
 
                     <!-- Статус выполнения -->
@@ -67,8 +71,9 @@
                                 <span>Приоритет<span style="color: red;"> *</span></span>
                             </label>
                             <select class="form-select" id="taskPriority" name="priority" required>
+
                                 <option value="CRITICAL" style="color: #FF0000">Критический</option>
-                                <option value="HIGH" style="color: #FF6347">Высокий</option>
+                                <option value="HIGH" style="color: #FF6347" selected>Высокий</option>
                                 <option value="MEDIUM" style="color: #FFD700">Средний</option>
                                 <option value="LOW" style="color: #1E90FF">Низкий</option>
                             </select>
@@ -78,7 +83,7 @@
                         <div class="mb-3">
                             <label for="taskTags" class="form-label">
                                 <i class="bi bi-box" style="font-size: 1.2rem;"></i>
-                                <span>Объекты<span style="color: red;"> *</span></span>
+                                <span>Объект</span>
                             </label>
                             {% include 'tree-select.html' with select_name='objects_create' objects_structure_json=objects_json %}
                         </div>
@@ -90,7 +95,7 @@
                         <div class="mb-3">
                             <label for="taskEngineers" class="form-label">
                                 <i class="bi bi-people-fill" style="font-size: 1.2rem;"></i>
-                                <span>Инженеры<span style="color: red;"> *</span></span>
+                                <span>Исполнитель<span style="color: red;"> *</span></span>
                             </label>
                             {% include 'tree-select.html' with select_name='engineers_create' objects_structure_json=engineers_json %}
 
@@ -100,7 +105,7 @@
                         <div class="mb-3">
                             <label for="taskTags" class="form-label">
                                 <i class="bi bi-tags-fill" style="font-size: 1.2rem;"></i>
-                                <span>Теги<span style="color: red;"> *</span></span>
+                                <span>Теги</span>
                             </label>
                             {% include 'tree-select.html' with select_name='tags_create' objects_structure_json=tags_json %}
 

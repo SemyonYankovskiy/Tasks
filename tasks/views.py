@@ -1,3 +1,4 @@
+import datetime
 from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
@@ -129,6 +130,8 @@ def get_tasks_page(request):
     random_icon = get_random_icon(request)
 
     context = {
+        "default_date": datetime.date.today().strftime("%Y-%m-%d"),
+        "default_time": "17:30",
         "pagination_data": pagination_data,
         "random_icon": random_icon,
         "tasks": filtered_task,

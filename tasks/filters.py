@@ -24,21 +24,30 @@ class TaskFilter(django_filters.FilterSet):
         fields = ["search", "tags", "engineers", "priority", "objects_set"]
 
     def dep_to_engineers(self, queryset, header: str, value: str):
-        print(value)
+        # Получаем список всех значений параметра engineers
+        values = self.data.getlist('engineers')
 
-        type_id = value.split("_")
-        type = type_id[0]
-        id = int(type_id[1])
+        if not values:
+            return queryset  # Если значений нет, возвращаем исходный queryset
 
-        if type == "eng":
-            # Фильтрация по конкретному инженеру через поле 'engineer'
-            return queryset.filter(engineers__id=id)
-        elif type == "dep":
-            # Фильтрация по департаменту через связь с инженером
-            return queryset.filter(engineers__departament__id=id)
-        else:
-            # Если значение не соответствует ожидаемым типам, возвращаем исходный queryset
-            return queryset
+        # Создаем Q объект для фильтрации по нескольким значениям
+        q_objects = Q()
+
+        # Проходим по каждому значению и добавляем условия в Q объект
+        for val in values:
+            type_id = val.split("_")
+            type = type_id[0]
+            id = int(type_id[1])
+
+            if type == "eng":
+                # Фильтрация по конкретному инженеру через поле 'engineers'
+                q_objects |= Q(engineers__id=id)
+            elif type == "dep":
+                # Фильтрация по департаменту через связь с инженером
+                q_objects |= Q(engineers__departament__id=id)
+
+        # Применяем фильтрацию с помощью Q объекта
+        return queryset.filter(q_objects)
 
     def search_filter(self, queryset, header: str, value: str):
         return queryset.filter(Q(header__icontains=value) | Q(text__icontains=value))
