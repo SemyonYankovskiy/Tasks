@@ -26,10 +26,26 @@ def get_filtered_tasks(request, obj=None):
 
     # Если пользователь администратор, получаем все задачи, иначе фильтруем по пользователю
     if request.user.is_superuser:
+        # Администратор видит все задачи
         basic_qs = Task.objects.all().distinct()
     else:
-        basic_qs = Task.objects.all().filter(
-            Q(objects_set__groups__users=request.user) | Q(engineers__user=request.user)).distinct()
+        # Получаем объект Engineer, связанный с текущим пользователем
+        try:
+            engineer = Engineer.objects.get(user=request.user)
+        except Engineer.DoesNotExist:
+            engineer = None
+
+        if engineer and engineer.departament:
+            # Пользователь видит задачи, в которых он сам указан как инженер,
+            # а также задачи, связанные с его департаментом
+            basic_qs = Task.objects.filter(
+                Q(engineers=engineer) | Q(departments=engineer.departament)
+            ).distinct()
+        else:
+            # Если у пользователя нет департамента, он видит только свои задачи
+            basic_qs = Task.objects.filter(
+                Q(engineers=engineer)
+            ).distinct()
 
     # Применяем фильтр задач на основе запроса
     tasks = TaskFilter(request.GET, queryset=basic_qs).qs
@@ -120,14 +136,18 @@ def task_filter_params(request):
 
     # Формируем строку с параметрами фильтра для последующего использования в шаблонах
     filter_url = urlencode(filter_data, doseq=True) + "#tasks"
-    current_engineers_with_type = request.GET.getlist("engineers")
-    current_engineers = []
-    for each in current_engineers_with_type:
-        type_id = each.split("_")
-        type = type_id[0]
-        id = int(type_id[1])
-        current_engineers.append(id)
 
+    # current_engineers_with_type = request.GET.getlist("engineers")
+    # current_engineers = []
+    # for each in current_engineers_with_type:
+    #     type_id = each.split("_")
+    #     type = type_id[0]
+    #     id = int(type_id[1])
+    #     current_engineers.append(id)
+    #
+    # print(current_engineers_with_type)
+    # print(current_engineers)
+    #
     # Возвращаем фильтры и количество активных параметров
     return {
         **get_m2m_fields_for_tasks(),

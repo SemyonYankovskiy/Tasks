@@ -23,27 +23,25 @@ class AddTaskForm(forms.ModelForm):
         # Формирование списка вариантов для инженеров и департаментов
         engineers_choices = [(f"eng_{eng.id}", f"{eng.first_name} {eng.second_name}") for eng in Engineer.objects.all()]
         departments_choices = [(f"dep_{dep.id}", f"{dep.name}") for dep in Departament.objects.all()]
-
         # Устанавливаем эти выборы для поля engineers_create
         self.fields['engineers_create'].choices = engineers_choices + departments_choices
 
     def save(self, commit=True):
-        # Получаем объект Task, но пока не сохраняем его в базу данных
         instance: Task = super().save(commit=False)
-
         # Обрабатываем дату и время завершения задачи
         completion_date_only = self.cleaned_data['completion_date_only']
         completion_time_only = self.cleaned_data['completion_time_only']
         completion_time = datetime.strptime(f'{completion_date_only} {completion_time_only}', '%Y-%m-%d %H:%M:%S')
         instance.completion_time = completion_time
 
-        # Сохраняем объект Task, чтобы он получил ID
         if commit:
             instance.save()
 
         # Обработка поля engineers_create (ManyToMany связь)
         engineers_create = self.cleaned_data['engineers_create']
+        print(engineers_create)
         engineers = []
+        departments = []
 
         for val in engineers_create:
             type_id = val.split("_")
@@ -54,21 +52,25 @@ class AddTaskForm(forms.ModelForm):
                 engineers.append(id)  # Если это конкретный инженер, добавляем его ID
             elif type == "dep":
                 # Если это департамент, находим всех инженеров, связанных с этим департаментом
-                dep_engineers = Engineer.objects.filter(departament__id=id)
-                engineers.extend(dep_engineers.values_list('id', flat=True))  # Добавляем ID всех инженеров департамента
+                # dep_engineers = Engineer.objects.filter(departament__id=id)
+                # engineers.extend(dep_engineers.values_list('id', flat=True))  # Добавляем ID всех инженеров департамента
+                departments.append(id)  # Также сохраняем ID департамента
 
-        # Теперь можем присвоить найденных инженеров задаче (ManyToMany связь)
+        # Устанавливаем найденных инженеров и департаменты задаче
         if engineers:
+            print("engineers",engineers)
             instance.engineers.set(engineers)
 
-        # Присваиваем другие связанные объекты (ManyToMany связи)
+        if departments:
+            print("departments",departments)
+            instance.departments.set(departments)  # Сохраняем департаменты
+
         if self.cleaned_data['tags_create']:
             instance.tags.set(self.cleaned_data['tags_create'])
 
         if self.cleaned_data['objects_create']:
             instance.objects.set(self.cleaned_data['objects_create'])
 
-        # Окончательно сохраняем объект Task (если commit=True)
         if commit:
             instance.save()
 
@@ -92,27 +94,25 @@ class EditTaskForm(forms.ModelForm):
         # Формирование списка вариантов для инженеров и департаментов
         engineers_choices = [(f"eng_{eng.id}", f"{eng.first_name} {eng.second_name}") for eng in Engineer.objects.all()]
         departments_choices = [(f"dep_{dep.id}", f"{dep.name}") for dep in Departament.objects.all()]
-
         # Устанавливаем эти выборы для поля engineers_create
-        self.fields['engineers_edit'].choices = engineers_choices + departments_choices
+        self.fields['engineers_create'].choices = engineers_choices + departments_choices
 
     def save(self, commit=True):
-        # Получаем объект Task, но пока не сохраняем его в базу данных
         instance: Task = super().save(commit=False)
-
         # Обрабатываем дату и время завершения задачи
         completion_date_only = self.cleaned_data['completion_date_only']
         completion_time_only = self.cleaned_data['completion_time_only']
         completion_time = datetime.strptime(f'{completion_date_only} {completion_time_only}', '%Y-%m-%d %H:%M:%S')
         instance.completion_time = completion_time
 
-        # Сохраняем объект Task, чтобы он получил ID
         if commit:
             instance.save()
 
         # Обработка поля engineers_create (ManyToMany связь)
         engineers_create = self.cleaned_data['engineers_edit']
+        print(engineers_create)
         engineers = []
+        departments = []
 
         for val in engineers_create:
             type_id = val.split("_")
@@ -123,21 +123,25 @@ class EditTaskForm(forms.ModelForm):
                 engineers.append(id)  # Если это конкретный инженер, добавляем его ID
             elif type == "dep":
                 # Если это департамент, находим всех инженеров, связанных с этим департаментом
-                dep_engineers = Engineer.objects.filter(departament__id=id)
-                engineers.extend(dep_engineers.values_list('id', flat=True))  # Добавляем ID всех инженеров департамента
+                # dep_engineers = Engineer.objects.filter(departament__id=id)
+                # engineers.extend(dep_engineers.values_list('id', flat=True))  # Добавляем ID всех инженеров департамента
+                departments.append(id)  # Также сохраняем ID департамента
 
-        # Теперь можем присвоить найденных инженеров задаче (ManyToMany связь)
+        # Устанавливаем найденных инженеров и департаменты задаче
         if engineers:
+            print("engineers", engineers)
             instance.engineers.set(engineers)
 
-        # Присваиваем другие связанные объекты (ManyToMany связи)
+        if departments:
+            print("departments", departments)
+            instance.departments.set(departments)  # Сохраняем департаменты
+
         if self.cleaned_data['tags_edit']:
             instance.tags.set(self.cleaned_data['tags_edit'])
 
         if self.cleaned_data['objects_edit']:
             instance.objects.set(self.cleaned_data['objects_edit'])
 
-        # Окончательно сохраняем объект Task (если commit=True)
         if commit:
             instance.save()
 

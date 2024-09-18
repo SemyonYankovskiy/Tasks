@@ -186,9 +186,14 @@ def get_task_edit_form(request, task_id: int):
     from_url = request.GET.get('from_url', reverse('tasks'))
 
     current_engineers_with_type = list(task.engineers.all().values_list("id", flat=True))
+    current_departaments_with_type = list(task.departments.all().values_list("id", flat=True))
+
     current_engineers = []
     for each in current_engineers_with_type:
         current_engineers.append(f"eng_{each}")
+
+    for each in current_departaments_with_type:
+        current_engineers.append(f"dep_{each}")
 
     context = {
         "task": task,
