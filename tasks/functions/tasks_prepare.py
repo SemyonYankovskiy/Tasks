@@ -120,6 +120,13 @@ def task_filter_params(request):
 
     # Формируем строку с параметрами фильтра для последующего использования в шаблонах
     filter_url = urlencode(filter_data, doseq=True) + "#tasks"
+    current_engineers_with_type = request.GET.getlist("engineers")
+    current_engineers = []
+    for each in current_engineers_with_type:
+        type_id = each.split("_")
+        type = type_id[0]
+        id = int(type_id[1])
+        current_engineers.append(id)
 
     # Возвращаем фильтры и количество активных параметров
     return {

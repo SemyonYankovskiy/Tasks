@@ -182,14 +182,19 @@ def get_calendar_page(request):
 def get_task_edit_form(request, task_id: int):
     task = get_object_or_404(Task, pk=task_id)
     fields = get_m2m_fields_for_tasks()
-    print(request.GET)
+
     from_url = request.GET.get('from_url', reverse('tasks'))
+
+    current_engineers_with_type = list(task.engineers.all().values_list("id", flat=True))
+    current_engineers = []
+    for each in current_engineers_with_type:
+        current_engineers.append(f"eng_{each}")
 
     context = {
         "task": task,
         **fields,
         "from_url": from_url,
-        "current_engineers": list(task.engineers.all().values_list("id", flat=True)),
+        "current_engineers": current_engineers,
         "current_tags_edit": list(task.tags.all().values_list("id", flat=True)),
         "current_objects_edit": list(task.objects_set.all().values_list("id", flat=True)),
     }

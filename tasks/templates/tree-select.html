@@ -5,7 +5,14 @@
 
 
 <div id="objects-tree-select_{{ select_name }}">
-    <treeselect name="{{ select_name }}" v-model="value" placeholder="Смотря какой {{ select_name }}" :flat="true" :multiple="true" :options="options" />
+    <treeselect
+            name="{{ select_name }}"
+            v-model="value"
+            placeholder="Смотря какой {{ select_name }}"
+
+            :multiple="true"
+            :options="options"
+            :value-consists-of="valueConsistsOf"/>
 </div>
 
 <script>
@@ -15,6 +22,7 @@
       el: '#objects-tree-select_{{ select_name }}',
       data: {
         value: {{ current_options|default:"[]"|safe }},
+        valueConsistsOf: 'BRANCH_PRIORITY',
         options: {{objects_structure_json|default:"[]"|safe }},
       },
     })
