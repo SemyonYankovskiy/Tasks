@@ -1,23 +1,34 @@
 /* Изменить цвет фона для сегодняшнего дня */
-    .fc-day-today {
-        background-color: #def4ff !important; /* Устанавливает цвет фона */
-        border: 2px dashed #0096ff !important; /* Устанавливает цвет рамки */
-    }
+.fc-day-today {
+    background-color: #def4ff !important; /* Устанавливает цвет фона */
+    border: 2px dashed #0096ff !important; /* Устанавливает цвет рамки */
+}
 
-    .fc-daygrid-event-dot {
-        background-color: #ffffff !important; /* Устанавливает цвет фона */
-        border: 0 !important; /* Устанавливает цвет рамки */
-    }
-    /*.fc-daygrid-day-number {*/
+.fc-daygrid-event-dot {
+    background-color: #ffffff !important; /* Устанавливает цвет фона */
+    border: 0 !important; /* Устанавливает цвет рамки */
+}
+
+/*.fc-daygrid-day-number {*/
 
 
-    /*}*/
-        .fc-daygrid-day-top {
-        justify-content: left;
-            padding-left: 5px;
+/*}*/
+.fc-daygrid-day-top {
+    justify-content: left;
+    padding-left: 5px;
 
-    }
+}
 
+/* Устанавливаем отступ между временем и заголовком события */
+.fc-event-time {
+    margin-right: 10px; /* Измените значение на желаемое */
+    padding-right: 5px;
+    border-right: 1px solid white;
+}
+
+.fc-event-title {
+    margin-left: 5px; /* Измените значение на желаемое */
+}
 
 .taskDone div {
     background-color: #00CC00;

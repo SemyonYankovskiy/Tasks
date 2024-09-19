@@ -84,7 +84,7 @@
                 ],
 
                 eventClick: function (info) {
-                    const currentFullPath = window.location.pathname+window.location.search; // Получаем полный URL
+                    const currentFullPath = window.location.pathname + window.location.search; // Получаем полный URL
 
                     const url = "/ajax/tasks/" + info.event.id + "/?referrer=" + encodeURIComponent(currentFullPath);
 
@@ -94,7 +94,11 @@
                         $("#task-content").load(url);
                     }
                 },
-
+                eventTimeFormat: { // like '14:30:00'
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    meridiem: false
+                },
 
                 events: [
                     {% for task in tasks.tasks %}
