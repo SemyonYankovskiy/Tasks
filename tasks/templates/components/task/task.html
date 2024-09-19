@@ -11,7 +11,8 @@
 
                 <div class="container-fluid ">
                     <div class="d-flex flex-row w-100 align-items-center">
-                        <!-- Первый столбец -->
+
+                        <!-- Огонёк-->
                         <div class="col-md-1 d-flex justify-content-center align-items-center "
                              style="max-width: 48px">
                             {% if task.is_done == False %}
@@ -21,7 +22,7 @@
                                         {% elif task.priority == 'HIGH' %}  fill="#FF6347"
                                         {% elif task.priority == 'CRITICAL' %}  fill="#FF0000"
                                         {% endif %}
-                                     class="bi bi-bookmarks-fill" viewBox="0 1 18 16">
+                                     class="bi bi-bookmarks-fill" viewBox="0 1 18 16" data-bs-toggle="tooltip" data-bs-delay='{"show":1000,"hide":150}' data-bs-title="Важность задачи">
                                     <path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16Zm0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15Z"></path>
                                 </svg>
                             {% else %}
@@ -33,26 +34,30 @@
                             {% endif %}
                         </div>
 
-                        <div class="col-md-2 d-flex align-items-center border-end border-start gap-2">
+                        <!-- Дата-время -->
+                        <div class="col-md-2 d-flex align-items-center border-end border-start gap-2 px-3">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                                 class="bi bi-calendar-week ms-3" viewBox="0 0 16 16">
+                                 class="bi bi-calendar-week" viewBox="0 0 16 16">
                                 <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
                                 <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
                             </svg>
-                            <span>{{ task.completion_time }}</span>
+                            <span class="ms-2" data-bs-toggle="tooltip" data-bs-delay='{"show":1000,"hide":150}' data-bs-title="Дата-время, когда задача должна быть завершена">{{ task.completion_time|date:"d.m.Y H:i" }}</span>
 
                         </div>
 
 
-                        <!-- Второй столбец -->
+                        <!-- Заголовок задачи -->
                         <div class="col-md-9 d-flex justify-content-left align-items-center px-3">
                             <strong style="text-align: justify;">{{ task.header }}</strong>
                         </div>
                     </div>
 
+                    <!-- Вторая строка -->
                     <div class="row mt-3">
+
+                        <!-- Объекты -->
                         <div class="col d-flex justify-content-left px-4 ">
-                            <div class="d-flex flex-wrap justify-content-left  align-items-center gap-2 mt-2">
+                            <div class="d-flex flex-wrap justify-content-left  align-items-center gap-2 mt-2" data-bs-toggle="tooltip" data-bs-delay='{"show":1000,"hide":150}' data-bs-title="Объект, к которому относится задача">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                                      class="bi bi-compass me-2" viewBox="0 0 16 16">
                                     <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5 8 5.961 14.154 3.5 8.186 1.113zM15 4.239l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464L7.443.184z"/>
@@ -70,8 +75,10 @@
 
                             </div>
                         </div>
+
+                        <!-- Инженеры -->
                         <div class="col d-flex justify-content-end px-3">
-                            <div class="col-md-10 d-flex flex-wrap justify-content-end  align-items-center gap-2 mt-2">
+                            <div class="col-md-10 d-flex flex-wrap justify-content-end  align-items-center gap-2 mt-2" data-bs-toggle="tooltip" data-bs-delay='{"show":1000,"hide":150}' data-bs-title="Исполнители задачи">
 
                                 {% if task.engineers.all %}
                                     {% for engineer in task.engineers.all %}
@@ -98,7 +105,7 @@
             <div class="accordion-body bg-white">
                 <div class="container text-center ">
                     {% if task.files.all %}
-                        <div class="d-flex row ">
+                        <div class="d-flex row border-bottom">
                             <div class="col border-end">
                                 {% include "components/files/gallery.html" with files=task.files.all id=task.id type="task" %}
                             </div>
@@ -110,7 +117,7 @@
 
                     {# ТЕКСТ ЗАДАЧИ #}
                     {% if task.text %}
-                        <div class="row mx-1 my-2 pt-3 d-flex align-items-center border-top">
+                        <div class="row mx-1 my-2 pt-3 d-flex align-items-center border-bottom">
                             <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                                      class="bi bi-chat-left-dots" viewBox="0 0 16 16">
@@ -128,11 +135,12 @@
                             </div>
                         </div>
                     {% endif %}
+
                     {% if task.completion_text %}
-                        <div class="row mx-1 my-2 pt-3 d-flex align-items-center border-top">
+                        <div class="row mx-1 my-2 pt-3 d-flex align-items-center">
                             <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                                     class="bi bi-activity" viewBox="0 0 16 16">
+                                     class="bi bi-activity" viewBox="0 0 16 16" data-bs-toggle="tooltip" data-bs-delay='{"show":1000,"hide":150}' data-bs-title="История действий">
                                     <path fill-rule="evenodd"
                                           d="M6 2a.5.5 0 0 1 .47.33L10 12.036l1.53-4.208A.5.5 0 0 1 12 7.5h3.5a.5.5 0 0 1 0 1h-3.15l-1.88 5.17a.5.5 0 0 1-.94 0L6 3.964 4.47 8.171A.5.5 0 0 1 4 8.5H.5a.5.5 0 0 1 0-1h3.15l1.88-5.17A.5.5 0 0 1 6 2Z"/>
                                 </svg>
