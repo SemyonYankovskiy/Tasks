@@ -107,9 +107,14 @@
                 ],
 
                 eventClick: function (info) {
+                    const currentFullPath = window.location.pathname+window.location.search; // Получаем полный URL
+
+                    const url = "/ajax/tasks/" + info.event.id + "/?referrer=" + encodeURIComponent(currentFullPath);
+
                     myModal.show();
-                    $("#task-content").load("/ajax/tasks/" + info.event.id + "/");
+                    $("#task-content").load(url);
                 },
+
 
                 events: [
                     {% for task in tasks.tasks %}

@@ -71,7 +71,7 @@
             <div class="mb-3">
                 <label for="taskObj_edit_{{ task.id }}" class="form-label">
                     <i class="bi bi-box" style="font-size: 1.2rem;"></i>
-                    <span>Объекты<span style="color: red;"> *</span></span>
+                    <span>Объекты</span>
                 </label>
                 {% include 'tree-select.html' with select_name='objects_edit' current_options=current_objects_edit task_id=task.id objects_structure_json=objects_json %}
             </div>
@@ -92,7 +92,7 @@
             <div class="mb-3">
                 <label for="taskTags_edit_{{ task.id }}" class="form-label">
                     <i class="bi bi-tags-fill" style="font-size: 1.2rem;"></i>
-                    <span>Теги<span style="color: red;"> *</span></span>
+                    <span>Теги</span>
                 </label>
                 {% include 'tree-select.html' with select_name='tags_edit' current_options=current_tags_edit task_id=task.id objects_structure_json=tags_json %}
             </div>

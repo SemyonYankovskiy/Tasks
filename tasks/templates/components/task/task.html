@@ -1,10 +1,22 @@
 {% load static %}
 <div class="accordion" id="accordionPanelsStayOpenExample">
-    <div class="accordion-item bg-light border rounded shadow-sm mx-3 my-3">
+    <div class="accordion-item bg-light border rounded {% if not expanded %}shadow{% else %}shadow-sm{% endif %} mx-3 my-3">
         <h2 class="accordion-header">
             <button class="accordion-button {% if not expanded %}collapsed{% endif %} d-flex" type="button"
                     data-bs-toggle="collapse"
-                    style="background-color: white"
+                    {% if task.completion_time|date:"Y-m-d" == default_date %}
+                        style="border: 2px solid
+                            {% if task.priority == 'LOW' %} #1E90FF
+                            {% elif task.priority == 'MEDIUM' %}  #FFD700
+                            {% elif task.priority == 'HIGH' %}  #FF6347
+                            {% elif task.priority == 'CRITICAL' %}  #FF0000
+                            {% endif %}
+                        !important;"
+                    {% else %}
+                    style="border-bottom: 1px solid gainsboro;"
+
+                    {% endif %}
+
                     data-bs-target="#collapse{{ task.id }}"
                     aria-expanded="{% if expanded %}true{% else %}false{% endif %}"
                     aria-controls="collapse{{ task.id }}">
@@ -48,6 +60,7 @@
 
                         <!-- Заголовок задачи -->
                         <div class="col-md-9 d-flex justify-content-left align-items-center px-3">
+
                             <strong style="text-align: justify;">{{ task.header }}</strong>
                         </div>
                     </div>
@@ -189,3 +202,18 @@
         </div>
     </div>
 </div>
+<style>
+    /* Убираем синюю рамку на активной кнопке */
+.accordion-button:focus {
+    box-shadow: none;
+    outline: none;
+    background-color: white;
+}
+
+/* Убираем синюю подсветку, если аккордеон активен */
+.accordion-button:not(.collapsed) {
+    box-shadow: none;
+}
+
+
+</style>
