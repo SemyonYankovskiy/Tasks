@@ -1,3 +1,4 @@
+import datetime
 from urllib.parse import urlencode
 
 from django.db.models import Q
@@ -84,6 +85,10 @@ def get_filtered_tasks(request, obj=None):
     else:
         tasks = tasks.none()  # Если оба фильтра отключены, не показываем задачи
 
+    # Находим количество задач, которые нужно выполнить сегодня
+    today = datetime.date.today()
+    tasks_due_today_count = tasks.filter(completion_time__date=today).count()
+
     # Возвращаем контекст с отфильтрованными задачами и параметрами отображения
     context = {
         "tasks": tasks,
@@ -93,6 +98,7 @@ def get_filtered_tasks(request, obj=None):
         "not_done_count": not_done_count,
         "show_my_tasks_only": show_my_tasks_only,
         "sort_order": sort_order,
+        "tasks_due_today_count": tasks_due_today_count,
     }
     return context
 

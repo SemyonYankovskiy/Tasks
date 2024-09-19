@@ -67,15 +67,15 @@ def get_object_page(request, object_slug):
     # Получаем основной объект
     obj = (
         Object.objects.filter(slug=object_slug)
-        .prefetch_related("files", "tags", "groups")
-        .annotate(
+            .prefetch_related("files", "tags", "groups")
+            .annotate(
             parent_name=F("parent__name"),
             parent_slug=F("parent__slug"),
             done_tasks_count=Count("id", filter=Q(tasks__is_done=True)),
             undone_tasks_count=Count("id", filter=Q(tasks__is_done=False)),
         )
-        .filter(groups__users=request.user)
-        .first()
+            .filter(groups__users=request.user)
+            .first()
     )
 
     # Если объект не найден, выбрасываем исключение 404 (страница не найдена)
@@ -99,6 +99,8 @@ def get_object_page(request, object_slug):
     filter_context = task_filter_params(request)
 
     context = {
+        "default_date": datetime.date.today().strftime("%Y-%m-%d"),
+        "default_time": "17:30",
         "object": obj,
         "tasks": filtered_tasks_data,
         "random_icon": random_icon,
@@ -174,7 +176,9 @@ def get_calendar_page(request):
     return render(
         request,
         "components/calendar/calendar.html",
-        {"tasks": tasks, **filter_context, "random_icon": random_icon, 'current_page': request.path, }
+        {"default_date": datetime.date.today().strftime("%Y-%m-%d"),
+         "default_time": "17:30", "tasks": tasks, **filter_context, "random_icon": random_icon,
+         'current_page': request.path, }
     )
 
 
