@@ -56,33 +56,30 @@
     function toggleFilter(filterName, currentValue, secondFilterName = null, secondFilterValue = null) {
         const urlParams = new URLSearchParams(window.location.search);
 
-        // Если оба фильтра переданы (для средней кнопки), то переключаем оба фильтра в одно и то же состояние
-        if (secondFilterName && secondFilterValue !== null) {
-            // Если хотя бы один фильтр выключен, включаем оба
-            if (currentValue === false || secondFilterValue === false) {
-                urlParams.set(filterName, "true");
-                urlParams.set(secondFilterName, "true");
-            } else {
-                // Если оба фильтра включены, выключаем оба
-                urlParams.set(filterName, "false");
-                urlParams.set(secondFilterName, "false");
-            }
-        } else {
-            // Если включаем один фильтр (кнопки Активные или Завершенные)
-            if (currentValue === true) {
-                urlParams.set(filterName, "false");
-            } else {
-                urlParams.set(filterName, "true");
-                // Отключаем второй фильтр, если включаем этот
-                if (filterName === "show_active_task") {
-                    urlParams.set("show_done_task", "false");
-                } else if (filterName === "show_done_task") {
-                    urlParams.set("show_active_task", "false");
-                }
-            }
+        // Логика для кнопки "Активные задачи"
+        if (filterName === 'show_active_task') {
+            // Всегда включаем активные и выключаем завершенные
+            urlParams.set('show_active_task', 'true');
+            urlParams.set('show_done_task', 'false');
+        }
+
+        // Логика для кнопки "Завершенные задачи"
+        if (filterName === 'show_done_task') {
+            // Всегда включаем завершенные и выключаем активные
+            urlParams.set('show_done_task', 'true');
+            urlParams.set('show_active_task', 'false');
+        }
+
+        // Логика для средней кнопки: включает обе группы, если хотя бы одна выключена
+        if (secondFilterName && (currentValue === false || secondFilterValue === false)) {
+            // Если хотя бы одна группа выключена, включаем обе
+            urlParams.set('show_active_task', 'true');
+            urlParams.set('show_done_task', 'true');
         }
 
         // Обновляем URL и перезагружаем страницу с новыми параметрами
         window.location.href = "?" + urlParams.toString();
     }
 </script>
+
+

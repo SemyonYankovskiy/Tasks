@@ -95,7 +95,7 @@ class EditTaskForm(forms.ModelForm):
         engineers_choices = [(f"eng_{eng.id}", f"{eng.first_name} {eng.second_name}") for eng in Engineer.objects.all()]
         departments_choices = [(f"dep_{dep.id}", f"{dep.name}") for dep in Departament.objects.all()]
         # Устанавливаем эти выборы для поля engineers_create
-        self.fields['engineers_create'].choices = engineers_choices + departments_choices
+        self.fields['engineers_edit'].choices = engineers_choices + departments_choices
 
     def save(self, commit=True):
         instance: Task = super().save(commit=False)
