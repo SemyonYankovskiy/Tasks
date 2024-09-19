@@ -1,6 +1,6 @@
 /* Изменить цвет фона для сегодняшнего дня */
     .fc-day-today {
-        background-color: #ffffff !important; /* Устанавливает цвет фона */
+        background-color: #def4ff !important; /* Устанавливает цвет фона */
         border: 2px dashed #0096ff !important; /* Устанавливает цвет рамки */
     }
 

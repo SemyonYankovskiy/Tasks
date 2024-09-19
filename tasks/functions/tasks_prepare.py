@@ -28,9 +28,7 @@ def permission_filter(request, engineer):
 
     # Если пользователь is_staff
     elif request.user.is_staff:
-        print("пользователь стаф")
         if engineer and engineer.departament:
-            print("пользователь есть инженер и есть в департаменте")
             # Находим все задачи департамента и задачи самого пользователя
             department_tasks = get_department_tasks(engineer.departament)
 
