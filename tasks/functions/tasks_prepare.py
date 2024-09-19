@@ -1,11 +1,71 @@
 import datetime
 from urllib.parse import urlencode
 
-from django.db.models import Q
+from django.db.models import Q, Count, Case, When
 
 from tasks.filters import TaskFilter
 from tasks.functions.objects import get_objects_tree, get_engineers_tree
 from tasks.models import Task, Tag, Engineer
+
+
+def get_department_tasks(department):
+    """
+    Функция для получения всех задач, связанных с инженерами из определённого департамента.
+    """
+    # Находим всех инженеров департамента
+    department_engineers = Engineer.objects.filter(departament=department)
+
+    # Собираем все задачи, связанные с этими инженерами
+    department_tasks = Task.objects.filter(engineers__in=department_engineers).distinct()
+
+    return department_tasks
+
+
+def permission_filter(request, engineer):
+    # Если пользователь администратор, он видит все задачи
+    if request.user.is_superuser:
+        basic_qs = Task.objects.all().distinct()
+
+    # Если пользователь is_staff
+    elif request.user.is_staff:
+        print("пользователь стаф")
+        if engineer and engineer.departament:
+            print("пользователь есть инженер и есть в департаменте")
+            # Находим все задачи департамента и задачи самого пользователя
+            department_tasks = get_department_tasks(engineer.departament)
+
+            # Пользователь is_staff видит задачи, связанные с инженерами его департамента, включая подчиненных
+            basic_qs = Task.objects.filter(
+                Q(departments=engineer.departament) |  # Задачи департамента
+                Q(engineers=engineer)  # Задачи самого пользователя-инженера
+            ).distinct()
+
+            # Объединение на уровне Python
+            # Так как union не поддерживает prefetch_related(), объединим запросы на уровне Python
+            basic_qs = basic_qs | department_tasks.distinct()
+
+        else:
+            # Если нет департамента, видит только свои задачи
+            basic_qs = Task.objects.filter(
+                Q(engineers=engineer)
+            ).distinct()
+
+    # Если пользователь не администратор и не is_staff
+    else:
+        if engineer and engineer.departament:
+            # Пользователь видит только свои задачи и задачи департамента
+            basic_qs = Task.objects.filter(
+                Q(engineers=engineer) | Q(departments=engineer.departament)
+            ).distinct()
+        else:
+            # Если у пользователя нет департамента, он видит только свои задачи
+            basic_qs = Task.objects.filter(
+                Q(engineers=engineer)
+            ).distinct()
+
+    return basic_qs
+
+
 
 
 def get_filtered_tasks(request, obj=None):
@@ -19,34 +79,13 @@ def get_filtered_tasks(request, obj=None):
     show_active_task = request.GET.get("show_active_task", "true") == "true"
     show_done_task = request.GET.get("show_done_task", "false") == "true"
 
-    # Получаем информацию об инженере, связанном с текущим пользователем
+    # Получаем объект Engineer, связанный с текущим пользователем
     try:
-        engineer = Engineer.objects.get(user=request.user)
+        engineer = Engineer.objects.select_related("departament").get(user=request.user)
     except Engineer.DoesNotExist:
         engineer = None
 
-    # Если пользователь администратор, получаем все задачи, иначе фильтруем по пользователю
-    if request.user.is_superuser:
-        # Администратор видит все задачи
-        basic_qs = Task.objects.all().distinct()
-    else:
-        # Получаем объект Engineer, связанный с текущим пользователем
-        try:
-            engineer = Engineer.objects.get(user=request.user)
-        except Engineer.DoesNotExist:
-            engineer = None
-
-        if engineer and engineer.departament:
-            # Пользователь видит задачи, в которых он сам указан как инженер,
-            # а также задачи, связанные с его департаментом
-            basic_qs = Task.objects.filter(
-                Q(engineers=engineer) | Q(departments=engineer.departament)
-            ).distinct()
-        else:
-            # Если у пользователя нет департамента, он видит только свои задачи
-            basic_qs = Task.objects.filter(
-                Q(engineers=engineer)
-            ).distinct()
+    basic_qs = permission_filter(request=request, engineer=engineer)
 
     # Применяем фильтр задач на основе запроса
     tasks = TaskFilter(request.GET, queryset=basic_qs).qs
@@ -63,7 +102,7 @@ def get_filtered_tasks(request, obj=None):
         tasks = tasks.filter(objects_set=obj)
 
     # Оптимизируем запросы с использованием prefetch_related
-    tasks = tasks.prefetch_related("files", "tags", "engineers", "objects_set")
+    tasks = tasks.prefetch_related("files", "tags", "engineers", "objects_set", "departments")
 
     # Применяем сортировку по дате завершения
     if sort_order == "asc":
@@ -71,9 +110,15 @@ def get_filtered_tasks(request, obj=None):
     else:
         tasks = tasks.order_by("-completion_time")
 
-    # Считаем количество завершённых и незавершённых задач
-    done_tasks_count = tasks.filter(is_done=True).count()
-    not_done_count = tasks.filter(is_done=False).count()
+    # Используем aggregate для подсчёта завершённых и незавершённых задач за один запрос
+    tasks_status = tasks.aggregate(
+        done_tasks_count=Count(Case(When(is_done=True, then=1))),
+        not_done_count=Count(Case(When(is_done=False, then=1)))
+    )
+
+    # Извлекаем значения из результата
+    done_tasks_count = tasks_status['done_tasks_count']
+    not_done_count = tasks_status['not_done_count']
 
     # Фильтруем задачи в зависимости от того, какие категории нужно показывать
     if show_active_task and not show_done_task:

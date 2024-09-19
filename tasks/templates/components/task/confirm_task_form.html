@@ -5,7 +5,7 @@
     {% csrf_token %}
     <!-- Скрытое поле для сохранения URL с фильтрами -->
     <input type="hidden" name="from_url" value="{{ request.get_full_path }}#tasks">
-    {{ request.get_full_path }}
+
     <div>
         <div class="mb-3">
             <label for="comment" class="form-label" style="display: block;">Комментарий к задаче</label>
