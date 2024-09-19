@@ -23,7 +23,7 @@
     background-color: #00CC00;
     border-radius: 5px;
     color: #ffffff;
-    text-align: center;
+    text-align: left;
     font-weight: 700;
 
 }
@@ -41,7 +41,7 @@
 .taskCrit div {
     /*background-color: #FF0000;*/
     color: #ffffff;
-    text-align: center;
+    text-align: left;
     font-weight: 700;
 }
 
@@ -49,7 +49,7 @@
     /*background-color: #FF6347;*/
     /*border-radius: 5px;*/
     color: #fcfcfc;
-    text-align: center;
+    text-align: left;
     font-weight: 700;
 
 }
@@ -58,7 +58,7 @@
     /*background-color: #FFD700;*/
     /*border-radius: 5px;*/
     color: #383838;
-    text-align: center;
+    text-align: left;
     font-weight: 700;
 
 }
@@ -67,7 +67,7 @@
     /*background-color: #1E90FF;*/
     /*border-radius: 5px;*/
     color: #ffffff;
-    text-align: center;
+    text-align: left;
     font-weight: 700;
 
 }

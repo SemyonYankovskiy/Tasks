@@ -18,35 +18,32 @@ class ObjectFilter(django_filters.FilterSet):
 class TaskFilter(django_filters.FilterSet):
     search = django_filters.CharFilter(method="search_filter")
     engineers = django_filters.CharFilter(method="dep_to_engineers")
+    completion_time_after = django_filters.DateFilter(field_name='completion_time', lookup_expr='date__gte', label='От')
+    completion_time_before = django_filters.DateFilter(field_name='completion_time', lookup_expr='date__lte',
+                                                       label='До')
 
     class Meta:
         model = Task
-        fields = ["search", "tags", "engineers", "priority", "objects_set"]
+        fields = ["search", "tags", "engineers", "priority", "objects_set", "completion_time_after",
+                  "completion_time_before"]
 
     def dep_to_engineers(self, queryset, header: str, value: str):
-        # Получаем список всех значений параметра engineers
         values = self.data.getlist('engineers')
 
         if not values:
-            return queryset  # Если значений нет, возвращаем исходный queryset
+            return queryset
 
-        # Создаем Q объект для фильтрации по нескольким значениям
         q_objects = Q()
-
-        # Проходим по каждому значению и добавляем условия в Q объект
         for val in values:
             type_id = val.split("_")
             type = type_id[0]
             id = int(type_id[1])
 
             if type == "eng":
-                # Фильтрация по конкретному инженеру через поле 'engineers'
                 q_objects |= Q(engineers__id=id)
             elif type == "dep":
-                # Фильтрация по департаменту через связь с инженером
                 q_objects |= Q(engineers__departament__id=id)
 
-        # Применяем фильтрацию с помощью Q объекта
         return queryset.filter(q_objects)
 
     def search_filter(self, queryset, header: str, value: str):

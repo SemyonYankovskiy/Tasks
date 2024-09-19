@@ -173,7 +173,7 @@ def get_m2m_fields_for_tasks():
 def task_filter_params(request):
     """
     Возвращает текущие параметры фильтра, количество примененных фильтров,
-    поля m2mб строку с параметрами фильтра для сохранения состояния фильтра
+    поля m2m, строку с параметрами фильтра для сохранения состояния фильтра
     """
 
     # Параметры, которые не нужно учитывать при подсчёте количества активных фильтров
@@ -186,23 +186,33 @@ def task_filter_params(request):
     # Формируем строку с параметрами фильтра для последующего использования в шаблонах
     filter_url = urlencode(filter_data, doseq=True) + "#tasks"
 
-    # current_engineers_with_type = request.GET.getlist("engineers")
-    # current_engineers = []
-    # for each in current_engineers_with_type:
-    #     type_id = each.split("_")
-    #     type = type_id[0]
-    #     id = int(type_id[1])
-    #     current_engineers.append(id)
-    #
-    # print(current_engineers_with_type)
-    # print(current_engineers)
-    #
-    # Возвращаем фильтры и количество активных параметров
+    # Логика подсчёта активных фильтров
+    applied_params = [
+        param for key, param in request.GET.items()
+        if param and key not in not_count_params
+    ]
+
+    # Проверяем наличие completion_time_after и completion_time_before и учитываем их как один фильтр
+    completion_time_after = request.GET.get("completion_time_after")
+    completion_time_before = request.GET.get("completion_time_before")
+
+    if completion_time_after and completion_time_before:
+        # Если оба параметра существуют, исключаем их из подсчёта по отдельности
+        applied_params = [
+            param for key, param in request.GET.items()
+            if key not in ["completion_time_after", "completion_time_before"]
+               and param and key not in not_count_params
+        ]
+        applied_params.append("completion_time_range")  # Добавляем как один фильтр
+
+    # Количество примененных фильтров
+    params_count = len(applied_params)
+
     return {
         **get_m2m_fields_for_tasks(),
         "current_tags": request.GET.getlist("tags"),
         "current_engineers": request.GET.getlist("engineers"),
         "current_objects": request.GET.getlist("objects_set"),
         "filter_data": filter_url,
-        "params_count": len([param for key, param in request.GET.items() if param and key not in not_count_params])
+        "params_count": params_count
     }
