@@ -1,3 +1,4 @@
+{% load static %}
 <div id="nanogallery2_{{ type }}_{{ id }}_{% now 'H_m_s' %}"  data-nanogallery2='{
         "thumbnailWidth": "auto",
         "thumbnailHeight": "200",
@@ -16,4 +17,4 @@
     {% endfor %}
 </div>
 
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/nanogallery2@3/dist/jquery.nanogallery2.min.js"></script>
+<script type="text/javascript" src="{% static 'nanogallery2/jquery.nanogallery2.min.js' %}"></script>

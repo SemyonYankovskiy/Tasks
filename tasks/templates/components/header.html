@@ -19,7 +19,7 @@
                         <ul class="nav nav-pills mx-5">
                             <li class="nav-item {% if current_page == '/' or is_objects_page %}active{% endif %}">
                                 <a href="{% url 'home' %}" class="nav-link p-0 ">
-                                    <img width="32" height="32" src="{% static 'img/grid.svg' %}"
+                                    <img width="32" height="32" src="{% static 'self/img/grid.svg' %}"
                                          class="bi d-block mx-auto mb-3" alt="objects"/>
                                     <span class="m-0 p-0 text-black" style="font-size: 1rem">Объекты</span>
                                 </a>
@@ -28,28 +28,28 @@
                       
                             <li class="nav-item {% if current_page == '/tasks/' %}active{% endif %}">
                                 <a href="{% url 'tasks' %}" class="nav-link p-0 ">
-                                    <img width="32" height="32" src="{% static 'img/list-task.svg' %}"
+                                    <img width="32" height="32" src="{% static 'self/img/list-task.svg' %}"
                                          class="bi d-block mx-auto mb-3" alt="tasks"/>
                                     <span class="m-0 p-0 text-black" style="font-size: 1rem">Задачи</span>
                                 </a>
                             </li>
                             <li class="nav-item {% if current_page == '/calendar/' %}active{% endif %}">
                                 <a href="{% url 'calendar' %}" class="nav-link p-0 ">
-                                    <img width="32" height="32" src="{% static 'img/calendar-week.svg' %}"
+                                    <img width="32" height="32" src="{% static 'self/img/calendar-week.svg' %}"
                                          class="bi d-block mx-auto mb-3" alt="calendar"/>
                                     <span class="m-0 p-0 text-black" style="font-size: 1rem">Календарь</span>
                                 </a>
                             </li>
                             <li class="nav-item {% if current_page == '/map/' %}active{% endif %}">
                                 <a href="{% url 'map' %}" class="nav-link p-0 disabled">
-                                    <img width="32" height="32" src="{% static 'img/map.svg' %}"
+                                    <img width="32" height="32" src="{% static 'self/img/map.svg' %}"
                                          class="bi d-block mx-auto mb-3" alt="map" style="opacity: 50%"/>
                                     <span class="m-0 p-0 text-black-50" style="font-size: 1rem">Карта</span>
                                 </a>
                             </li>
                             <li class="nav-item {% if current_page == '/stat/' %}active{% endif %}">
                                 <a href="#" class="nav-link p-0 disabled">
-                                    <img width="32" height="32" src="{% static 'img/graph-up.svg' %}"
+                                    <img width="32" height="32" src="{% static 'self/img/graph-up.svg' %}"
                                          class="bi d-block mx-auto mb-3" alt="stat" style="opacity: 50%"/>
                                     <span class="m-0 p-0 text-black-50" style="font-size: 1rem">Статистика</span>
                                 </a>
@@ -57,7 +57,7 @@
                             {% if user.is_superuser %}
                                 <li class="nav-item {% if current_page == 'admin/' %}active{% endif %}">
                                     <a href="/admin" class="nav-link p-0">
-                                        <img width="32" height="32" src="{% static 'img/gear.svg' %}"
+                                        <img width="32" height="32" src="{% static 'self/img/gear.svg' %}"
                                              class="bi d-block mx-auto mb-3" alt="stat"/>
                                         <span class="m-0 p-0 text-black" style="font-size: 1rem">Админ панель</span>
                                     </a>
@@ -69,7 +69,7 @@
 
                                 <a class="dropdown" data-bs-toggle="dropdown" aria-expanded="false"
                                    style="color: inherit; text-decoration: none;">
-                                    <img width="32" height="32" src="{% static 'img/person-circle.svg' %}"
+                                    <img width="32" height="32" src="{% static 'self/img/person-circle.svg' %}"
                                          class="bi d-block mx-auto mb-3" alt="user" style="cursor: pointer;"/>
 
 
@@ -102,7 +102,7 @@
                     <div class="col-md-1"></div>
                     <div class="col-md-3 d-flex align-items-center">
                         <a href="#" class="btn mx-3">
-                            <img class="me-3" src="{% static 'img/login.png' %}" alt=""
+                            <img class="me-3" src="{% static 'self/img/login.png' %}" alt=""
                                  style="max-height: 150px; max-width: 150px">
                         </a>
                     </div>
