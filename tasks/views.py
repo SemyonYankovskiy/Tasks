@@ -102,6 +102,7 @@ def get_object_page(request, object_slug):
         "default_date": datetime.date.today().strftime("%Y-%m-%d"),
         "default_time": "17:30",
         "object": obj,
+        "object_id_list": [obj.id],
         "tasks": filtered_tasks_data,
         "random_icon": random_icon,
         "pagination_data": pagination_data,

@@ -86,7 +86,7 @@
                                 <i class="bi bi-box" style="font-size: 1.2rem;"></i>
                                 <span>Объект</span>
                             </label>
-                            {% include 'tree-select.html' with select_name='objects_create' objects_structure_json=objects_json %}
+                            {% include 'tree-select.html' with select_name='objects_create' current_options=object_id_list objects_structure_json=objects_json %}
                         </div>
 
                     </div>

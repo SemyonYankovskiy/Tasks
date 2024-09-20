@@ -56,20 +56,21 @@ class AddTaskForm(forms.ModelForm):
                 # engineers.extend(dep_engineers.values_list('id', flat=True))  # Добавляем ID всех инженеров департамента
                 departments.append(id)  # Также сохраняем ID департамента
 
+
         # Устанавливаем найденных инженеров и департаменты задаче
         if engineers:
-            print("engineers",engineers)
+            print("engineers", engineers)
             instance.engineers.set(engineers)
 
         if departments:
-            print("departments",departments)
+            print("departments", departments)
             instance.departments.set(departments)  # Сохраняем департаменты
 
         if self.cleaned_data['tags_create']:
             instance.tags.set(self.cleaned_data['tags_create'])
 
         if self.cleaned_data['objects_create']:
-            instance.objects.set(self.cleaned_data['objects_create'])
+            instance.objects_set.set(self.cleaned_data['objects_create'])
 
         if commit:
             instance.save()
@@ -127,20 +128,26 @@ class EditTaskForm(forms.ModelForm):
                 # engineers.extend(dep_engineers.values_list('id', flat=True))  # Добавляем ID всех инженеров департамента
                 departments.append(id)  # Также сохраняем ID департамента
 
+
+
         # Устанавливаем найденных инженеров и департаменты задаче
         if engineers:
-            print("engineers", engineers)
+            print("engineers",engineers)
             instance.engineers.set(engineers)
+        else:
+            instance.engineers.clear()
 
         if departments:
-            print("departments", departments)
+            print("departments",departments)
             instance.departments.set(departments)  # Сохраняем департаменты
+        else:
+            instance.departments.clear()
 
         if self.cleaned_data['tags_edit']:
             instance.tags.set(self.cleaned_data['tags_edit'])
 
         if self.cleaned_data['objects_edit']:
-            instance.objects.set(self.cleaned_data['objects_edit'])
+            instance.objects_set.set(self.cleaned_data['objects_edit'])
 
         if commit:
             instance.save()

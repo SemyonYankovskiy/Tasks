@@ -1,0 +1,11 @@
+<form id="take_task" method="post" class="d-inline" action="{% url 'take_task' task.id %}">
+    {% csrf_token %}
+    <!-- Скрытое поле для сохранения URL с фильтрами -->
+    <input type="hidden" name="from_url" value="{{ request.get_full_path }}#tasks">
+
+    <button type="submit" class="btn btn-outline-dark">
+        <i class="bi bi-person-raised-hand" style="font-size: 1.2rem"></i>
+        Взять задачу
+    </button>
+
+</form>

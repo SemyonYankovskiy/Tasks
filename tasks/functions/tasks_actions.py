@@ -72,6 +72,39 @@ def edit_task(request, task_id):
 
 
 @login_required
+@atomic
+def take_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id)
+    # Стандартный редирект на список задач
+    redirect_to = reverse("tasks")
+
+    if request.method == 'POST':
+        # Получаем URL с параметрами фильтров
+        redirect_to = request.POST.get("from_url", redirect_to).strip()
+
+        if request.user.engineer:
+            print(request.user.engineer)
+            task.engineers.add(request.user.engineer)
+            task.save()
+            messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' добавлена в Мои задачи")
+        else:
+            print(f"у {request.user} нет инженера")
+            messages.add_message(request, messages.WARNING, f"у {request.user} нет инженера")
+            return redirect(redirect_to)
+
+
+        # if form.is_valid():
+        #     updated_task = form.save()
+
+            # messages.add_message(request, messages.SUCCESS, f"Задача '{form.cleaned_data['header']}' отредактирована")
+            # else:
+            # messages.add_message(request, messages.WARNING, form.errors)
+
+    # Редирект на исходную страницу
+    return redirect(redirect_to)
+
+
+@login_required
 def reopen_task(request, task_id):
     """
     Устанавливает в поле task.is_done = False и добавляет комментарий к полю task.completion_text

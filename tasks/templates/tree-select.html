@@ -9,7 +9,7 @@
             name="{{ select_name }}"
             v-model="value"
             placeholder="Смотря какой {{ select_name }}"
-
+            :flat="true"
             :multiple="true"
             :options="options"
             :value-consists-of="valueConsistsOf"/>
