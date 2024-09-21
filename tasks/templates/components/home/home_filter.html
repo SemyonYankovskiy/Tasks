@@ -6,29 +6,19 @@
             <div class="p-4 border border-2 rounded-2"
                  style="background-color: rgba(255,255,255,0.52); border-color: #d2d2d2">
                 <div id="div_id_name__icontains" class="text-field__group mb-3">
-                    <label for="id_name__icontains" class="text-field__label form-label"></label>
+                    <i class="bi bi-card-heading"></i>
+                    <label for="id_name__icontains" class="text-field__label form-label">Название/описание</label>
                     <input type="text" name="search" class=" text-field__input textinput form-control"
                            value="{{ request.GET.search }}"
-                           id="id_name__icontains" placeholder="Поиск по объектам">
+                           id="id_name__icontains" placeholder="Поиск">
                 </div>
                 <div class="row">
 
-                    <div id="div_id_tags" class="col mb-3">
-                        <label for="id_tags" class="form-label">Теги</label>
-                        {% include 'tree-select.html' with select_name='tags' current_options=current_tags objects_structure_json=tags_json %}
-                    </div>
-
-
-                    <div id="div_id_groups" class="col mb-3">
-                        <label for="id_groups" class="form-label">Группы</label>
-                        {% include 'tree-select.html' with select_name='groups' current_options=current_groups objects_structure_json=groups_json %}
-                    </div>
-
-
                     <div id="div_id_priority" class="col mb-3">
+                    <i class="bi bi-fire" style="font-size: 1rem;"></i>
                         <label for="id_priority" class="form-label">Важность</label>
                         <select name="priority" class="select form-select" id="id_priority">
-                            <option value="" {% if not request.GET.priority %}selected{% endif %}>-</option>
+                            <option value="" {% if not request.GET.priority %}selected{% endif %}></option>
                             <option value="CRITICAL" {% if request.GET.priority == 'CRITICAL' %}selected{% endif %}>
                                 Критический
                             </option>
@@ -41,6 +31,22 @@
                             </option>
                         </select>
                     </div>
+
+                    <div id="div_id_tags" class="col mb-3">
+                        <i class="bi bi-tags-fill" style="font-size: 1rem;"></i>
+                        <label for="id_tags" class="form-label">Теги</label>
+                        {% include 'tree-select.html' with select_name='tags' current_options=current_tags objects_structure_json=tags_json %}
+                    </div>
+
+
+                    <div id="div_id_groups" class="col mb-3">
+                        <i class="bi bi-boxes"></i>
+                        <label for="id_groups" class="form-label">Группы</label>
+                        {% include 'tree-select.html' with select_name='groups' current_options=current_groups objects_structure_json=groups_json %}
+                    </div>
+
+
+
 
                 </div>
 
