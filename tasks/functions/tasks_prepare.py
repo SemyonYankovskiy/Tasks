@@ -98,9 +98,9 @@ def get_filtered_tasks(request, obj=None):
 
     # Применяем сортировку по дате завершения
     if sort_order == "asc":
-        tasks = tasks.order_by("completion_time")
+        tasks = tasks.order_by("completion_time","create_time")
     else:
-        tasks = tasks.order_by("-completion_time")
+        tasks = tasks.order_by("-completion_time", "-create_time")
 
     # Используем aggregate для подсчёта завершённых и незавершённых задач за один запрос
     tasks_status = tasks.aggregate(
