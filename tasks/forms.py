@@ -39,7 +39,6 @@ class AddTaskForm(forms.ModelForm):
 
         # Обработка поля engineers_create (ManyToMany связь)
         engineers_create = self.cleaned_data['engineers_create']
-        print(engineers_create)
         engineers = []
         departments = []
 
@@ -59,11 +58,9 @@ class AddTaskForm(forms.ModelForm):
 
         # Устанавливаем найденных инженеров и департаменты задаче
         if engineers:
-            print("engineers", engineers)
             instance.engineers.set(engineers)
 
         if departments:
-            print("departments", departments)
             instance.departments.set(departments)  # Сохраняем департаменты
 
         if self.cleaned_data['tags_create']:
@@ -111,7 +108,6 @@ class EditTaskForm(forms.ModelForm):
 
         # Обработка поля engineers_create (ManyToMany связь)
         engineers_create = self.cleaned_data['engineers_edit']
-        print(engineers_create)
         engineers = []
         departments = []
 
@@ -132,13 +128,11 @@ class EditTaskForm(forms.ModelForm):
 
         # Устанавливаем найденных инженеров и департаменты задаче
         if engineers:
-            print("engineers",engineers)
             instance.engineers.set(engineers)
         else:
             instance.engineers.clear()
 
         if departments:
-            print("departments",departments)
             instance.departments.set(departments)  # Сохраняем департаменты
         else:
             instance.departments.clear()

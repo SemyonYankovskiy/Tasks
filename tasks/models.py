@@ -91,6 +91,7 @@ class Task(models.Model):
     priority = models.CharField(choices=Priority.choices, max_length=10)
     is_done = models.BooleanField()
     completion_time = models.DateTimeField()
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     header = models.CharField(max_length=128)
     text = models.TextField(blank=True)
     completion_text = models.TextField(blank=True)
@@ -103,6 +104,7 @@ class Task(models.Model):
 
     class Meta:
         db_table = "object_tasks"
+        ordering = ["create_time"]
 
     def __str__(self):
         return self.header

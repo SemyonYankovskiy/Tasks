@@ -44,22 +44,16 @@ def permission_filter(request, engineer):
 
         else:
             # Если нет департамента, видит только свои задачи
-            basic_qs = Task.objects.filter(
-                Q(engineers=engineer)
-            ).distinct()
+            basic_qs = Task.objects.filter(engineers=engineer).distinct()
 
     # Если пользователь не администратор и не is_staff
     else:
         if engineer and engineer.departament:
             # Пользователь видит только свои задачи и задачи департамента
-            basic_qs = Task.objects.filter(
-                Q(engineers=engineer) | Q(departments=engineer.departament)
-            ).distinct()
+            basic_qs = Task.objects.filter(Q(engineers=engineer) | Q(departments=engineer.departament)).distinct()
         else:
             # Если у пользователя нет департамента, он видит только свои задачи
-            basic_qs = Task.objects.filter(
-                Q(engineers=engineer)
-            ).distinct()
+            basic_qs = Task.objects.filter(engineers=engineer).distinct()
 
     return basic_qs
 

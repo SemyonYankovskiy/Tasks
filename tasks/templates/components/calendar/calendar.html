@@ -18,7 +18,6 @@
     <!-- Календарь -->
 
     <div class="px-3 py-3">
-
         <div class="container  px-4 py-4 rounded-4 border border-1">
 
             {% include "components/task/tasks_container_buttons.html" with show_active_task=tasks.show_active_task not_done_count=tasks.not_done_count  show_done_task=tasks.show_done_task  done_count=tasks.done_count  show_my_tasks_only=tasks.show_my_tasks_only tasks_due_today_count=tasks.tasks_due_today_count %}
@@ -28,7 +27,6 @@
             </div>
             <div class="mt-4 px-4" id="calendar"></div>
         </div>
-
     </div>
 
     {% include 'components/task/edit_task_modal.html' %}
@@ -89,6 +87,11 @@
                     const url = "/ajax/tasks/" + info.event.id + "/?referrer=" + encodeURIComponent(currentFullPath);
 
                     if (calendarTaskModal) {
+                        // Закрываем popover FullCalendar, если он открыт
+                        let popoverElement = document.querySelector('.fc-more-popover');
+                        if (popoverElement) {
+                            popoverElement.style.display = 'none';
+                        }
                         calendarTaskModal.show();
                         modals.push(calendarTaskModal);
                         $("#task-content").load(url);

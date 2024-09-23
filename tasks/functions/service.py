@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import random
@@ -85,3 +86,22 @@ def paginate_queryset(queryset, page_number, per_page):
         "last_page_number": total_pages,
         "per_page": per_page
     }
+
+
+def default_date():
+    # Получаем текущее время
+    now = datetime.datetime.now()
+
+    # Определяем время 17:30 для сравнения
+    cutoff_time = now.replace(hour=17, minute=30, second=0, microsecond=0)
+
+    # Проверяем, текущее время больше 17:30 или нет
+    if now > cutoff_time:
+        # Если текущее время больше 17:30, устанавливаем следующий день
+        date_today = now + datetime.timedelta(days=1)
+    else:
+        # Иначе устанавливаем сегодняшний день
+        date_today = now
+
+    # Оставляем только дату (без времени)
+    return date_today.date().strftime("%Y-%m-%d")

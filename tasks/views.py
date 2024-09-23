@@ -9,7 +9,7 @@ from django.urls import reverse
 
 from .filters import ObjectFilter
 from .functions.objects import get_objects_list
-from .functions.service import paginate_queryset, get_random_icon
+from .functions.service import paginate_queryset, get_random_icon, default_date
 from .functions.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
 from .models import Object, Task, Tag, ObjectGroup
 
@@ -99,7 +99,7 @@ def get_object_page(request, object_slug):
     filter_context = task_filter_params(request)
 
     context = {
-        "default_date": datetime.date.today().strftime("%Y-%m-%d"),
+        "default_date": default_date(),
         "default_time": "17:30",
         "object": obj,
         "object_id_list": [obj.id],
@@ -113,6 +113,7 @@ def get_object_page(request, object_slug):
     }
 
     return render(request, "components/object/object-page.html", context=context)
+
 
 
 @login_required
@@ -131,6 +132,8 @@ def get_tasks_page(request):
                                         per_page)  # Тут теперь хранятся и задачи и параметры пагинатора
 
     random_icon = get_random_icon(request)
+
+    print("filtered_task",filtered_task)
 
     context = {
         "default_date": datetime.date.today().strftime("%Y-%m-%d"),

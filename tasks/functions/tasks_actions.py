@@ -10,7 +10,7 @@ from django.urls import reverse
 
 from tasks.forms import AddTaskForm, EditTaskForm
 from tasks.functions.service import remove_unused_task_attached_files
-from tasks.models import Task, AttachedFile
+from tasks.models import Task, AttachedFile, Engineer
 
 
 @login_required
@@ -82,23 +82,16 @@ def take_task(request, task_id):
         # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
 
-        if request.user.engineer:
+        try:
+            Engineer.objects.get(user=request.user)
             print(request.user.engineer)
             task.engineers.add(request.user.engineer)
             task.save()
             messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' добавлена в Мои задачи")
-        else:
+        except Engineer.DoesNotExist:
             print(f"у {request.user} нет инженера")
             messages.add_message(request, messages.WARNING, f"у {request.user} нет инженера")
             return redirect(redirect_to)
-
-
-        # if form.is_valid():
-        #     updated_task = form.save()
-
-            # messages.add_message(request, messages.SUCCESS, f"Задача '{form.cleaned_data['header']}' отредактирована")
-            # else:
-            # messages.add_message(request, messages.WARNING, form.errors)
 
     # Редирект на исходную страницу
     return redirect(redirect_to)

@@ -1,4 +1,4 @@
-from django.db.models import Count, OuterRef, Subquery, Case, When, Value, CharField
+from django.db.models import Count, OuterRef, Subquery, Case, When, Value, CharField, Q
 from django.db.models.functions import Concat, Substr, Length
 
 from tasks.models import Object, AttachedFile, Engineer
@@ -26,7 +26,7 @@ def get_objects_list(request):
             img_preview=Subquery(image_subquery),  # Добавляем превью изображения как подзапрос
             child_count=Count('children', distinct=True),  # Подсчет уникальных дочерних объектов
             description_length=Length('description'),  # Подсчет длины описания объекта
-            tasks_count=Count('tasks', distinct=True),  # Подсчет уникальных задач, связанных с объектом
+            tasks_count=Count('tasks', filter=Q(tasks__is_done=False), distinct=True),  # Подсчет активных задач
             short_description=Case(
                 # Если длина описания больше 53 символов, обрезаем до 50 символов и добавляем "..."
                 When(description_length__gt=53, then=Concat(Substr("description", 1, 50), Value("..."))),
