@@ -1,5 +1,6 @@
 import datetime
 from urllib.parse import urlencode
+from zoneinfo import ZoneInfo
 
 from django.db.models import Q, Count, Case, When
 
@@ -125,6 +126,26 @@ def get_filtered_tasks(request, obj=None):
     # Находим количество задач, которые нужно выполнить сегодня
     today = datetime.date.today()
     tasks_due_today_count = tasks.filter(completion_time__date=today).count()
+
+    # Задаём московский часовой пояс
+    moscow_tz = ZoneInfo('Europe/Moscow')
+
+    for task in tasks:
+        if task.completion_time:
+            completion_time_moscow = task.completion_time.astimezone(moscow_tz)
+            now_moscow = datetime.datetime.now(moscow_tz)
+
+            # Вычисляем оставшееся время
+            time_left = completion_time_moscow - now_moscow
+
+            # Переводим время в часы и преобразуем к int
+            hours_left = int(time_left.total_seconds() // 3600) if time_left.total_seconds() > 0 else 0
+            task.time_left = hours_left
+
+        else:
+            task.time_left = 0  # Если дедлайн не задан
+
+
 
     # Возвращаем контекст с отфильтрованными задачами и параметрами отображения
     context = {

@@ -133,7 +133,6 @@ def get_tasks_page(request):
 
     random_icon = get_random_icon(request)
 
-    print("filtered_task",filtered_task)
 
     context = {
         "default_date": datetime.date.today().strftime("%Y-%m-%d"),

@@ -1,10 +1,11 @@
 {% load static %}
+{{ task.time_left }}
 <div class="accordion" id="accordionPanelsStayOpenExample">
     <div class="accordion-item bg-light border rounded {% if not expanded %}shadow{% else %}shadow-sm{% endif %} mx-3 my-3">
         <h2 class="accordion-header">
             <button class="accordion-button {% if not expanded %}collapsed{% endif %} d-flex" type="button"
                     data-bs-toggle="collapse"
-                    {% if task.completion_time|date:"Y-m-d" == default_date %}
+                    {% if task.time_left < 24 and task.time_left > 0 %}
                     style="border: 2px solid
                             {% if task.priority == 'LOW' %} #1E90FF
                             {% elif task.priority == 'MEDIUM' %}  #FFD700
