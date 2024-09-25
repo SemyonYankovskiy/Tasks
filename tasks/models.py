@@ -45,13 +45,19 @@ class Object(models.Model):
         LOW = "LOW", "Низкий"
 
     priority = models.CharField(choices=Priority.choices, max_length=10)
-    parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, related_name="children")
+    parent = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.SET_NULL, related_name="children"
+    )
     name = models.CharField(max_length=64)
     address = models.ForeignKey("Address", on_delete=models.CASCADE)
     description = models.TextField(blank=True)
-    tasks = models.ManyToManyField("Task", related_name="objects_set", db_table="objects_tasks_m2m", blank=True)
+    tasks = models.ManyToManyField(
+        "Task", related_name="objects_set", db_table="objects_tasks_m2m", blank=True
+    )
     tags = models.ManyToManyField("Tag", related_name="objects_set", db_table="objects_tags_m2m", blank=True)
-    files = models.ManyToManyField("AttachedFile", related_name="objects_set", db_table="objects_files_m2m", blank=True)
+    files = models.ManyToManyField(
+        "AttachedFile", related_name="objects_set", db_table="objects_files_m2m", blank=True
+    )
     groups = models.ManyToManyField("ObjectGroup", related_name="objects_set", db_table="objects_groups_m2m")
     slug = models.SlugField(max_length=255, unique=True, db_index=True)
 
@@ -95,10 +101,16 @@ class Task(models.Model):
     header = models.CharField(max_length=128)
     text = models.TextField(blank=True)
     completion_text = models.TextField(blank=True)
-    engineers = models.ManyToManyField("Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True)
-    departments = models.ManyToManyField("Department", related_name="tasks", db_table="tasks_departments_m2m", blank=True)
+    engineers = models.ManyToManyField(
+        "Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True
+    )
+    departments = models.ManyToManyField(
+        "Department", related_name="tasks", db_table="tasks_departments_m2m", blank=True
+    )
     tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m", blank=True)
-    files = models.ManyToManyField("AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True)
+    files = models.ManyToManyField(
+        "AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True
+    )
     creator = models.ForeignKey(get_user_model(), related_name="created_tasks", on_delete=models.PROTECT)
     # slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
 
@@ -125,7 +137,9 @@ class Engineer(models.Model):
     second_name = models.CharField(max_length=128)
     position = models.CharField(max_length=256, null=True, blank=True)
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, null=True, blank=True)
-    department = models.ForeignKey("Department", null=True, blank=True, on_delete=models.SET_NULL, related_name="engineers")
+    department = models.ForeignKey(
+        "Department", null=True, blank=True, on_delete=models.SET_NULL, related_name="engineers"
+    )
     head_of_department = models.BooleanField(default=False)
 
     class Meta:
@@ -162,8 +176,7 @@ class AttachedFile(models.Model):
         return self.file.name
 
     def clear_file_name(self):
-        return re.search(r'.+\/\S{8}-\S{4}-\S{4}-\S{4}-\S{12}_\._(.+)', self.file.name).group(1)
-
+        return re.search(r".+\/\S{8}-\S{4}-\S{4}-\S{4}-\S{12}_\._(.+)", self.file.name).group(1)
 
     def is_image(self) -> bool:
         return self.extension in [".jpeg", ".jpg", ".png"]

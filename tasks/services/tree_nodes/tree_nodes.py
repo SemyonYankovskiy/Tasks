@@ -156,9 +156,7 @@ class EngineersTree(Tree):
 
             # Если у инженера нет департамента, добавляем его в список без департаментов
             if department_id is None:
-                no_department_engineers.append(
-                    {"id": f"eng_{engineer_id}", "label": engineer_label}
-                )
+                no_department_engineers.append({"id": f"eng_{engineer_id}", "label": engineer_label})
             else:
                 # Если департамент существует, проверяем, есть ли он уже в словаре департаментов
                 if department_id not in departments:

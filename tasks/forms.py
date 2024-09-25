@@ -15,30 +15,45 @@ class AddTaskForm(forms.ModelForm):
 
     class Meta:
         model = Task
-        fields = ['header', 'priority', 'is_done', 'completion_time_only', 'completion_date_only', 'text', 'engineers_create', 'tags_create', 'files', 'objects_create']
+        fields = [
+            "header",
+            "priority",
+            "is_done",
+            "completion_time_only",
+            "completion_date_only",
+            "text",
+            "engineers_create",
+            "tags_create",
+            "files",
+            "objects_create",
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Формирование списка вариантов для инженеров и департаментов
-        engineers_choices = [(f"eng_{eng.id}", f"{eng.first_name} {eng.second_name}") for eng in Engineer.objects.all()]
+        engineers_choices = [
+            (f"eng_{eng.id}", f"{eng.first_name} {eng.second_name}") for eng in Engineer.objects.all()
+        ]
         departments_choices = [(f"dep_{dep.id}", f"{dep.name}") for dep in Department.objects.all()]
         # Устанавливаем эти выборы для поля engineers_create
-        self.fields['engineers_create'].choices = engineers_choices + departments_choices
+        self.fields["engineers_create"].choices = engineers_choices + departments_choices
 
     def save(self, commit=True):
         instance: Task = super().save(commit=False)
         # Обрабатываем дату и время завершения задачи
-        completion_date_only = self.cleaned_data['completion_date_only']
-        completion_time_only = self.cleaned_data['completion_time_only']
-        completion_time = datetime.strptime(f'{completion_date_only} {completion_time_only}', '%Y-%m-%d %H:%M:%S')
+        completion_date_only = self.cleaned_data["completion_date_only"]
+        completion_time_only = self.cleaned_data["completion_time_only"]
+        completion_time = datetime.strptime(
+            f"{completion_date_only} {completion_time_only}", "%Y-%m-%d %H:%M:%S"
+        )
         instance.completion_time = completion_time
 
         if commit:
             instance.save()
 
         # Обработка поля engineers_create (ManyToMany связь)
-        engineers_create = self.cleaned_data['engineers_create']
+        engineers_create = self.cleaned_data["engineers_create"]
         engineers = []
         departments = []
 
@@ -54,7 +69,6 @@ class AddTaskForm(forms.ModelForm):
                 # dep_engineers = Engineer.objects.filter(department__id=id)
                 # engineers.extend(dep_engineers.values_list('id', flat=True))  # Добавляем ID всех инженеров департамента
                 departments.append(id)  # Также сохраняем ID департамента
-
 
         # Устанавливаем найденных инженеров и департаменты задаче
         if engineers:
@@ -63,11 +77,11 @@ class AddTaskForm(forms.ModelForm):
         if departments:
             instance.departments.set(departments)  # Сохраняем департаменты
 
-        if self.cleaned_data['tags_create']:
-            instance.tags.set(self.cleaned_data['tags_create'])
+        if self.cleaned_data["tags_create"]:
+            instance.tags.set(self.cleaned_data["tags_create"])
 
-        if self.cleaned_data['objects_create']:
-            instance.objects_set.set(self.cleaned_data['objects_create'])
+        if self.cleaned_data["objects_create"]:
+            instance.objects_set.set(self.cleaned_data["objects_create"])
 
         if commit:
             instance.save()
@@ -76,38 +90,57 @@ class AddTaskForm(forms.ModelForm):
 
 
 class EditTaskForm(forms.ModelForm):
-    engineers_edit = forms.MultipleChoiceField(choices=[], required=False)  # Поддержка департаментов и инженеров
+    engineers_edit = forms.MultipleChoiceField(
+        choices=[], required=False
+    )  # Поддержка департаментов и инженеров
     tags_edit = forms.ModelMultipleChoiceField(queryset=Tag.objects.all(), required=False)
-    objects_edit = forms.ModelMultipleChoiceField(queryset=Object.objects.all(), required=False)  # Поле для объектов
+    objects_edit = forms.ModelMultipleChoiceField(
+        queryset=Object.objects.all(), required=False
+    )  # Поле для объектов
     completion_time_only = forms.TimeField(required=True)
     completion_date_only = forms.DateField(required=True)
 
     class Meta:
         model = Task
-        fields = ['header', 'priority', 'is_done', 'completion_time_only', 'completion_date_only', 'text', 'engineers_edit', 'tags_edit', 'files', 'objects_edit']
+        fields = [
+            "header",
+            "priority",
+            "is_done",
+            "completion_time_only",
+            "completion_date_only",
+            "text",
+            "engineers_edit",
+            "tags_edit",
+            "files",
+            "objects_edit",
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Формирование списка вариантов для инженеров и департаментов
-        engineers_choices = [(f"eng_{eng.id}", f"{eng.first_name} {eng.second_name}") for eng in Engineer.objects.all()]
+        engineers_choices = [
+            (f"eng_{eng.id}", f"{eng.first_name} {eng.second_name}") for eng in Engineer.objects.all()
+        ]
         departments_choices = [(f"dep_{dep.id}", f"{dep.name}") for dep in Department.objects.all()]
         # Устанавливаем эти выборы для поля engineers_create
-        self.fields['engineers_edit'].choices = engineers_choices + departments_choices
+        self.fields["engineers_edit"].choices = engineers_choices + departments_choices
 
     def save(self, commit=True):
         instance: Task = super().save(commit=False)
         # Обрабатываем дату и время завершения задачи
-        completion_date_only = self.cleaned_data['completion_date_only']
-        completion_time_only = self.cleaned_data['completion_time_only']
-        completion_time = datetime.strptime(f'{completion_date_only} {completion_time_only}', '%Y-%m-%d %H:%M:%S')
+        completion_date_only = self.cleaned_data["completion_date_only"]
+        completion_time_only = self.cleaned_data["completion_time_only"]
+        completion_time = datetime.strptime(
+            f"{completion_date_only} {completion_time_only}", "%Y-%m-%d %H:%M:%S"
+        )
         instance.completion_time = completion_time
 
         if commit:
             instance.save()
 
         # Обработка поля engineers_create (ManyToMany связь)
-        engineers_create = self.cleaned_data['engineers_edit']
+        engineers_create = self.cleaned_data["engineers_edit"]
         engineers = []
         departments = []
 
@@ -123,8 +156,6 @@ class EditTaskForm(forms.ModelForm):
                 # dep_engineers = Engineer.objects.filter(department__id=id)
                 # engineers.extend(dep_engineers.values_list('id', flat=True))  # Добавляем ID всех инженеров департамента
                 departments.append(id)  # Также сохраняем ID департамента
-
-
 
         # Устанавливаем найденных инженеров и департаменты задаче
         if engineers:
@@ -137,11 +168,11 @@ class EditTaskForm(forms.ModelForm):
         else:
             instance.departments.clear()
 
-        if self.cleaned_data['tags_edit']:
-            instance.tags.set(self.cleaned_data['tags_edit'])
+        if self.cleaned_data["tags_edit"]:
+            instance.tags.set(self.cleaned_data["tags_edit"])
 
-        if self.cleaned_data['objects_edit']:
-            instance.objects_set.set(self.cleaned_data['objects_edit'])
+        if self.cleaned_data["objects_edit"]:
+            instance.objects_set.set(self.cleaned_data["objects_edit"])
 
         if commit:
             instance.save()

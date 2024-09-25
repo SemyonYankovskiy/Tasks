@@ -19,7 +19,7 @@ def create_task(request):
     # Стандартный редирект на список задач
     redirect_to = reverse("tasks")
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = AddTaskForm(request.POST, request.FILES, instance=Task(creator=request.user))
         # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
@@ -30,7 +30,9 @@ def create_task(request):
             for file in request.FILES.getlist("files[]"):
                 task.files.add(AttachedFile.objects.create(file=file))
 
-            messages.add_message(request, messages.SUCCESS, f"Задача '{form.cleaned_data['header']}' успешно создана")
+            messages.add_message(
+                request, messages.SUCCESS, f"Задача '{form.cleaned_data['header']}' успешно создана"
+            )
             return redirect(redirect_to)
         else:
             messages.add_message(request, messages.WARNING, form.errors)
@@ -46,7 +48,7 @@ def edit_task(request, task_id):
     # Стандартный редирект на список задач
     redirect_to = reverse("tasks")
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = EditTaskForm(request.POST, request.FILES, instance=task)
 
         # Получаем URL с параметрами фильтров
@@ -59,11 +61,13 @@ def edit_task(request, task_id):
             remove_unused_task_attached_files(request.POST.get("fileuploader-list-files"), updated_task)
 
             # Обработка прикрепленных файлов
-            for file in request.FILES.getlist('files[]'):
+            for file in request.FILES.getlist("files[]"):
                 updated_task.files.add(AttachedFile.objects.create(file=file))
             updated_task.save()
 
-            messages.add_message(request, messages.SUCCESS, f"Задача '{form.cleaned_data['header']}' отредактирована")
+            messages.add_message(
+                request, messages.SUCCESS, f"Задача '{form.cleaned_data['header']}' отредактирована"
+            )
         else:
             messages.add_message(request, messages.WARNING, form.errors)
 
@@ -78,7 +82,7 @@ def take_task(request, task_id):
     # Стандартный редирект на список задач
     redirect_to = reverse("tasks")
 
-    if request.method == 'POST':
+    if request.method == "POST":
         # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
 
@@ -122,7 +126,7 @@ def reopen_task(request, task_id):
             # Если у пользователя нет engineer, использовать имя пользователя
             name = request.user.username
 
-        pattern = (f"\n\nПереоткрыто: [{name} / {datetime.now().strftime('%d.%m.%Y %H:%M')}]\n")
+        pattern = f"\n\nПереоткрыто: [{name} / {datetime.now().strftime('%d.%m.%Y %H:%M')}]\n"
 
         task.completion_text += pattern + comment
         task.save()
@@ -145,13 +149,13 @@ def close_task(request, task_id):
         # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
 
-        if '?referrer=' in redirect_to:
+        if "?referrer=" in redirect_to:
             # Извлекаем параметры из URL
             parsed_url = urlparse(redirect_to)
             query_params = parse_qs(parsed_url.query)
 
             # Получаем параметр referrer
-            encoded_referrer = query_params.get('referrer', [''])[0]
+            encoded_referrer = query_params.get("referrer", [""])[0]
             decoded_referrer = unquote(encoded_referrer)
 
             redirect_to = decoded_referrer
@@ -166,7 +170,7 @@ def close_task(request, task_id):
             # Если у пользователя нет engineer, использовать имя пользователя
             name = request.user.username
 
-        pattern = (f"\n\nЗакрыто: [{name} / {datetime.now().strftime('%d.%m.%Y %H:%M')}]\n")
+        pattern = f"\n\nЗакрыто: [{name} / {datetime.now().strftime('%d.%m.%Y %H:%M')}]\n"
 
         task.completion_text += pattern + comment
         task.save()

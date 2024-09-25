@@ -24,14 +24,14 @@ def get_home(request):
 
     # Получаем номер страницы из запроса
     page_number = request.GET.get("page")
-    per_page = request.GET.get('per_page', 8)  # Значение по умолчанию
+    per_page = request.GET.get("per_page", 8)  # Значение по умолчанию
     pagination_data = paginate_queryset(filtered_objects, page_number, per_page)
     objects_qs = pagination_data["page_obj"]
 
     add_tasks_count_to_objects(queryset=objects_qs, user=request.user, field_name="tasks_count")
 
-    tags = ObjectsTagsTree({"user":request.user}).get_nodes()
-    groups = GroupsTree({"user":request.user}).get_nodes()
+    tags = ObjectsTagsTree({"user": request.user}).get_nodes()
+    groups = GroupsTree({"user": request.user}).get_nodes()
 
     exclude_params = ["page"]
     filter_data = {key: value for key, value in request.GET.items() if key not in exclude_params}
@@ -52,8 +52,10 @@ def get_home(request):
         "current_tags": request.GET.getlist("tags"),
         "groups_json": groups,
         "current_groups": request.GET.getlist("groups"),
-        'current_page': request.path,
-        "params_count": len([param for key, param in request.GET.items() if param and key not in not_count_params])
+        "current_page": request.path,
+        "params_count": len(
+            [param for key, param in request.GET.items() if param and key not in not_count_params]
+        ),
     }
 
     return render(request, "components/home/home.html", context=context)
@@ -105,7 +107,7 @@ def get_object_page(request, object_slug):
         "pagination_data": pagination_data,
         "child_objects": child_objects,
         **filter_context,
-        'is_objects_page': request.path.startswith('/object/'),
+        "is_objects_page": request.path.startswith("/object/"),
     }
 
     return render(request, "components/object/object-page.html", context=context)
@@ -122,7 +124,9 @@ def get_tasks_page(request):
 
     # Пагинация
     page_number = request.GET.get("page")  # Получаем номер страницы из запроса
-    per_page = request.GET.get('per_page', 8)  # Получаем количество отображаемых элементов пагинации из селектора
+    per_page = request.GET.get(
+        "per_page", 8
+    )  # Получаем количество отображаемых элементов пагинации из селектора
 
     # Тут теперь хранятся и задачи и параметры пагинатора
     pagination_data = paginate_queryset(filtered_task.tasks, page_number, per_page)
@@ -135,7 +139,7 @@ def get_tasks_page(request):
         "counters": filtered_task.tasks_counters,
         "filter_params": filtered_task.filter_params,
         **filter_context,
-        'current_page': request.path,
+        "current_page": request.path,
     }
 
     return render(request, "components/task/tasks_page.html", context=context)
@@ -173,10 +177,10 @@ def get_calendar_page(request):
             "tasks": tasks,
             **filter_context,
             "random_icon": random_icon,
-            'current_page': request.path,
+            "current_page": request.path,
             "c": tasks.tasks_counters,
-            "fp": tasks.filter_params
-        }
+            "fp": tasks.filter_params,
+        },
     )
 
 
@@ -185,7 +189,7 @@ def get_task_edit_form(request, task_id: int):
     task = get_object_or_404(Task, pk=task_id)
     fields = get_m2m_fields_for_tasks(request.user)
 
-    from_url = request.GET.get('from_url', reverse('tasks'))
+    from_url = request.GET.get("from_url", reverse("tasks"))
 
     current_engineers_with_type = list(task.engineers.all().values_list("id", flat=True))
     current_departments_with_type = list(task.departments.all().values_list("id", flat=True))
@@ -205,4 +209,4 @@ def get_task_edit_form(request, task_id: int):
         "current_tags_edit": list(task.tags.all().values_list("id", flat=True)),
         "current_objects_edit": list(task.objects_set.all().values_list("id", flat=True)),
     }
-    return render(request, 'components/task/edit_task_form.html', context)
+    return render(request, "components/task/edit_task_form.html", context)

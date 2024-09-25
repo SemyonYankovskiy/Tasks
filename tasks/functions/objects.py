@@ -26,8 +26,8 @@ def get_objects_list(request) -> QuerySet[Object]:
         .filter(groups__users=request.user)  # Фильтрация объектов по пользователю, который связан с группой
         .annotate(
             img_preview=Subquery(image_subquery),  # Добавляем превью изображения как подзапрос
-            child_count=Count('children', distinct=True),  # Подсчет уникальных дочерних объектов
-            description_length=Length('description'),  # Подсчет длины описания объекта
+            child_count=Count("children", distinct=True),  # Подсчет уникальных дочерних объектов
+            description_length=Length("description"),  # Подсчет длины описания объекта
             # tasks_count=Count('tasks', filter=Q(tasks__is_done=False), distinct=True),  # Подсчет активных задач
             short_description=Case(
                 # Если длина описания больше 53 символов, обрезаем до 50 символов и добавляем "..."

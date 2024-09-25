@@ -13,7 +13,7 @@ from tasks.models import Task
 @login_required
 def get_random_icon(request):
     # Папка с иконками
-    icon_directory = os.path.join(settings.BASE_DIR, 'static/self/img/lazy')
+    icon_directory = os.path.join(settings.BASE_DIR, "static/self/img/lazy")
 
     # Получаем список файлов в папке
     icon_pull = os.listdir(icon_directory)
@@ -22,12 +22,14 @@ def get_random_icon(request):
     icon = random.choice(icon_pull) if icon_pull else None
 
     # Формируем путь для шаблона
-    icon_path = f'self/img/lazy/{icon}' if icon else None
+    icon_path = f"self/img/lazy/{icon}" if icon else None
 
     return icon_path
 
 
-def remove_unused_task_attached_files(file_uploader_data: str, task: Task, *, delete_orphan_files: bool = False):
+def remove_unused_task_attached_files(
+    file_uploader_data: str, task: Task, *, delete_orphan_files: bool = False
+):
     """Удаляет прикрепленные к задачам файлы, которые не используются"""
 
     try:
@@ -84,7 +86,7 @@ def paginate_queryset(queryset, page_number, per_page):
         "start_show_ellipsis": start_show_ellipsis,
         "start_show_first_page_link": start_show_first_page_link,
         "last_page_number": total_pages,
-        "per_page": per_page
+        "per_page": per_page,
     }
 
 

@@ -22,8 +22,8 @@ def permission_filter(user: User) -> QuerySet[Task]:
     elif engineer and engineer.head_of_department:
         # Пользователь head_of_department видит задачи, связанные с инженерами его департамента, включая подчиненных
         queryset = Task.objects.filter(
-            Q(departments=engineer.department) |  # Задачи департамента
-            Q(engineers__department=engineer.department)  # Задачи всех в департаменте
+            Q(departments=engineer.department)  # Задачи департамента
+            | Q(engineers__department=engineer.department)  # Задачи всех в департаменте
         )
 
     # Если пользователь не администратор и не head_of_department
@@ -71,14 +71,16 @@ def get_tasks_count(queryset: QuerySet[Task]) -> TasksCounter:
     # Используем aggregate для подсчёта завершённых и незавершённых задач за один запрос
     tasks_status = queryset.aggregate(
         done_tasks_count=Count(Case(When(is_done=True, then=1))),
-        not_done_count=Count(Case(When(is_done=False, then=1)))
+        not_done_count=Count(Case(When(is_done=False, then=1))),
     )
 
-    tasks_due_today_count = queryset.filter(completion_time__date=datetime.datetime.now(), is_done=False).count()
+    tasks_due_today_count = queryset.filter(
+        completion_time__date=datetime.datetime.now(), is_done=False
+    ).count()
 
     return TasksCounter(
-        done_count=tasks_status['done_tasks_count'],
-        not_done_count=tasks_status['not_done_count'],
+        done_count=tasks_status["done_tasks_count"],
+        not_done_count=tasks_status["not_done_count"],
         tasks_due_today_count=tasks_due_today_count,
     )
 
@@ -105,7 +107,7 @@ def get_filtered_tasks(request, obj=None):
     tasks_qs = tasks_filter_by_done.qs
 
     # Задаём московский часовой пояс
-    moscow_tz = ZoneInfo('Europe/Moscow')
+    moscow_tz = ZoneInfo("Europe/Moscow")
 
     for task in tasks_qs:
         if task.completion_time:
@@ -132,7 +134,7 @@ def get_filtered_tasks(request, obj=None):
             show_active_task=tasks_filter_by_done.data.get("show_active_task"),
             show_done_task=tasks_filter_by_done.data.get("show_done_task"),
         ),
-        tasks_filter_by_done=tasks_filter_by_done
+        tasks_filter_by_done=tasks_filter_by_done,
     )
 
 
@@ -161,7 +163,14 @@ def task_filter_params(request):
     """
 
     # Параметры, которые не нужно учитывать при подсчёте количества активных фильтров
-    not_count_params = ["show_my_tasks_only", "sort_order", "page", "show_active_task", "show_done_task", "per_page"]
+    not_count_params = [
+        "show_my_tasks_only",
+        "sort_order",
+        "page",
+        "show_active_task",
+        "show_done_task",
+        "per_page",
+    ]
 
     # Параметры, которые исключаются из URL
     exclude_params = ["page", "per_page"]
@@ -171,10 +180,7 @@ def task_filter_params(request):
     filter_url = urlencode(filter_data, doseq=True) + "#tasks"
 
     # Логика подсчёта активных фильтров
-    applied_params = [
-        param for key, param in request.GET.items()
-        if param and key not in not_count_params
-    ]
+    applied_params = [param for key, param in request.GET.items() if param and key not in not_count_params]
 
     # Количество примененных фильтров
     params_count = len(applied_params)
