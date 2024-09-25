@@ -10,10 +10,9 @@
 
         {% include "components/home/home_filter.html" %}
 
-        {% if pagination_data.page_obj %}
+        {% if objects_qs %}
 
-
-            {% for object in pagination_data.page_obj %}
+            {% for object in objects_qs %}
 
                 {% include "components/object/object-preview.html" with tasks_count=object.tasks_count img_preview=object.img_preview title=object.name desc=object.short_description priority=object.priority groups=object.groups child_count=object.child_count slug=object.slug tags=object.tags %}
 

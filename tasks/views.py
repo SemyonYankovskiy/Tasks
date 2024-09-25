@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from tasks.services.tree_nodes import GroupsTree, ObjectsTagsTree
 from .filters import ObjectFilter
-from .functions.objects import get_objects_list
+from .functions.objects import get_objects_list, add_tasks_count_to_objects
 from .functions.service import paginate_queryset, get_random_icon
 from .functions.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
 from .models import Object, Task
@@ -26,6 +26,9 @@ def get_home(request):
     page_number = request.GET.get("page")
     per_page = request.GET.get('per_page', 8)  # Значение по умолчанию
     pagination_data = paginate_queryset(filtered_objects, page_number, per_page)
+    objects_qs = pagination_data["page_obj"]
+
+    add_tasks_count_to_objects(queryset=objects_qs, user=request.user, field_name="tasks_count")
 
     tags = ObjectsTagsTree({"user":request.user}).get_nodes()
     groups = GroupsTree({"user":request.user}).get_nodes()
@@ -41,6 +44,7 @@ def get_home(request):
     not_count_params = ["page", "per_page"]
     # Передаем отфильтрованные объекты в контекст
     context = {
+        "objects_qs": objects_qs,
         "pagination_data": pagination_data,
         "filter_data": filter_url,
         "tags_json": tags,
@@ -50,7 +54,6 @@ def get_home(request):
         "current_groups": request.GET.getlist("groups"),
         'current_page': request.path,
         "params_count": len([param for key, param in request.GET.items() if param and key not in not_count_params])
-
     }
 
     return render(request, "components/home/home.html", context=context)

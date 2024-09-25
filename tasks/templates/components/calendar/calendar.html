@@ -182,59 +182,6 @@
             calendar.render();
         });
 
-        function updateUrl() {
-            {#const showActiveTasks = document.getElementById('showActiveTasksSwitch').checked;#}
-            {#const showDoneTasks = document.getElementById('showDoneTasksSwitch').checked;#}
-            const showMyTasksOnly = document.getElementById('showMyTasksOnlySwitch') ? document.getElementById('showMyTasksOnlySwitch').checked : null;
-            const sortOrder = document.getElementById('sortOrderSwitch') ? (document.getElementById('sortOrderSwitch').checked ? 'desc' : 'asc') : null;
-
-            const currentUrl = new URL(window.location.href);
-            const params = new URLSearchParams(currentUrl.search);
-
-            // Устанавливаем параметры
-            {#params.set('show_active_task', showActiveTasks);#}
-            {#params.set('show_done_task', showDoneTasks);#}
-            if (showMyTasksOnly !== null) params.set('show_my_tasks_only', showMyTasksOnly);
-            if (sortOrder !== null) params.set('sort_order', sortOrder);
-
-            // Обновляем URL
-            window.location.search = params.toString();
-        }
-
-        function toggleFilter(filterName, currentValue, secondFilterName = null, secondFilterValue = null) {
-            const urlParams = new URLSearchParams(window.location.search);
-
-            // Если оба фильтра переданы (для средней кнопки), то переключаем оба фильтра в одно и то же состояние
-            if (secondFilterName && secondFilterValue !== null) {
-                // Если хотя бы один фильтр выключен, включаем оба
-                if (currentValue === false || secondFilterValue === false) {
-                    urlParams.set(filterName, "true");
-                    urlParams.set(secondFilterName, "true");
-                } else {
-                    // Если оба фильтра включены, выключаем оба
-                    urlParams.set(filterName, "false");
-                    urlParams.set(secondFilterName, "false");
-                }
-            } else {
-                // Если включаем один фильтр (кнопки Активные или Завершенные)
-                if (currentValue === true) {
-                    urlParams.set(filterName, "false");
-                } else {
-                    urlParams.set(filterName, "true");
-                    // Отключаем второй фильтр, если включаем этот
-                    if (filterName === "show_active_task") {
-                        urlParams.set("show_done_task", "false");
-                    } else if (filterName === "show_done_task") {
-                        urlParams.set("show_active_task", "false");
-                    }
-                }
-            }
-
-            // Обновляем URL и перезагружаем страницу с новыми параметрами
-            window.location.href = "?" + urlParams.toString();
-        }
-    </script>
-
-
-
+</script>
+<script src="{% static 'self/js/filters.js' %}"></script>
 {% endblock %}

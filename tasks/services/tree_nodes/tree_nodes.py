@@ -38,20 +38,17 @@ class TasksTagsTree(Tree):
             # Если пользователь не авторизован
             return qs.none()
 
-        try:
-            engineer = Engineer.objects.get(user=user)
+        engineer: Engineer | None = user.get_engineer_or_none()
+        if engineer and engineer.head_of_department:
+            qs = qs.filter(
+                Q(tasks__departments=engineer.department)
+                | Q(tasks__engineers__department=engineer.department)
+            )
+        elif engineer:
+            qs = qs.filter(Q(tasks__engineers=engineer) | Q(tasks__departments=engineer.department_id))
 
-            if engineer.head_of_department:
-                qs = qs.filter(
-                    Q(tasks__departments=engineer.department)
-                    | Q(tasks__engineers__department=engineer.department)
-                )
-            else:
-                qs = qs.filter(Q(tasks__engineers=engineer) | Q(tasks__departments=engineer.department))
-
-        except Engineer.DoesNotExist:
-            if not user.is_superuser:
-                qs = qs.none()
+        elif not user.is_superuser:
+            qs = qs.none()
 
         return qs.distinct()
 
