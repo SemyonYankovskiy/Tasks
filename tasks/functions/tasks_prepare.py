@@ -1,16 +1,17 @@
 import datetime
+from dataclasses import dataclass
 from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
 
-from django.db.models import Q, Count, Case, When
+from django.db.models import Q, Count, Case, When, QuerySet
 
-from tasks.filters import TaskFilter
+from tasks.filters import TaskFilter, TaskFilterByDone
 from tasks.functions.service import default_date
-from tasks.models import Task, Engineer
+from tasks.models import Task, Engineer, Object
 from tasks.services.tree_nodes import TasksTagsTree, ObjectsTree, EngineersTree
 
 
-def permission_filter(user, engineer: Engineer | None):
+def permission_filter(user, engineer: Engineer | None) -> QuerySet[Task]:
 
     # Если пользователь администратор, он видит все задачи
     if user.is_superuser:
@@ -37,81 +38,130 @@ def permission_filter(user, engineer: Engineer | None):
     else:
         queryset = Task.objects.none()
 
-    queryset |= Task.objects.filter(creator=user)
+    queryset |= Task.objects.filter(creator=user).distinct()
 
     return queryset.distinct()
 
 
-def get_filtered_tasks(request, obj=None):
-    """
-    Возвращает часть задач, которые отфильтрованы или включены/выключены в шаблоне
-    """
+def _filter_task_queryset(request, queryset, engineer: Engineer, obj: Object | None) -> QuerySet[Task]:
     # Определяем, показывать ли только мои задачи и порядок сортировки
-    show_my_tasks_only = request.GET.get("show_my_tasks_only") == "true"
-    sort_order = request.GET.get("sort_order", "desc")  # По умолчанию сортировка по убыванию
-
-    show_active_task = request.GET.get("show_active_task", "true") == "true"
-    show_done_task = request.GET.get("show_done_task", "false") == "true"
+    # show_my_tasks_only: bool = request.GET.get("show_my_tasks_only") == "true"
+    # sort_order = request.GET.get("sort_order", "desc")  # По умолчанию сортировка по убыванию
+    #
+    # show_active_task = request.GET.get("show_active_task", "true") == "true"
+    # show_done_task = request.GET.get("show_done_task", "false") == "true"
 
     # Получаем объект Engineer, связанный с текущим пользователем
-    try:
-        engineer = Engineer.objects.select_related("department").get(user=request.user)
-    except Engineer.DoesNotExist:
-        engineer = None
-
-    basic_qs = permission_filter(user=request.user, engineer=engineer)
+    # try:
+    #     engineer = Engineer.objects.select_related("department").get(user=request.user)
+    # except Engineer.DoesNotExist:
+    #     engineer = None
 
     # Применяем фильтр задач на основе запроса
-    tasks = TaskFilter(request.GET, queryset=basic_qs).qs
+    tasks = TaskFilter(request.GET, queryset=queryset).qs
 
     # Если фильтр "только мои задачи" активен, фильтруем по текущему инженеру
-    if show_my_tasks_only:
-        if engineer:
-            tasks = tasks.filter(engineers=engineer)
-        else:
-            tasks = tasks.none()
+    # if show_my_tasks_only:
+    #     if engineer:
+    #         tasks = tasks.filter(engineers=engineer)
+    #     else:
+    #         tasks = tasks.none()
 
     # Фильтруем задачи по переданному объекту, если он есть
     if obj:
         tasks = tasks.filter(objects_set=obj)
 
     # Оптимизируем запросы с использованием prefetch_related
-    tasks = tasks.prefetch_related("files", "tags", "engineers", "objects_set", "departments")
 
     # Применяем сортировку по дате завершения
-    if sort_order == "asc":
-        tasks = tasks.order_by("completion_time","create_time")
-    else:
-        tasks = tasks.order_by("-completion_time", "-create_time")
+    # if sort_order == "asc":
+    #     tasks = tasks.order_by("completion_time","create_time")
+    # else:
+    #     tasks = tasks.order_by("-completion_time", "-create_time")
 
+    # Фильтруем задачи в зависимости от того, какие категории нужно показывать
+    # if show_active_task and not show_done_task:
+    #     tasks = tasks.filter(is_done=False)
+    # elif show_done_task and not show_active_task:
+    #     tasks = tasks.filter(is_done=True)
+    # elif show_active_task and show_done_task:
+    #     tasks = tasks  # Показываем и активные, и завершённые задачи
+    # else:
+    #     tasks = tasks.none()  # Если оба фильтра отключены, не показываем задачи
+
+    return tasks
+
+
+@dataclass
+class TasksCounter:
+    done_count: int
+    not_done_count: int
+    tasks_due_today_count: int
+
+
+@dataclass
+class FilterParams:
+    show_my_tasks_only: bool
+    sort_order: str
+    show_active_task: bool
+    show_done_task: bool
+
+
+@dataclass
+class FilteredTasksResult:
+    tasks: QuerySet[Task]
+    tasks_counters: TasksCounter
+    filter_params: FilterParams
+    tasks_filter_by_done: TaskFilterByDone
+
+
+def get_tasks_count(queryset: QuerySet[Task]) -> TasksCounter:
     # Используем aggregate для подсчёта завершённых и незавершённых задач за один запрос
-    tasks_status = tasks.aggregate(
+    tasks_status = queryset.aggregate(
         done_tasks_count=Count(Case(When(is_done=True, then=1))),
         not_done_count=Count(Case(When(is_done=False, then=1)))
     )
 
-    # Извлекаем значения из результата
-    done_tasks_count = tasks_status['done_tasks_count']
-    not_done_count = tasks_status['not_done_count']
+    tasks_due_today_count = queryset.filter(completion_time__date=datetime.datetime.now(), is_done=False).count()
 
-    # Фильтруем задачи в зависимости от того, какие категории нужно показывать
-    if show_active_task and not show_done_task:
-        tasks = tasks.filter(is_done=False)
-    elif show_done_task and not show_active_task:
-        tasks = tasks.filter(is_done=True)
-    elif show_active_task and show_done_task:
-        tasks = tasks  # Показываем и активные, и завершённые задачи
-    else:
-        tasks = tasks.none()  # Если оба фильтра отключены, не показываем задачи
+    return TasksCounter(
+        done_count=tasks_status['done_tasks_count'],
+        not_done_count=tasks_status['not_done_count'],
+        tasks_due_today_count=tasks_due_today_count,
+    )
 
-    # Находим количество задач, которые нужно выполнить сегодня
-    today = datetime.date.today()
-    tasks_due_today_count = tasks.filter(completion_time__date=today).count()
+
+def get_filtered_tasks(request, obj=None):
+    """
+    Возвращает часть задач, которые отфильтрованы или включены/выключены в шаблоне
+    """
+
+    # Получаем объект Engineer, связанный с текущим пользователем
+    engineer = request.user.get_engineer_or_none()
+
+    tasks_qs = permission_filter(user=request.user, engineer=engineer)
+
+    print(tasks_qs)
+
+    tasks_qs = tasks_qs.prefetch_related("files", "tags", "engineers", "objects_set", "departments")
+
+    tasks_filter = TaskFilter(request.GET, queryset=tasks_qs, request=request)
+
+    tasks_qs = tasks_filter.qs
+
+    if obj:
+        tasks_qs = tasks_qs.filter(objects_set=obj)
+
+    tasks_counters = get_tasks_count(tasks_qs)
+
+    tasks_filter_by_done = TaskFilterByDone(request.GET, queryset=tasks_qs, request=request)
+
+    tasks_qs = tasks_filter_by_done.qs
 
     # Задаём московский часовой пояс
     moscow_tz = ZoneInfo('Europe/Moscow')
 
-    for task in tasks:
+    for task in tasks_qs:
         if task.completion_time:
             completion_time_moscow = task.completion_time.astimezone(moscow_tz)
             now_moscow = datetime.datetime.now(moscow_tz)
@@ -126,20 +176,20 @@ def get_filtered_tasks(request, obj=None):
         else:
             task.time_left = 0  # Если дедлайн не задан
 
-
+    print(tasks_filter.data)
 
     # Возвращаем контекст с отфильтрованными задачами и параметрами отображения
-    context = {
-        "tasks": tasks,
-        "show_active_task": show_active_task,
-        "show_done_task": show_done_task,
-        "done_count": done_tasks_count,
-        "not_done_count": not_done_count,
-        "show_my_tasks_only": show_my_tasks_only,
-        "sort_order": sort_order,
-        "tasks_due_today_count": tasks_due_today_count,
-    }
-    return context
+    return FilteredTasksResult(
+        tasks=tasks_qs,
+        tasks_counters=tasks_counters,
+        filter_params=FilterParams(
+            show_my_tasks_only=tasks_filter.data.get("show_my_tasks_only"),
+            sort_order=tasks_filter.data.get("sort_order"),
+            show_active_task=tasks_filter_by_done.data.get("show_active_task"),
+            show_done_task=tasks_filter_by_done.data.get("show_done_task"),
+        ),
+        tasks_filter_by_done=tasks_filter_by_done
+    )
 
 
 def get_m2m_fields_for_tasks(user):

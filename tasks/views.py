@@ -30,7 +30,6 @@ def get_home(request):
     tags = ObjectsTagsTree({"user":request.user}).get_nodes()
     groups = GroupsTree({"user":request.user}).get_nodes()
 
-
     exclude_params = ["page"]
     filter_data = {key: value for key, value in request.GET.items() if key not in exclude_params}
 
@@ -62,15 +61,15 @@ def get_object_page(request, object_slug):
     # Получаем основной объект
     obj = (
         Object.objects.filter(slug=object_slug)
-            .prefetch_related("files", "tags", "groups")
-            .annotate(
+        .prefetch_related("files", "tags", "groups")
+        .annotate(
             parent_name=F("parent__name"),
             parent_slug=F("parent__slug"),
             done_tasks_count=Count("id", filter=Q(tasks__is_done=True)),
             undone_tasks_count=Count("id", filter=Q(tasks__is_done=False)),
         )
-            .filter(groups__users=request.user)
-            .first()
+        .filter(groups__users=request.user)
+        .first()
     )
 
     # Если объект не найден, выбрасываем исключение 404 (страница не найдена)
@@ -83,9 +82,9 @@ def get_object_page(request, object_slug):
     # Получаем номер страницы из запроса
     page_number = request.GET.get("page")
     # Используем функцию пагинации
-    pagination_data = paginate_queryset(filtered_tasks_data["tasks"], page_number, per_page=8)
+    pagination_data = paginate_queryset(filtered_tasks_data.tasks, page_number, per_page=8)
 
-    filtered_tasks_data["tasks"] = pagination_data["page_obj"]
+    tasks = pagination_data["page_obj"]
 
     child_objects = get_objects_list(request).filter(parent=obj)
 
@@ -96,10 +95,11 @@ def get_object_page(request, object_slug):
     context = {
         "object": obj,
         "object_id_list": [obj.id],
-        "tasks": filtered_tasks_data,
+        "tasks": tasks,
+        "counters": filtered_tasks_data.tasks_counters,
+        "filter_params": filtered_tasks_data.filter_params,
         "random_icon": random_icon,
         "pagination_data": pagination_data,
-        "task_count": obj.done_tasks_count + obj.undone_tasks_count,
         "child_objects": child_objects,
         **filter_context,
         'is_objects_page': request.path.startswith('/object/'),
@@ -120,21 +120,22 @@ def get_tasks_page(request):
     # Пагинация
     page_number = request.GET.get("page")  # Получаем номер страницы из запроса
     per_page = request.GET.get('per_page', 8)  # Получаем количество отображаемых элементов пагинации из селектора
-    pagination_data = paginate_queryset(filtered_task["tasks"], page_number,
-                                        per_page)  # Тут теперь хранятся и задачи и параметры пагинатора
+
+    # Тут теперь хранятся и задачи и параметры пагинатора
+    pagination_data = paginate_queryset(filtered_task.tasks, page_number, per_page)
 
     random_icon = get_random_icon(request)
-
 
     context = {
         "pagination_data": pagination_data,
         "random_icon": random_icon,
-        "tasks": filtered_task,
+        "counters": filtered_task.tasks_counters,
+        "filter_params": filtered_task.filter_params,
         **filter_context,
         'current_page': request.path,
     }
 
-    return render(request, "components/task/tasks_page.html", context=context, )
+    return render(request, "components/task/tasks_page.html", context=context)
 
 
 @login_required
@@ -165,7 +166,14 @@ def get_calendar_page(request):
     return render(
         request,
         "components/calendar/calendar.html",
-        {"tasks": tasks, **filter_context, "random_icon": random_icon, 'current_page': request.path, }
+        {
+            "tasks": tasks,
+            **filter_context,
+            "random_icon": random_icon,
+            'current_page': request.path,
+            "c": tasks.tasks_counters,
+            "fp": tasks.filter_params
+        }
     )
 
 

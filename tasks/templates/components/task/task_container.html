@@ -1,12 +1,6 @@
 <div id="tasks" class=" p-4">
 
-    {#    <div class="pb-2 d-flex justify-content-between px-4">#}
-    {#        <h3>Задачи</h3>#}
-    {##}
-    {#    </div>#}
-
-
-     {% include "components/task/tasks_container_buttons.html" %}
+    {% include "components/task/tasks_container_buttons.html" %}
 
     <div class="d-flex justify-content-start px-4 mt-3">
         {% include "components/task/create_task.html" %}
@@ -25,7 +19,7 @@
     {% else %}
         <div class="d-flex justify-content-left mt-3">Задач для отображения нет.</div>
     {% endif %}
-    {% include 'components/home/../pagination.html' %}
+    {% include 'components/pagination.html' %}
     </div>
 
     {% include 'components/task/edit_task_modal.html' %}
@@ -51,9 +45,9 @@
         // Обновляем URL
         window.location.search = params.toString();
     }
-</script>
-<script>
+
     function toggleFilter(filterName, currentValue, secondFilterName = null, secondFilterValue = null) {
+        console.log(filterName, currentValue, secondFilterName, secondFilterValue)
         const urlParams = new URLSearchParams(window.location.search);
 
         // Логика для кнопки "Активные задачи"
