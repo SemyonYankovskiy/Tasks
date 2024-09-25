@@ -1,4 +1,3 @@
-import datetime
 from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
@@ -9,7 +8,7 @@ from django.urls import reverse
 
 from .filters import ObjectFilter
 from .functions.objects import get_objects_list
-from .functions.service import paginate_queryset, get_random_icon, default_date
+from .functions.service import paginate_queryset, get_random_icon
 from .functions.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
 from .models import Object, Task, Tag, ObjectGroup
 
@@ -99,8 +98,6 @@ def get_object_page(request, object_slug):
     filter_context = task_filter_params(request)
 
     context = {
-        "default_date": default_date(),
-        "default_time": "17:30",
         "object": obj,
         "object_id_list": [obj.id],
         "tasks": filtered_tasks_data,
@@ -135,8 +132,6 @@ def get_tasks_page(request):
 
 
     context = {
-        "default_date": datetime.date.today().strftime("%Y-%m-%d"),
-        "default_time": "17:30",
         "pagination_data": pagination_data,
         "random_icon": random_icon,
         "tasks": filtered_task,
@@ -152,15 +147,11 @@ def get_task_view(request, task_id: int):
     """
     Рендер задачи в модальном окне
     """
-    # Получаем параметр from_url или используем URL по умолчанию
-    from_url = request.GET.get('from_url', reverse('tasks'))
-
     task = get_object_or_404(Task, pk=task_id)
     context = {
         "task": task,
         "expanded": True,  # параметр для аккордеона, без него будет раскрыт
         "form_type": "collapse",
-        'from_url': from_url,  # Передаем URL с фильтрами в контекст
     }
     return render(request, "components/task/task.html", context=context)
 
@@ -179,9 +170,7 @@ def get_calendar_page(request):
     return render(
         request,
         "components/calendar/calendar.html",
-        {"default_date": datetime.date.today().strftime("%Y-%m-%d"),
-         "default_time": "17:30", "tasks": tasks, **filter_context, "random_icon": random_icon,
-         'current_page': request.path, }
+        {"tasks": tasks, **filter_context, "random_icon": random_icon, 'current_page': request.path, }
     )
 
 

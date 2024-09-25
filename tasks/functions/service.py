@@ -92,12 +92,12 @@ def default_date():
     # Получаем текущее время
     now = datetime.datetime.now()
 
-    # Определяем время 17:30 для сравнения
-    cutoff_time = now.replace(hour=17, minute=30, second=0, microsecond=0)
+    # Определяем время 17:00 для сравнения
+    cutoff_time = now.replace(hour=17, minute=0, second=0, microsecond=0)
 
-    # Проверяем, текущее время больше 17:30 или нет
+    # Проверяем, текущее время больше 17:00 или нет
     if now > cutoff_time:
-        # Если текущее время больше 17:30, устанавливаем следующий день
+        # Если текущее время больше 17:00, устанавливаем следующий день
         date_today = now + datetime.timedelta(days=1)
     else:
         # Иначе устанавливаем сегодняшний день

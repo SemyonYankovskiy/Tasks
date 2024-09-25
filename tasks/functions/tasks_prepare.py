@@ -6,6 +6,7 @@ from django.db.models import Q, Count, Case, When
 
 from tasks.filters import TaskFilter
 from tasks.functions.objects import get_objects_tree, get_engineers_tree
+from tasks.functions.service import default_date
 from tasks.models import Task, Tag, Engineer
 
 
@@ -169,11 +170,7 @@ def get_m2m_fields_for_tasks():
     tags_qs = Tag.objects.filter(tasks__isnull=False).values("id", "tag_name").distinct()
     tags = [{"id": tag["id"], "label": tag["tag_name"]} for tag in tags_qs]  # Поле label обязательно
 
-    # # Получаем инженеров, связанных с задачами, и формируем список для отображения
-    # engineers_qs = list(Engineer.objects.all().values("id", "first_name", "second_name"))
-    # engineers = [{"id": eng["id"], "label": f"{eng['first_name']} {eng['second_name']}"} for eng in engineers_qs]
-
-    # Получаем дерево объектов
+    # Получаем дерево объектов и дерево инженеров
     objects_tree = get_objects_tree()
     engineers_tree = get_engineers_tree()
 
@@ -229,5 +226,7 @@ def task_filter_params(request):
         "current_engineers": request.GET.getlist("engineers"),
         "current_objects": request.GET.getlist("objects_set"),
         "filter_data": filter_url,
-        "params_count": params_count
+        "params_count": params_count,
+        "default_date": default_date(),
+        "default_time": "17:30",
     }
