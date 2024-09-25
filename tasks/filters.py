@@ -42,7 +42,7 @@ class TaskFilter(django_filters.FilterSet):
             if type == "eng":
                 q_objects |= Q(engineers__id=id)
             elif type == "dep":
-                q_objects |= Q(engineers__departament__id=id)
+                q_objects |= Q(engineers__department__id=id)
 
         return queryset.filter(q_objects)
 

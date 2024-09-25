@@ -172,7 +172,7 @@
 
                     {% if not task.is_done %}
 
-                        {% if request.user.engineer in task.engineers.all or request.user.engineer.departament in task.departments.all or request.user.is_superuser or request.user.is_staff %}
+                        {% if request.user.engineer in task.engineers.all or request.user.engineer.department in task.departments.all or request.user.is_superuser or request.user.is_staff %}
                             <div class="row text-start">
 
 

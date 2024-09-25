@@ -96,7 +96,7 @@ class Task(models.Model):
     text = models.TextField(blank=True)
     completion_text = models.TextField(blank=True)
     engineers = models.ManyToManyField("Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True)
-    departments = models.ManyToManyField("Departament", related_name="tasks", db_table="tasks_departments_m2m", blank=True)
+    departments = models.ManyToManyField("Department", related_name="tasks", db_table="tasks_departments_m2m", blank=True)
     tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m", blank=True)
     files = models.ManyToManyField("AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True)
 
@@ -123,9 +123,10 @@ class Tag(models.Model):
 class Engineer(models.Model):
     first_name = models.CharField(max_length=128)
     second_name = models.CharField(max_length=128)
-    position = models.CharField(max_length=256)
+    position = models.CharField(max_length=256, null=True, blank=True)
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, null=True, blank=True)
-    departament = models.ForeignKey("Departament", null=True, blank=True, on_delete=models.SET_NULL, related_name="engineers")
+    department = models.ForeignKey("Department", null=True, blank=True, on_delete=models.SET_NULL, related_name="engineers")
+    head_of_department = models.BooleanField(default=False)
 
     class Meta:
         db_table = "engineers"
@@ -134,7 +135,7 @@ class Engineer(models.Model):
         return f"{self.first_name} {self.second_name}"
 
 
-class Departament(models.Model):
+class Department(models.Model):
     name = models.CharField(max_length=128)
 
     class Meta:

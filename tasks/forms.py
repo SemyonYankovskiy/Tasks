@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django import forms
 
-from .models import Task, Engineer, Tag, Object, Departament
+from .models import Task, Engineer, Tag, Object, Department
 
 
 class AddTaskForm(forms.ModelForm):
@@ -22,7 +22,7 @@ class AddTaskForm(forms.ModelForm):
 
         # Формирование списка вариантов для инженеров и департаментов
         engineers_choices = [(f"eng_{eng.id}", f"{eng.first_name} {eng.second_name}") for eng in Engineer.objects.all()]
-        departments_choices = [(f"dep_{dep.id}", f"{dep.name}") for dep in Departament.objects.all()]
+        departments_choices = [(f"dep_{dep.id}", f"{dep.name}") for dep in Department.objects.all()]
         # Устанавливаем эти выборы для поля engineers_create
         self.fields['engineers_create'].choices = engineers_choices + departments_choices
 
@@ -51,7 +51,7 @@ class AddTaskForm(forms.ModelForm):
                 engineers.append(id)  # Если это конкретный инженер, добавляем его ID
             elif type == "dep":
                 # Если это департамент, находим всех инженеров, связанных с этим департаментом
-                # dep_engineers = Engineer.objects.filter(departament__id=id)
+                # dep_engineers = Engineer.objects.filter(department__id=id)
                 # engineers.extend(dep_engineers.values_list('id', flat=True))  # Добавляем ID всех инженеров департамента
                 departments.append(id)  # Также сохраняем ID департамента
 
@@ -91,7 +91,7 @@ class EditTaskForm(forms.ModelForm):
 
         # Формирование списка вариантов для инженеров и департаментов
         engineers_choices = [(f"eng_{eng.id}", f"{eng.first_name} {eng.second_name}") for eng in Engineer.objects.all()]
-        departments_choices = [(f"dep_{dep.id}", f"{dep.name}") for dep in Departament.objects.all()]
+        departments_choices = [(f"dep_{dep.id}", f"{dep.name}") for dep in Department.objects.all()]
         # Устанавливаем эти выборы для поля engineers_create
         self.fields['engineers_edit'].choices = engineers_choices + departments_choices
 
@@ -120,7 +120,7 @@ class EditTaskForm(forms.ModelForm):
                 engineers.append(id)  # Если это конкретный инженер, добавляем его ID
             elif type == "dep":
                 # Если это департамент, находим всех инженеров, связанных с этим департаментом
-                # dep_engineers = Engineer.objects.filter(departament__id=id)
+                # dep_engineers = Engineer.objects.filter(department__id=id)
                 # engineers.extend(dep_engineers.values_list('id', flat=True))  # Добавляем ID всех инженеров департамента
                 departments.append(id)  # Также сохраняем ID департамента
 

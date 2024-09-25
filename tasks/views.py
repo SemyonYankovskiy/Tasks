@@ -6,11 +6,12 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
+from tasks.services.tree_nodes import GroupsTree, ObjectsTagsTree
 from .filters import ObjectFilter
 from .functions.objects import get_objects_list
 from .functions.service import paginate_queryset, get_random_icon
 from .functions.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
-from .models import Object, Task, Tag, ObjectGroup
+from .models import Object, Task
 
 
 @login_required
@@ -26,14 +27,9 @@ def get_home(request):
     per_page = request.GET.get('per_page', 8)  # Значение по умолчанию
     pagination_data = paginate_queryset(filtered_objects, page_number, per_page)
 
-    # Получаем теги, связанные с объектами
-    tags = Tag.objects.filter(objects_set__isnull=False).filter(objects_set__groups__users=request.user).distinct()
+    tags = ObjectsTagsTree({"user":request.user}).get_nodes()
+    groups = GroupsTree({"user":request.user}).get_nodes()
 
-    tags = [{"id": tag.id, "label": tag.tag_name} for tag in tags]
-    # Получаем группы, связанные с объектами
-    groups = ObjectGroup.objects.filter(objects_set__isnull=False).filter(users=request.user).distinct()
-
-    groups = [{"id": group.id, "label": group.name} for group in groups]
 
     exclude_params = ["page"]
     filter_data = {key: value for key, value in request.GET.items() if key not in exclude_params}
@@ -177,18 +173,18 @@ def get_calendar_page(request):
 @login_required
 def get_task_edit_form(request, task_id: int):
     task = get_object_or_404(Task, pk=task_id)
-    fields = get_m2m_fields_for_tasks()
+    fields = get_m2m_fields_for_tasks(request.user)
 
     from_url = request.GET.get('from_url', reverse('tasks'))
 
     current_engineers_with_type = list(task.engineers.all().values_list("id", flat=True))
-    current_departaments_with_type = list(task.departments.all().values_list("id", flat=True))
+    current_departments_with_type = list(task.departments.all().values_list("id", flat=True))
 
     current_engineers = []
     for each in current_engineers_with_type:
         current_engineers.append(f"eng_{each}")
 
-    for each in current_departaments_with_type:
+    for each in current_departments_with_type:
         current_engineers.append(f"dep_{each}")
 
     context = {

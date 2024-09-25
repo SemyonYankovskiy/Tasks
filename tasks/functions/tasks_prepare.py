@@ -5,61 +5,35 @@ from zoneinfo import ZoneInfo
 from django.db.models import Q, Count, Case, When
 
 from tasks.filters import TaskFilter
-from tasks.functions.objects import get_objects_tree, get_engineers_tree
 from tasks.functions.service import default_date
-from tasks.models import Task, Tag, Engineer
+from tasks.models import Task, Engineer
+from tasks.services.tree_nodes import TasksTagsTree, ObjectsTree, EngineersTree
 
 
-def get_department_tasks(department):
-    """
-    Функция для получения всех задач, связанных с инженерами из определённого департамента.
-    """
-    # Находим всех инженеров департамента
-    department_engineers = Engineer.objects.filter(departament=department)
+def permission_filter(user, engineer: Engineer | None):
 
-    # Собираем все задачи, связанные с этими инженерами
-    department_tasks = Task.objects.filter(engineers__in=department_engineers).distinct()
-
-    return department_tasks
-
-
-def permission_filter(request, engineer):
     # Если пользователь администратор, он видит все задачи
-    if request.user.is_superuser:
-        basic_qs = Task.objects.all().distinct()
+    if user.is_superuser:
+        queryset = Task.objects.all()
 
-    # Если пользователь is_staff
-    elif request.user.is_staff:
-        if engineer and engineer.departament:
-            # Находим все задачи департамента и задачи самого пользователя
-            department_tasks = get_department_tasks(engineer.departament)
+    # Если пользователь head_of_department
+    elif engineer.head_of_department:
+        # Пользователь head_of_department видит задачи, связанные с инженерами его департамента, включая подчиненных
+        queryset = Task.objects.filter(
+            Q(departments=engineer.department) |  # Задачи департамента
+            Q(engineers__department=engineer.department)  # Задачи всех в департаменте
+        )
 
-            # Пользователь is_staff видит задачи, связанные с инженерами его департамента, включая подчиненных
-            basic_qs = Task.objects.filter(
-                Q(departments=engineer.departament) |  # Задачи департамента
-                Q(engineers=engineer)  # Задачи самого пользователя-инженера
-            ).distinct()
-
-            # Объединение на уровне Python
-            # Так как union не поддерживает prefetch_related(), объединим запросы на уровне Python
-            basic_qs = basic_qs | department_tasks.distinct()
-
-        else:
-            # Если нет департамента, видит только свои задачи
-            basic_qs = Task.objects.filter(engineers=engineer).distinct()
-
-    # Если пользователь не администратор и не is_staff
+    # Если пользователь не администратор и не head_of_department
     else:
-        if engineer and engineer.departament:
+        if engineer and engineer.department:
             # Пользователь видит только свои задачи и задачи департамента
-            basic_qs = Task.objects.filter(Q(engineers=engineer) | Q(departments=engineer.departament)).distinct()
+            queryset = Task.objects.filter(Q(engineers=engineer) | Q(departments=engineer.department)).distinct()
         else:
             # Если у пользователя нет департамента, он видит только свои задачи
-            basic_qs = Task.objects.filter(engineers=engineer).distinct()
+            queryset = Task.objects.filter(engineers=engineer)
 
-    return basic_qs
-
-
+    return queryset.distinct()
 
 
 def get_filtered_tasks(request, obj=None):
@@ -75,11 +49,11 @@ def get_filtered_tasks(request, obj=None):
 
     # Получаем объект Engineer, связанный с текущим пользователем
     try:
-        engineer = Engineer.objects.select_related("departament").get(user=request.user)
+        engineer = Engineer.objects.select_related("department").get(user=request.user)
     except Engineer.DoesNotExist:
         engineer = None
 
-    basic_qs = permission_filter(request=request, engineer=engineer)
+    basic_qs = permission_filter(user=request.user, engineer=engineer)
 
     # Применяем фильтр задач на основе запроса
     tasks = TaskFilter(request.GET, queryset=basic_qs).qs
@@ -162,21 +136,19 @@ def get_filtered_tasks(request, obj=None):
     return context
 
 
-def get_m2m_fields_for_tasks():
+def get_m2m_fields_for_tasks(user):
     """
     Возвращает поля m2m задач, для отображения в фильтре задач
     """
-    # Получаем теги, связанные с задачами, и формируем список для отображения
-    tags_qs = Tag.objects.filter(tasks__isnull=False).values("id", "tag_name").distinct()
-    tags = [{"id": tag["id"], "label": tag["tag_name"]} for tag in tags_qs]  # Поле label обязательно
+    context = {"user": user}
 
-    # Получаем дерево объектов и дерево инженеров
-    objects_tree = get_objects_tree()
-    engineers_tree = get_engineers_tree()
+    tasks_tags_tree = TasksTagsTree(context).get_nodes()
+    objects_tree = ObjectsTree(context).get_nodes()
+    engineers_tree = EngineersTree(context).get_nodes()
 
     # Возвращаем данные для использования в фильтрах
     return {
-        "tags_json": tags,
+        "tags_json": tasks_tags_tree,
         "engineers_json": engineers_tree,
         "objects_json": objects_tree,
     }
@@ -221,7 +193,7 @@ def task_filter_params(request):
     params_count = len(applied_params)
 
     return {
-        **get_m2m_fields_for_tasks(),
+        **get_m2m_fields_for_tasks(request.user),
         "current_tags": request.GET.getlist("tags"),
         "current_engineers": request.GET.getlist("engineers"),
         "current_objects": request.GET.getlist("objects_set"),

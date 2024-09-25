@@ -83,9 +83,9 @@ def get_objects_tree() -> list:
 
 
 def get_engineers_tree() -> list:
-    # Запрос к базе данных для получения всех объектов с полями id, first_name, second_name и departament
+    # Запрос к базе данных для получения всех объектов с полями id, first_name, second_name и department
     engineers_qs = list(
-        Engineer.objects.all().values("id", "first_name", "second_name", "departament", "departament__name"))
+        Engineer.objects.all().values("id", "first_name", "second_name", "department", "department__name"))
 
     # Словарь для департаментов
     departments = {}
@@ -97,25 +97,25 @@ def get_engineers_tree() -> list:
     for engineer in engineers_qs:
         engineer_id = engineer["id"]
         engineer_label = engineer["first_name"] + " " + engineer["second_name"]
-        departament_id = engineer["departament"]
-        departament_label = engineer["departament__name"]
+        department_id = engineer["department"]
+        department_label = engineer["department__name"]
 
         # Если у инженера нет департамента, добавляем его в список без департаментов
-        if not departament_id:
+        if not department_id:
             no_department_engineers.append({
                 "id": f"eng_{engineer_id}",
                 "label": engineer_label
             })
         else:
             # Если департамент существует, проверяем, есть ли он уже в словаре департаментов
-            if departament_id not in departments:
-                departments[departament_id] = {
-                    "id": f"dep_{departament_id}",
-                    "label": departament_label,
+            if department_id not in departments:
+                departments[department_id] = {
+                    "id": f"dep_{department_id}",
+                    "label": department_label,
                     "children": []
                 }
             # Добавляем инженера как "ребенка" в департамент
-            departments[departament_id]["children"].append({
+            departments[department_id]["children"].append({
                 "id": f"eng_{engineer_id}",
                 "label": engineer_label
             })
