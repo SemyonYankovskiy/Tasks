@@ -108,7 +108,6 @@ def get_object_page(request, object_slug):
     return render(request, "components/object/object-page.html", context=context)
 
 
-
 @login_required
 def get_tasks_page(request):
     """

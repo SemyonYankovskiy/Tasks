@@ -17,7 +17,7 @@ def permission_filter(user, engineer: Engineer | None):
         queryset = Task.objects.all()
 
     # Если пользователь head_of_department
-    elif engineer.head_of_department:
+    elif engineer and engineer.head_of_department:
         # Пользователь head_of_department видит задачи, связанные с инженерами его департамента, включая подчиненных
         queryset = Task.objects.filter(
             Q(departments=engineer.department) |  # Задачи департамента
@@ -25,13 +25,19 @@ def permission_filter(user, engineer: Engineer | None):
         )
 
     # Если пользователь не администратор и не head_of_department
-    else:
-        if engineer and engineer.department:
+    elif engineer:
+        if engineer.department:
             # Пользователь видит только свои задачи и задачи департамента
             queryset = Task.objects.filter(Q(engineers=engineer) | Q(departments=engineer.department)).distinct()
         else:
             # Если у пользователя нет департамента, он видит только свои задачи
             queryset = Task.objects.filter(engineers=engineer)
+
+    # Если нет инженера
+    else:
+        queryset = Task.objects.none()
+
+    queryset |= Task.objects.filter(creator=user)
 
     return queryset.distinct()
 

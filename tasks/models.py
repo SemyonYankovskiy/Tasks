@@ -99,7 +99,7 @@ class Task(models.Model):
     departments = models.ManyToManyField("Department", related_name="tasks", db_table="tasks_departments_m2m", blank=True)
     tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m", blank=True)
     files = models.ManyToManyField("AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True)
-
+    creator = models.ForeignKey(get_user_model(), related_name="created_tasks", on_delete=models.PROTECT)
     # slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
 
     class Meta:

@@ -20,7 +20,7 @@ def create_task(request):
     redirect_to = reverse("tasks")
 
     if request.method == 'POST':
-        form = AddTaskForm(request.POST, request.FILES)
+        form = AddTaskForm(request.POST, request.FILES, instance=Task(creator=request.user))
         # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
 
