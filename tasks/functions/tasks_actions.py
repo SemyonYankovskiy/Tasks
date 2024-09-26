@@ -10,23 +10,56 @@ from django.urls import reverse
 
 from tasks.forms import AddTaskForm, EditTaskForm
 from tasks.functions.service import remove_unused_task_attached_files
-from tasks.models import Task, AttachedFile, Engineer
+from tasks.models import Task, AttachedFile, Engineer, Tag
+
+
+@atomic
+def create_tags(request):
+    """
+    проверяет, существуют ли теги в базе данных, и создаёт новые теги, если они отсутствуют.
+    """
+
+    # Получаем данные о тегах из формы (может содержать как новые теги, так и существующие ID)
+    tags_data = request.getlist('tags_create')  # Здесь список тегов, включая новые
+    new_tag_ids = []  # Для хранения ID тегов (как существующих, так и новых)
+
+    for tag in tags_data:
+        # Если тег не является числом (значит это новый тег), создаем его
+        if not tag.isdigit():
+            # Создаем новый тег в базе данных
+            new_tag = Tag.objects.create(tag_name=tag)
+            # Добавляем ID нового тега в список
+            new_tag_ids.append(str(new_tag.id))
+        else:
+            # Если тег уже существует (его значение - это ID), просто добавляем его в список
+            new_tag_ids.append(tag)
+
+    # Копируем данные POST-запроса и заменяем список тегов на список их ID
+    post_data = request.copy()
+    post_data.setlist('tags_create', new_tag_ids)  # Заменяем теги их ID
+    return post_data  # Возвращаем обновленные данные POST-запроса
+
 
 
 @login_required
 @atomic
 def create_task(request):
-    # Стандартный редирект на список задач
     redirect_to = reverse("tasks")
 
     if request.method == "POST":
-        form = AddTaskForm(request.POST, request.FILES, instance=Task(creator=request.user))
+
+        post_data = create_tags(request.POST) # Сохраняем теги и возвращаем
+
+        # Теперь создаем форму с обновлёнными данными (содержит ID всех тегов)
+        form = AddTaskForm(post_data, request.FILES, instance=Task(creator=request.user))
+
         # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
 
         if form.is_valid():
-            task = form.save()  # Сохраняем задачу, но не коммитим
-            # Проходимся по файлам и сохраняем их
+            task = form.save()
+
+            # Сохраняем прикреплённые файлы (если они есть)
             for file in request.FILES.getlist("files[]"):
                 task.files.add(AttachedFile.objects.create(file=file))
 

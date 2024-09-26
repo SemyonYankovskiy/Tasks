@@ -18,10 +18,7 @@ urlpatterns = [
     path("calendar/", views.get_calendar_page, name="calendar"),  # Страница карты
     path("object/<slug:object_slug>/", views.get_object_page, name="show-object"),
     path("", views.get_home, name="home"),
-    path(
-        "admin/",
-        admin.site.urls,
-    ),
+    path("admin/",admin.site.urls),
     path("user/", include("user.urls", namespace="user")),
     path("ajax/tasks/<int:task_id>/", views.get_task_view, name="ajax-show-task"),
     path("ajax/tasks/<int:task_id>/edit", views.get_task_edit_form, name="ajax-task-edit-form"),

@@ -59,7 +59,6 @@ class TaskFilter(django_filters.FilterSet):
 
     def filter_show_my_tasks_only(self, queryset, name: str, value: bool):
         engineer: Engineer | None = self.request.user.get_engineer_or_none()
-        print("filter_show_my_tasks_only", name, value)
 
         if engineer and value:
             return queryset.filter(engineers=engineer)

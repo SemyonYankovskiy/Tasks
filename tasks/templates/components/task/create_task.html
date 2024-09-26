@@ -103,12 +103,12 @@
                         </div>
 
                         <!-- Выбор тегов  -->
-                        <div class="mb-3">
+                        <div class="mb-3" style="min-width: 500px">
                             <label for="taskTags" class="form-label">
                                 <i class="bi bi-tags-fill" style="font-size: 1.2rem;"></i>
                                 <span>Теги</span>
                             </label>
-                            {% include 'tree-select.html' with select_name='tags_create' objects_structure_json=tags_json %}
+                            {% include 'tags-select.html' with select_name='tags_create' objects_structure_json=tags_json %}
 
                         </div>
                     </div>
