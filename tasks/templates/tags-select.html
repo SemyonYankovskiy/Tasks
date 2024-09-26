@@ -1,0 +1,133 @@
+<div id="vue-select_{{ select_name }}" class="w-100">
+
+    <select hidden v-model="selected" multiple name="{{ select_name }}">
+        <option v-for="option in selected" :value="option">{% verbatim %}{{ option }}{% endverbatim %}</option>
+    </select>
+
+    <v-select
+            @option:selected="changeTags"
+            taggable
+            multiple
+            v-model="value"
+            :reduce="(option) => option.label"
+            :options="options"
+            @search:blur="addNewTag"
+    >
+    </v-select>
+</div>
+
+
+<script>
+    Vue.component('v-select', VueSelect.VueSelect);
+    new Vue({
+        el: '#vue-select_{{ select_name }}',
+        data: {
+            value: {{ current_options|default:"[]"|safe }},
+            selected: {{ current_options|default:"[]"|safe }},
+            options: {{ objects_structure_json|default:"[]"|safe }},
+        },
+        methods: {
+            changeTags(tags) {
+                this.selected = tags.map(tag => tag.label);
+            },
+            addNewTag(newTag) {
+                if (newTag && !this.selected.includes(newTag)) {
+                    const newTagObject = {label: newTag, id: null};  // Создаем объект с label (имя тега) и id = null
+                    this.options.push(newTagObject);  // Добавляем новый тег в массив опций
+                    this.selected.push(newTagObject);  // Добавляем новый тег в выбранные значения
+                }
+            },
+        },
+
+    })
+    ;
+    // Пример objects_structure_json, который должен передаваться:
+    // [
+    //   {id: 1, label: 'Option 1'},
+    //   {id: 2, label: 'Option 2'},
+    //   {id: 3, label: 'Option 3'},
+    //   {id: 4, label: 'Option 4'},
+    // ]
+
+    // Пример current_options. Названия должны быть в objects_structure_json!
+    // ["Option 1", "Option 2"]
+</script>
+
+
+<style>
+    .vs__selected {
+        background-color: #e3f2fd;
+        color: #039be5;
+        font-size: small;
+        border: none;
+        border-radius: 2px;
+        padding: 0.1rem 0.3rem;
+        margin: 0.3rem 0.2rem 0 0.2rem;
+    }
+
+
+    .vs__deselect {
+        padding: 0.3rem 0 0.3rem 0.3rem;
+        border-left: 1px solid #ffffff;
+    }
+
+    .vs__deselect svg {
+        display: none; /* Скрываем старый SVG */
+    }
+
+    .vs__deselect::after {
+        content: ""; /* Псевдоэлемент не имеет текста */
+        display: inline-block; /* Устанавливаем inline-block для использования размеров */
+        width: 6px; /* Ширина нового SVG */
+        height: 6px; /* Высота нового SVG */
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 348.333 348.333"><path d="M336.559 68.611L231.016 174.165l105.543 105.549c15.699 15.705 15.699 41.145 0 56.85-7.844 7.844-18.128 11.769-28.407 11.769-10.296 0-20.581-3.919-28.419-11.769L174.167 231.003 68.609 336.563c-7.843 7.844-18.128 11.769-28.416 11.769-10.285 0-20.563-3.919-28.413-11.769-15.699-15.698-15.699-41.139 0-56.85l105.54-105.549L11.774 68.611c-15.699-15.699-15.699-41.145 0-56.844 15.696-15.687 41.127-15.687 56.829 0l105.563 105.554L279.721 11.767c15.705-15.687 41.139-15.687 56.832 0 15.705 15.699 15.705 41.145.006 56.844z" fill="%23039be5"></path></svg>') no-repeat center; /* Новый SVG как фон */
+        background-size: contain; /* Масштабируем SVG для соответствия размеру кнопки */
+    }
+
+    .vs__deselect:hover::after {
+        filter: brightness(0) saturate(100%) invert(28%) sepia(97%) saturate(4301%) hue-rotate(344deg) brightness(94%) contrast(97%); /* Изменяем цвет SVG при наведении */
+    }
+
+    .vs__dropdown-option {
+        color: black;
+        background-color: rgb(255, 255, 255);
+    }
+
+    .vs__dropdown-option:hover {
+        color: black;
+        background-color: rgb(234, 234, 234);
+    }
+
+    .vs__search {
+        color: #9e9e9e;
+    }
+
+    .vs__actions {
+    {#padding: 0.1rem 0 0.1rem 2rem;#} border-left: 1px solid #ffffff;
+        cursor: pointer;
+        margin-right: 0.4rem;
+    }
+
+    .vs__actions svg {
+        display: none; /* Скрываем старый SVG */
+    }
+
+    .vs__actions::after {
+        content: ""; /* Псевдоэлемент не имеет текста */
+        display: inline-block; /* Устанавливаем inline-block для использования размеров */
+        width: 9px; /* Ширина нового SVG */
+        height: 9px; /* Высота нового SVG */
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 292.362 292.362" class="vue-treeselect__control-arrow"><path d="M286.935 69.377c-3.614-3.617-7.898-5.424-12.848-5.424H18.274c-4.952 0-9.233 1.807-12.85 5.424C1.807 72.998 0 77.279 0 82.228c0 4.948 1.807 9.229 5.424 12.847l127.907 127.907c3.621 3.617 7.902 5.428 12.85 5.428s9.233-1.811 12.847-5.428L286.935 95.074c3.613-3.617 5.427-7.898 5.427-12.847 0-4.948-1.814-9.229-5.427-12.85z" fill="%23b4b4b4"></path></svg>') no-repeat center; /* Новый SVG с заданным цветом */
+        background-size: contain; /* Масштабируем SVG для соответствия размеру кнопки */
+    }
+
+    .vs__actions:hover::after {
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 292.362 292.362" class="vue-treeselect__control-arrow"><path d="M286.935 69.377c-3.614-3.617-7.898-5.424-12.848-5.424H18.274c-4.952 0-9.233 1.807-12.85 5.424C1.807 72.998 0 77.279 0 82.228c0 4.948 1.807 9.229 5.424 12.847l127.907 127.907c3.621 3.617 7.902 5.428 12.85 5.428s9.233-1.811 12.847-5.428L286.935 95.074c3.613-3.617 5.427-7.898 5.427-12.847 0-4.948-1.814-9.229-5.427-12.85z" fill="%23727272"></path></svg>') no-repeat center; /* Новый SVG с заданным цветом */
+    }
+
+    .vs__dropdown-menu {
+        overflow-x: hidden; /* Удалить горизонтальную прокрутку */
+        white-space: nowrap; /* Предотвратить перенос текста */
+    }
+
+</style>
