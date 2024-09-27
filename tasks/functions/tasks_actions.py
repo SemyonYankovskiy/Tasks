@@ -18,27 +18,30 @@ def create_tags(request):
     """
     Проверяет, существуют ли теги в базе данных, и создаёт новые теги, если они отсутствуют.
     """
-    print("request", request)
 
     # Получаем данные о тегах из формы (может содержать как новые теги, так и существующие ID)
     tags_data = request.getlist('tags_create')  # Здесь список тегов, включая новые
     new_tag_ids = []  # Для хранения ID тегов (как существующих, так и новых)
-    print("tags_data", tags_data)
 
     # Получаем все существующие теги для проверки
     existing_tags = {tag.tag_name for tag in Tag.objects.all()}  # Используем множество для быстрого поиска
 
+    existing_lower_tags = {tag.lower() for tag in existing_tags}
     for tag in tags_data:
+        tag_lower = tag.lower()
         # Если тег не является числом и не существует в базе, создаем его
-        if tag not in existing_tags:
+        if tag_lower not in existing_lower_tags:
             # Создаем новый тег в базе данных
             new_tag = Tag.objects.create(tag_name=tag)
             # Добавляем ID нового тега в список
             new_tag_ids.append(str(new_tag.id))
         else:
-            # Если тег уже существует, просто добавляем его ID в список
-            existing_tag = Tag.objects.get(tag_name=tag)
-            new_tag_ids.append(str(existing_tag.id))
+            try:
+                # Если тег уже существует, просто добавляем его ID в список
+                existing_tag = Tag.objects.get(tag_name=tag)
+                new_tag_ids.append(str(existing_tag.id))
+            except Exception as e:
+                print(f"Тег {tag} уже существует")
 
     # Копируем данные POST-запроса и заменяем список тегов на список их ID
     post_data = request.copy()

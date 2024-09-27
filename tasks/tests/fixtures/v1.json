@@ -1,0 +1,866 @@
+[
+{
+    "model": "tasks.objectgroup",
+    "pk": 1,
+    "fields": {
+        "name": "Buildings"
+    }
+},
+{
+    "model": "tasks.objectgroup",
+    "pk": 2,
+    "fields": {
+        "name": "Tech"
+    }
+},
+{
+    "model": "tasks.objectgroup",
+    "pk": 3,
+    "fields": {
+        "name": "Secret"
+    }
+},
+{
+    "model": "tasks.objectgroup",
+    "pk": 4,
+    "fields": {
+        "name": "Cars"
+    }
+},
+{
+    "model": "tasks.objectgroup",
+    "pk": 5,
+    "fields": {
+        "name": "NOC"
+    }
+},
+{
+    "model": "tasks.objectgroup",
+    "pk": 6,
+    "fields": {
+        "name": "QA"
+    }
+},
+{
+    "model": "tasks.objectgroup",
+    "pk": 7,
+    "fields": {
+        "name": "Servers"
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 3,
+    "fields": {
+        "priority": "CRITICAL",
+        "parent": null,
+        "name": "Building1",
+        "address": 1,
+        "description": "",
+        "slug": "building1",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            1
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 4,
+    "fields": {
+        "priority": "HIGH",
+        "parent": 3,
+        "name": "Parking building 1",
+        "address": 1,
+        "description": "",
+        "slug": "parking-building-1",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            1
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 5,
+    "fields": {
+        "priority": "CRITICAL",
+        "parent": null,
+        "name": "Building 2",
+        "address": 2,
+        "description": "",
+        "slug": "building-2",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            1
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 6,
+    "fields": {
+        "priority": "HIGH",
+        "parent": 5,
+        "name": "Parking building 2",
+        "address": 2,
+        "description": "",
+        "slug": "parking-building-2",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            1
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 7,
+    "fields": {
+        "priority": "CRITICAL",
+        "parent": 8,
+        "name": "NOC PC1",
+        "address": 1,
+        "description": "",
+        "slug": "noc-pc1",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            2,
+            5
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 8,
+    "fields": {
+        "priority": "CRITICAL",
+        "parent": 3,
+        "name": "NOC room",
+        "address": 1,
+        "description": "",
+        "slug": "noc-room",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            1,
+            5
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 9,
+    "fields": {
+        "priority": "CRITICAL",
+        "parent": 8,
+        "name": "NOC PC2",
+        "address": 1,
+        "description": "",
+        "slug": "noc-pc2",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            2,
+            5
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 10,
+    "fields": {
+        "priority": "CRITICAL",
+        "parent": 4,
+        "name": "Company car NOC",
+        "address": 1,
+        "description": "",
+        "slug": "company-car-noc",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            4,
+            5
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 11,
+    "fields": {
+        "priority": "CRITICAL",
+        "parent": 4,
+        "name": "Company car QA",
+        "address": 1,
+        "description": "",
+        "slug": "company-car-qa",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            4,
+            6
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 12,
+    "fields": {
+        "priority": "CRITICAL",
+        "parent": 5,
+        "name": "QA room",
+        "address": 2,
+        "description": "",
+        "slug": "qa-room",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            1,
+            6
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 13,
+    "fields": {
+        "priority": "MEDIUM",
+        "parent": 12,
+        "name": "QA PC1",
+        "address": 2,
+        "description": "",
+        "slug": "qa-pc1",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            2,
+            6
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 14,
+    "fields": {
+        "priority": "MEDIUM",
+        "parent": 12,
+        "name": "QA PC2",
+        "address": 2,
+        "description": "",
+        "slug": "qa-pc2",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            2,
+            6
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 15,
+    "fields": {
+        "priority": "CRITICAL",
+        "parent": null,
+        "name": "Secret1",
+        "address": 1,
+        "description": "",
+        "slug": "secret1",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            3
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 16,
+    "fields": {
+        "priority": "CRITICAL",
+        "parent": 5,
+        "name": "Secret2",
+        "address": 2,
+        "description": "",
+        "slug": "secret2",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            3
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 17,
+    "fields": {
+        "priority": "CRITICAL",
+        "parent": 18,
+        "name": "Server1",
+        "address": 3,
+        "description": "",
+        "slug": "server1",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            7
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 18,
+    "fields": {
+        "priority": "CRITICAL",
+        "parent": null,
+        "name": "DC1",
+        "address": 3,
+        "description": "",
+        "slug": "dc1",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            1
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 19,
+    "fields": {
+        "priority": "CRITICAL",
+        "parent": null,
+        "name": "DC2",
+        "address": 4,
+        "description": "",
+        "slug": "dc2",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            1
+        ]
+    }
+},
+{
+    "model": "tasks.object",
+    "pk": 20,
+    "fields": {
+        "priority": "CRITICAL",
+        "parent": 19,
+        "name": "Server2",
+        "address": 4,
+        "description": "",
+        "slug": "server2",
+        "tasks": [],
+        "tags": [],
+        "files": [],
+        "groups": [
+            7
+        ]
+    }
+},
+{
+    "model": "tasks.department",
+    "pk": 1,
+    "fields": {
+        "name": "NOC"
+    }
+},
+{
+    "model": "tasks.department",
+    "pk": 2,
+    "fields": {
+        "name": "QA"
+    }
+},
+{
+    "model": "tasks.department",
+    "pk": 3,
+    "fields": {
+        "name": "IT"
+    }
+},
+{
+    "model": "tasks.address",
+    "pk": 1,
+    "fields": {
+        "region": "Sevastopol",
+        "settlement": "Sevastopol",
+        "plan_structure": null,
+        "street": "Lenina",
+        "house": "15",
+        "block": null,
+        "floor": null,
+        "apartment": null
+    }
+},
+{
+    "model": "tasks.address",
+    "pk": 2,
+    "fields": {
+        "region": "Sevastopol",
+        "settlement": "Sevastopol",
+        "plan_structure": null,
+        "street": "Lenina",
+        "house": "1",
+        "block": null,
+        "floor": null,
+        "apartment": null
+    }
+},
+{
+    "model": "tasks.address",
+    "pk": 3,
+    "fields": {
+        "region": "Sevastopol",
+        "settlement": "Sevastopol",
+        "plan_structure": null,
+        "street": "Green",
+        "house": "1",
+        "block": null,
+        "floor": null,
+        "apartment": null
+    }
+},
+{
+    "model": "tasks.address",
+    "pk": 4,
+    "fields": {
+        "region": "Sevastopol",
+        "settlement": "Sevastopol",
+        "plan_structure": null,
+        "street": "Orange",
+        "house": "1",
+        "block": null,
+        "floor": null,
+        "apartment": null
+    }
+},
+{
+    "model": "user.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$eyBA7x6osRFssIEatFdi01$eehjSuh9EJiwdOklcx29ABIQn7QNroM9WgdjxyJo8Gw=",
+        "last_login": "2024-09-13T12:34:53Z",
+        "is_superuser": true,
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2024-09-11T11:47:21Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "user.user",
+    "pk": 2,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$MFA4tzfDoEkRZXftmyLfUu$QmtuT0O0b+0R+I6/wo4Y1ABL8CVqvC75QQAVwhSSiOI=",
+        "last_login": "2024-09-23T09:44:18Z",
+        "is_superuser": false,
+        "username": "empty_user",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2024-09-23T09:43:44Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "user.user",
+    "pk": 3,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$sRCMtOo8EiaRTGj3YZ99sc$rulFHfKcnDUsTblShj2dtGdQdYQyUfFCcsiF+ctpSL4=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "noah_griffith",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2024-09-26T06:45:02Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "user.user",
+    "pk": 4,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$HkRANySrlupyR26V0fWpw4$ma0yeHi5RebapFhCLDHiZJAskebeihxOqfNlLZcBofY=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "kyle_shields",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2024-09-26T06:45:42.167Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "user.user",
+    "pk": 5,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$gd3KJFKf2WrNWWLYYPn26f$PYCbUQnzKiS3rCr/LjQ7H2TrLrxRqund21HgnPt8r68=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "megan_horne",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2024-09-26T06:46:00.547Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "user.user",
+    "pk": 6,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$RntCpdNk9WmBXE9ZFruPL9$Qvjl68yRpg2kDCzGmBJ62nA8irk6S/KPbLUtEJgER7Q=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "chad_orr",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2024-09-26T07:15:49.121Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "user.user",
+    "pk": 7,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$GGRe2QDFMkWNjEtIF6fDsf$NIGOch+G+ep62LlZ+cHqpuOfSkkhhNuMjeEmPnvHUZM=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "noc",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2024-09-26T10:54:06.174Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "user.user",
+    "pk": 8,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$2srXvRzRrZgjz0QbHkA2qH$oell0Sp+VotWEa9XYZzBKa09E+zwB0OCdrnRjaxWaLY=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "jeffrey_mason",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2024-09-26T10:59:07.580Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "tasks.engineer",
+    "pk": 1,
+    "fields": {
+        "first_name": "Noah",
+        "second_name": "Griffith",
+        "position": "head engineer",
+        "user": [
+            "noah_griffith"
+        ],
+        "department": 1,
+        "head_of_department": true
+    }
+},
+{
+    "model": "tasks.engineer",
+    "pk": 2,
+    "fields": {
+        "first_name": "Kyle",
+        "second_name": "Shields",
+        "position": "engineer",
+        "user": [
+            "kyle_shields"
+        ],
+        "department": 1,
+        "head_of_department": false
+    }
+},
+{
+    "model": "tasks.engineer",
+    "pk": 3,
+    "fields": {
+        "first_name": "Megan",
+        "second_name": "Horne",
+        "position": "engineer",
+        "user": [
+            "megan_horne"
+        ],
+        "department": 1,
+        "head_of_department": false
+    }
+},
+{
+    "model": "tasks.engineer",
+    "pk": 4,
+    "fields": {
+        "first_name": "Sandra",
+        "second_name": "Schmidt",
+        "position": "QA engineer",
+        "user": null,
+        "department": 2,
+        "head_of_department": false
+    }
+},
+{
+    "model": "tasks.engineer",
+    "pk": 5,
+    "fields": {
+        "first_name": "Adrian",
+        "second_name": "Robertson",
+        "position": "QA lead",
+        "user": null,
+        "department": 2,
+        "head_of_department": true
+    }
+},
+{
+    "model": "tasks.engineer",
+    "pk": 6,
+    "fields": {
+        "first_name": "Chad",
+        "second_name": "Orr",
+        "position": "QA Dir",
+        "user": [
+            "chad_orr"
+        ],
+        "department": 2,
+        "head_of_department": true
+    }
+},
+{
+    "model": "tasks.engineer",
+    "pk": 7,
+    "fields": {
+        "first_name": "Sara",
+        "second_name": "Ray",
+        "position": "QA engineer",
+        "user": null,
+        "department": 2,
+        "head_of_department": false
+    }
+},
+{
+    "model": "tasks.engineer",
+    "pk": 8,
+    "fields": {
+        "first_name": "Taylor",
+        "second_name": "Hickman",
+        "position": "sysadmin",
+        "user": null,
+        "department": 3,
+        "head_of_department": false
+    }
+},
+{
+    "model": "tasks.engineer",
+    "pk": 9,
+    "fields": {
+        "first_name": "Jeffrey",
+        "second_name": "Mason",
+        "position": "Tech Dir",
+        "user": [
+            "jeffrey_mason"
+        ],
+        "department": 3,
+        "head_of_department": true
+    }
+},
+{
+    "model": "tasks.engineer",
+    "pk": 10,
+    "fields": {
+        "first_name": "Richard",
+        "second_name": "Weiss",
+        "position": "DevOps",
+        "user": null,
+        "department": 3,
+        "head_of_department": false
+    }
+},
+{
+    "model": "tasks.userobjectgroup",
+    "pk": 3,
+    "fields": {
+        "user": [
+            "chad_orr"
+        ],
+        "group": 1,
+        "permission": "R"
+    }
+},
+{
+    "model": "tasks.userobjectgroup",
+    "pk": 4,
+    "fields": {
+        "user": [
+            "kyle_shields"
+        ],
+        "group": 1,
+        "permission": "R"
+    }
+},
+{
+    "model": "tasks.userobjectgroup",
+    "pk": 5,
+    "fields": {
+        "user": [
+            "megan_horne"
+        ],
+        "group": 1,
+        "permission": "R"
+    }
+},
+{
+    "model": "tasks.userobjectgroup",
+    "pk": 6,
+    "fields": {
+        "user": [
+            "noah_griffith"
+        ],
+        "group": 1,
+        "permission": "R"
+    }
+},
+{
+    "model": "tasks.userobjectgroup",
+    "pk": 10,
+    "fields": {
+        "user": [
+            "noc"
+        ],
+        "group": 1,
+        "permission": "R"
+    }
+},
+{
+    "model": "tasks.userobjectgroup",
+    "pk": 11,
+    "fields": {
+        "user": [
+            "megan_horne"
+        ],
+        "group": 5,
+        "permission": "RW"
+    }
+},
+{
+    "model": "tasks.userobjectgroup",
+    "pk": 12,
+    "fields": {
+        "user": [
+            "kyle_shields"
+        ],
+        "group": 5,
+        "permission": "RW"
+    }
+},
+{
+    "model": "tasks.userobjectgroup",
+    "pk": 13,
+    "fields": {
+        "user": [
+            "noah_griffith"
+        ],
+        "group": 5,
+        "permission": "RW"
+    }
+},
+{
+    "model": "tasks.userobjectgroup",
+    "pk": 14,
+    "fields": {
+        "user": [
+            "noc"
+        ],
+        "group": 5,
+        "permission": "RW"
+    }
+},
+{
+    "model": "tasks.userobjectgroup",
+    "pk": 15,
+    "fields": {
+        "user": [
+            "chad_orr"
+        ],
+        "group": 6,
+        "permission": "RW"
+    }
+},
+{
+    "model": "tasks.userobjectgroup",
+    "pk": 16,
+    "fields": {
+        "user": [
+            "jeffrey_mason"
+        ],
+        "group": 1,
+        "permission": "R"
+    }
+},
+{
+    "model": "tasks.userobjectgroup",
+    "pk": 17,
+    "fields": {
+        "user": [
+            "jeffrey_mason"
+        ],
+        "group": 7,
+        "permission": "RW"
+    }
+}
+]

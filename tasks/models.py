@@ -123,7 +123,7 @@ class Task(models.Model):
 
 
 class Tag(models.Model):
-    tag_name = models.CharField(max_length=64)
+    tag_name = models.CharField(max_length=64, unique=True)
 
     class Meta:
         db_table = "tags"

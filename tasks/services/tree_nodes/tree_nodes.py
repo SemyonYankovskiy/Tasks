@@ -167,7 +167,7 @@ class EngineersTree(Tree):
                     }
                 # Добавляем инженера как "ребенка" в департамент
                 departments[department_id]["children"].append(
-                    {"id": f"eng_{engineer_id}", "label": engineer_label, "children": []}
+                    {"id": f"eng_{engineer_id}", "label": engineer_label, }
                 )
 
         # Преобразуем департаменты в список и добавляем в начало списка
