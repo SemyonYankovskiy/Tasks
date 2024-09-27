@@ -88,12 +88,12 @@
             </div>
 
             <!-- Выбор тегов  -->
-            <div class="mb-3">
+            <div class="mb-3" style="min-width: 500px">
                 <label for="taskTags_edit_{{ task.id }}" class="form-label">
                     <i class="bi bi-tags-fill" style="font-size: 1.2rem;"></i>
                     <span>Теги</span>
                 </label>
-                {% include 'tree-select.html' with select_name='tags_edit' current_options=current_tags_edit task_id=task.id objects_structure_json=tags_json %}
+                {% include 'tags-select.html' with select_name='tags_edit' current_options=current_tags_edit task_id=task.id objects_structure_json=tags_json %}
             </div>
         </div>
 
@@ -109,7 +109,7 @@
 
 
         <!-- Загрузка файлов (псевдокод для примера) -->
-        <div class="mb-3">
+        <div id="filess" class="mb-3">
             <input class="form-control" type="file" id="taskFilesEdit" name="files" multiple>
         </div>
 
@@ -122,6 +122,31 @@
                 </div>
 </form>
 
+
+<style>
+    .fileuploader-input-button {
+        background-color: var(--bs-blue) !important;
+        border-radius: 10px !important;
+        background-image: none !important;
+
+        display: none !important;
+    }
+
+
+    .fileuploader-input-caption {
+        border-radius: 10px !important;
+        margin-right: 0 !important;
+    }
+
+    .fileuploader {
+        padding: 0; /* Опционально: внутренние отступы */
+    }
+
+    .fileuploader-input {
+        background-color: #fafafa; /* Цвет фона для области выбора файлов */
+
+    }
+</style>
 
 <script>
     $(document).ready(function () {
@@ -151,6 +176,14 @@
                 ],
             {% endif %}
         });
+        // Замена текста
+        $('.fileuploader-input-caption span').text('Добавить файлы');
+        $('.fileuploader-input-button span').text('Выберите файл');
+
+        // Удаление всего текста внутри div с id="files"
+        $('#filess').contents().filter(function() {
+            return this.nodeType === 3; // Текстовый узел
+        }).remove();
     });
 
 </script>

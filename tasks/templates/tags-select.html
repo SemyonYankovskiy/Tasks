@@ -1,5 +1,6 @@
-<div id="vue-select_{{ select_name }}" class="w-100">
+{% load static %}
 
+<div id="vue-select_{{ select_name }}" class="w-100">
     <select hidden v-model="selected" multiple name="{{ select_name }}">
         <option v-for="option in selected" :value="option">{% verbatim %}{{ option }}{% endverbatim %}</option>
     </select>
@@ -12,6 +13,7 @@
             :reduce="(option) => option.label"
             :options="options"
             @search:blur="addNewTag"
+            placeholder="Смотря какой tags"
     >
     </v-select>
 </div>

@@ -206,7 +206,8 @@ def get_task_edit_form(request, task_id: int):
         **fields,
         "from_url": from_url,
         "current_engineers": current_engineers,
-        "current_tags_edit": list(task.tags.all().values_list("id", flat=True)),
+        # "current_tags_edit": list(task.tags.all().values_list("id", flat=True)),
+        "current_tags_edit": list(task.tags.all().values_list("tag_name", flat=True)),
         "current_objects_edit": list(task.objects_set.all().values_list("id", flat=True)),
     }
     return render(request, "components/task/edit_task_form.html", context)

@@ -35,7 +35,7 @@
                     <div class="d-flex gap-2">
                         <!-- Заголовок задачи -->
                         <div class="mb-3 w-100">
-                             <i class="bi bi-card-heading" style="font-size: 1.2rem;"></i>
+                            <i class="bi bi-card-heading" style="font-size: 1.2rem;"></i>
                             <label for="taskHeader" class="form-label">Заголовок<span
                                     style="color: red;"> *</span></label>
                             <input type="text" class="form-control" id="taskHeader" name="header" required>
@@ -72,9 +72,9 @@
                                 <span>Приоритет<span style="color: red;"> *</span></span>
                             </label>
                             <select class="form-select" id="taskPriority" name="priority" required>
-                                <option disabled selected value> - Приоритет - </option>
+                                <option disabled selected value> - Приоритет -</option>
                                 <option value="CRITICAL" style="color: #FF0000">Критический</option>
-                                <option value="HIGH" style="color: #FF6347" >Высокий</option>
+                                <option value="HIGH" style="color: #FF6347">Высокий</option>
                                 <option value="MEDIUM" style="color: #FFD700">Средний</option>
                                 <option value="LOW" style="color: #1E90FF">Низкий</option>
                             </select>
@@ -115,7 +115,7 @@
 
 
                     <!-- Текст задачи -->
-                    <div class="mb-3">
+                    <div class="mb-3 ">
                         <label for="taskText" class="form-label">
                             <i class="bi bi-card-text" style="font-size: 1.2rem;"></i>
                             <span>Описание</span>
@@ -125,7 +125,7 @@
 
 
                     <!-- Загрузка файлов (псевдокод для примера) -->
-                    <div class="mb-3">
+                    <div id="files" class="mb-3">
                         <input class="form-control" type="file" id="taskFiles" name="files" multiple>
                     </div>
 
@@ -147,14 +147,23 @@
         background-color: var(--bs-blue) !important;
         border-radius: 10px !important;
         background-image: none !important;
+
+        display: none !important;
     }
 
-    .fileuploader-theme-default {
-        background-color: white !important;
-    }
 
     .fileuploader-input-caption {
         border-radius: 10px !important;
+        margin-right: 0 !important;
+    }
+
+    .fileuploader {
+        padding: 0; /* Опционально: внутренние отступы */
+    }
+
+    .fileuploader-input {
+        background-color: #fafafa; /* Цвет фона для области выбора файлов */
+
     }
 </style>
 
@@ -164,7 +173,24 @@
             addMore: true,
             limit: 10,
         });
+
+        // Замена текста
+        $('.fileuploader-input-caption span').text('Добавить файлы');
+        $('.fileuploader-input-button span').text('Выберите файл');
+
+        // Удаление всего текста внутри div с id="files"
+        $('#files').contents().filter(function() {
+            return this.nodeType === 3; // Текстовый узел
+        }).remove();
+
+        // Или замена текста на пустую строку:
+        // $('#files').contents().filter(function() {
+        //     return this.nodeType === 3; // Текстовый узел
+        // }).each(function() {
+        //     this.nodeValue = ''; // Заменяем текст на пустую строку
+        // });
     });
 
 </script>
+
 
