@@ -14,15 +14,15 @@ from tasks.models import Task, AttachedFile, Engineer, Tag
 
 
 @atomic
-def create_tags(request):
+def create_tags(request, tags_list):
     """
     Проверяет, существуют ли теги в базе данных, и создаёт новые теги, если они отсутствуют.
     """
 
     # Получаем данные о тегах из формы (может содержать как новые теги, так и существующие ID)
-    tags_data = request.getlist('tags_create')  # Здесь список тегов, включая новые
+    tags_data = request.getlist(tags_list)  # Здесь список тегов, включая новые
     new_tag_ids = []  # Для хранения ID тегов (как существующих, так и новых)
-
+    print(tags_data)
     # Получаем все существующие теги для проверки
     existing_tags = {tag.tag_name for tag in Tag.objects.all()}  # Используем множество для быстрого поиска
 
@@ -40,12 +40,13 @@ def create_tags(request):
                 # Если тег уже существует, просто добавляем его ID в список
                 existing_tag = Tag.objects.get(tag_name=tag)
                 new_tag_ids.append(str(existing_tag.id))
+                print(existing_tag.id)
             except Exception as e:
                 print(f"Тег {tag} уже существует")
 
     # Копируем данные POST-запроса и заменяем список тегов на список их ID
     post_data = request.copy()
-    post_data.setlist('tags_create', new_tag_ids)  # Заменяем теги их ID
+    post_data.setlist(tags_list, new_tag_ids)  # Заменяем теги их ID
     return post_data  # Возвращаем обновленные данные POST-запроса
 
 
@@ -57,7 +58,7 @@ def create_task(request):
 
     if request.method == "POST":
 
-        post_data = create_tags(request.POST) # Сохраняем теги и возвращаем
+        post_data = create_tags(request.POST, "tags_create") # Сохраняем теги и возвращаем
 
         # Теперь создаем форму с обновлёнными данными (содержит ID всех тегов)
         form = AddTaskForm(post_data, request.FILES, instance=Task(creator=request.user))
@@ -91,7 +92,10 @@ def edit_task(request, task_id):
     redirect_to = reverse("tasks")
 
     if request.method == "POST":
-        form = EditTaskForm(request.POST, request.FILES, instance=task)
+
+        post_data = create_tags(request.POST, "tags_edit")  # Сохраняем теги и возвращаем
+
+        form = EditTaskForm(post_data, request.FILES, instance=task)
 
         # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
