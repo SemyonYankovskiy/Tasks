@@ -41,10 +41,10 @@
                                 </a>
                             </li>
                             <li class="nav-item {% if current_page == '/stat/' %}active{% endif %}">
-                                <a href="#" class="nav-link p-0 disabled">
+                                <a href="{% url 'stat' %}" class="nav-link p-0">
                                     <img width="32" height="32" src="{% static 'self/img/graph-up.svg' %}"
-                                         class="bi d-block mx-auto mb-3" alt="stat" style="opacity: 50%"/>
-                                    <span class="m-0 p-0 text-black-50" style="font-size: 1rem">Статистика</span>
+                                         class="bi d-block mx-auto mb-3" alt="stat"/>
+                                    <span class="m-0 p-0 text-black" style="font-size: 1rem">Статистика</span>
                                 </a>
                             </li>
                             {% if user.is_superuser %}

@@ -91,7 +91,7 @@ def get_filtered_tasks(request, obj=None):
     """
     tasks_qs = permission_filter(user=request.user)
 
-    tasks_qs = tasks_qs.prefetch_related("files", "tags", "engineers", "objects_set", "departments")
+    tasks_qs = tasks_qs.prefetch_related("files", "tags", "engineers", "objects_set", "departments", "creator")
 
     tasks_filter = TaskFilter(request.GET, queryset=tasks_qs, request=request)
 

@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Статистика{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <h1>Статистика инженеров</h1>
+
+        <table id="engineerTable">
+            <thead>
+            <tr>
+                <th onclick="sortTable(0)">Имя <i class="bi bi-sort-alpha-down"></i></th>
+                <th onclick="sortTable(1)">Департамент <i class="bi bi-sort-alpha-down"></i></th>
+                <th onclick="sortTable(2, 'number')">Активные задачи <i class="bi bi-sort-numeric-down-alt"></i></th>
+                <th onclick="sortTable(3, 'number')">Завершенные задачи <i class="bi bi-sort-numeric-down-alt"></i></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for engineer in engineer_stats %}
+                <tr>
+                    <td>{{ engineer.first_name }} {{ engineer.second_name }}</td>
+                    <td>{{ engineer.department }}</td>
+                    <td style="text-align: center">{{ engineer.active_tasks_count }}</td>
+                    <td style="text-align: center">{{ engineer.completed_tasks_count }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+    </div>
+
+
+    <style>
+
+        h1 {
+            text-align: left;
+            font-size: 24px;
+            color: #333;
+            margin-left: 8rem;
+        }
+
+        table {
+            width: 80%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            table-layout: fixed; /* Фиксированная ширина столбцов */
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тень вокруг таблицы */
+            border-radius: 8px; /* Округление углов таблицы */
+        }
+
+        th, td {
+            padding: 12px 20px; /* Увеличенные отступы для более чистого вида */
+            text-align: left;
+            cursor: pointer;
+        }
+
+        th {
+            font-size: 18px;
+            font-weight: bold;
+            color: #000000;
+            background-color: rgb(127, 187, 255); /* Зеленый фон для заголовков */
+        }
+
+        td {
+            font-size: 16px;
+            color: #333;
+            word-wrap: break-word; /* Перенос длинных слов */
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2; /* Полосатая таблица для удобства чтения */
+        }
+
+        /* Управление шириной столбцов */
+        th:first-child, td:first-child {
+            width: 25%; /* Ширина столбца для имени инженера */
+        }
+
+        th:nth-child(2), td:nth-child(2) {
+            width: 20%; /* Ширина столбца для департамента */
+        }
+
+        th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4) {
+            width: 10%; /* Ширина для столбцов с задачами */
+            text-align: center; /* Центрирование данных с числами */
+        }
+
+        /* Управление размерами для мобильных устройств */
+        @media (max-width: 768px) {
+            table {
+                width: 100%;
+            }
+
+            td, th {
+                padding: 8px 12px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+    <script>
+        function sortTable(columnIndex, dataType) {
+            var table = document.getElementById("engineerTable");
+            var rows = table.getElementsByTagName("TR");
+            var switching = true;
+            var shouldSwitch;
+            var direction = "asc"; // Направление сортировки: по возрастанию
+            var switchCount = 0;
+
+            while (switching) {
+                switching = false;
+                var rowsArray = Array.prototype.slice.call(rows, 1); // Преобразуем коллекцию строк в массив, исключая заголовок
+
+                for (var i = 0; i < rowsArray.length - 1; i++) {
+                    shouldSwitch = false;
+
+                    var x = rowsArray[i].getElementsByTagName("TD")[columnIndex];
+                    var y = rowsArray[i + 1].getElementsByTagName("TD")[columnIndex];
+
+                    var xValue, yValue;
+
+                    if (dataType === 'number') {
+                        // Для числовых значений
+                        xValue = parseInt(x.innerText) || 0;
+                        yValue = parseInt(y.innerText) || 0;
+                    } else {
+                        // Для строковых значений
+                        xValue = x.innerText.toLowerCase();
+                        yValue = y.innerText.toLowerCase();
+                    }
+
+                    if (direction == "asc") {
+                        if (xValue > yValue) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (direction == "desc") {
+                        if (xValue < yValue) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (shouldSwitch) {
+                    // Меняем местами строки
+                    rowsArray[i].parentNode.insertBefore(rowsArray[i + 1], rowsArray[i]);
+                    switching = true;
+                    switchCount++;
+                } else {
+                    // Если не было никаких перестановок и направление было "asc", меняем его на "desc"
+                    if (switchCount === 0 && direction == "asc") {
+                        direction = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+    </script>
+    </script>
+{% endblock %}

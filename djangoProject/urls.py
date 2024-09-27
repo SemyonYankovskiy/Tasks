@@ -16,6 +16,7 @@ urlpatterns = [
     path("tasks/", views.get_tasks_page, name="tasks"),  # Страница задач
     path("map/", views.get_map_page, name="map"),  # Страница карты
     path("calendar/", views.get_calendar_page, name="calendar"),  # Страница карты
+    path("stat/", views.get_stat_page, name="stat"),  # Страница карты
     path("object/<slug:object_slug>/", views.get_object_page, name="show-object"),
     path("", views.get_home, name="home"),
     path("admin/",admin.site.urls),

@@ -11,7 +11,7 @@ from .filters import ObjectFilter
 from .functions.objects import get_objects_list, add_tasks_count_to_objects
 from .functions.service import paginate_queryset, get_random_icon
 from .functions.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
-from .models import Object, Task
+from .models import Object, Task, Engineer
 
 
 @login_required
@@ -166,7 +166,6 @@ def get_map_page(request):
 
 @login_required
 def get_calendar_page(request):
-    random_icon = get_random_icon(request)
     tasks = get_filtered_tasks(request)
     filter_context = task_filter_params(request)
 
@@ -176,7 +175,7 @@ def get_calendar_page(request):
         {
             "tasks": tasks,
             **filter_context,
-            "random_icon": random_icon,
+            "random_icon": get_random_icon(request),
             "current_page": request.path,
             "c": tasks.tasks_counters,
             "fp": tasks.filter_params,
@@ -211,3 +210,32 @@ def get_task_edit_form(request, task_id: int):
         "current_objects_edit": list(task.objects_set.all().values_list("id", flat=True)),
     }
     return render(request, "components/task/edit_task_form.html", context)
+
+@login_required
+def get_stat_page(request):
+    # Выбираем всех инженеров с данными по активным и завершённым задачам
+    engineers = (Engineer.objects.all()
+                 .prefetch_related("tasks")
+                 .select_related("department")
+                 .annotate(
+                     active_task_count=Count('tasks', filter=Q(tasks__is_done=False)),  # Подсчёт активных задач
+                     completed_task_count=Count('tasks', filter=Q(tasks__is_done=True))  # Подсчёт завершённых задач
+                 ))
+
+    # Собираем данные для каждого инженера
+    engineer_stats = []
+    for engineer in engineers:
+        engineer_stats.append({
+            'first_name': engineer.first_name,
+            'second_name': engineer.second_name,
+            'department': engineer.department.name if engineer.department else 'Нет департамента',
+            'active_tasks_count': engineer.active_task_count,
+            'completed_tasks_count': engineer.completed_task_count,
+        })
+
+    context = {
+        'random_icon': get_random_icon(request),  # Ваша функция для получения случайного значка (если нужно)
+        'engineer_stats': engineer_stats,
+    }
+
+    return render(request, 'stat_page.html', context)
