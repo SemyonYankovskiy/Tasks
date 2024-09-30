@@ -187,7 +187,7 @@
         $('.fileuploader-input-button span').text('Выберите файл');
 
         // Удаление всего текста внутри div с id="files"
-        $('#files').contents().filter(function() {
+        $('#files').contents().filter(function () {
             return this.nodeType === 3; // Текстовый узел
         }).remove();
 
@@ -202,4 +202,13 @@
 </script>
 
 
+<style>
+    .cke_contents {
+        max-height: 100px;    !important; /* Ограничиваем максимальную высоту редактора */
 
+    }
+    .django-ckeditor-widget{
+        width: 100% !important;
+    }
+
+</style>
