@@ -8,6 +8,7 @@ from django.urls import reverse
 
 from tasks.services.tree_nodes import GroupsTree, ObjectsTagsTree
 from .filters import ObjectFilter
+from .forms import CKEditorForm
 from .functions.objects import get_objects_list, add_tasks_count_to_objects
 from .functions.service import paginate_queryset, get_random_icon
 from .functions.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
@@ -133,6 +134,8 @@ def get_tasks_page(request):
 
     random_icon = get_random_icon(request)
 
+    ckeditor = CKEditorForm(request.POST)
+
     context = {
         "pagination_data": pagination_data,
         "random_icon": random_icon,
@@ -140,6 +143,8 @@ def get_tasks_page(request):
         "filter_params": filtered_task.filter_params,
         **filter_context,
         "current_page": request.path,
+        "ckeditor": ckeditor,
+
     }
 
     return render(request, "components/task/tasks_page.html", context=context)

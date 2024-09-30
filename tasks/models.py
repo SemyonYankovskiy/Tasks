@@ -3,6 +3,7 @@ import re
 import uuid
 from datetime import datetime
 
+from ckeditor_uploader.fields import RichTextUploadingField
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, MinValueValidator
@@ -50,7 +51,7 @@ class Object(models.Model):
     )
     name = models.CharField(max_length=64)
     address = models.ForeignKey("Address", on_delete=models.CASCADE)
-    description = models.TextField(blank=True)
+    description = RichTextUploadingField(blank=True)
     tasks = models.ManyToManyField(
         "Task", related_name="objects_set", db_table="objects_tasks_m2m", blank=True
     )
@@ -99,8 +100,8 @@ class Task(models.Model):
     completion_time = models.DateTimeField()
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     header = models.CharField(max_length=128)
-    text = models.TextField(blank=True)
-    completion_text = models.TextField(blank=True)
+    text = RichTextUploadingField(blank=True)
+    completion_text = RichTextUploadingField(blank=True)
     engineers = models.ManyToManyField(
         "Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True
     )
@@ -162,7 +163,7 @@ class Department(models.Model):
 def upload_directory_path(instance, filename):
     # файл будет загружен в MEDIA_ROOT/user_<id>/<filename>
     current_date = datetime.now()
-    return f"uploads/{current_date.year}/{current_date.month}/{current_date.day}/{uuid.uuid4()}_._{filename}"
+    return f"uploads/{current_date.year}/{current_date.month:>02}/{current_date.day:>02}/{uuid.uuid4()}_._{filename}"
 
 
 class AttachedFile(models.Model):

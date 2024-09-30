@@ -23,6 +23,9 @@ urlpatterns = [
     path("user/", include("user.urls", namespace="user")),
     path("ajax/tasks/<int:task_id>/", views.get_task_view, name="ajax-show-task"),
     path("ajax/tasks/<int:task_id>/edit", views.get_task_edit_form, name="ajax-task-edit-form"),
+
+    # CKEDITOR
+    path('ckeditor/', include('ckeditor_uploader.urls')),
 ]
 
 if settings.DEBUG:

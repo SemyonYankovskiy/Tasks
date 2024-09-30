@@ -1,10 +1,12 @@
 {% load static %}
-<!-- font -->
+
+<!-- fileuploader -->
 <link href="{% static 'fileuploader/font/font-fileuploader.css' %}" media="all" rel="stylesheet">
-<!-- css -->
 <link href="{% static 'fileuploader/jquery.fileuploader.min.css' %}" media="all" rel="stylesheet">
-<!-- js -->
 <script src="{% static 'fileuploader/jquery.fileuploader.min.js' %}" type="text/javascript"></script>
+<!-- ckeditor -->
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 
 <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
         data-bs-target="#staticBackdrop_create_task">
@@ -120,7 +122,13 @@
                             <i class="bi bi-card-text" style="font-size: 1.2rem;"></i>
                             <span>Описание</span>
                         </label>
-                        <textarea class="form-control" id="taskText" name="text" rows="4"></textarea>
+                        <div>
+
+                            {{ ckeditor.text }}
+
+
+                        </div>
+
                     </div>
 
 
@@ -192,5 +200,6 @@
     });
 
 </script>
+
 
 
