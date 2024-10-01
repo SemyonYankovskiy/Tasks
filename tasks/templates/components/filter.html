@@ -1,20 +1,18 @@
-<form method="get" class="w-100 ">
+<form method="get" class="w-100">
     <div>
-
-
         <div class="collapse" id="collapseExample">
-            <div class=" p-4 border border-2 rounded-2 bg-light"
+            <div class="p-4 border border-2 rounded-2 bg-light"
                  style="background-color: rgba(255,255,255,0.52); border-color: #d2d2d2">
                 <div class="row g-2">
 
                     <div id="div_id_header__icontains" class="text-field__group mb-3 col-md-6">
                         <i class="bi bi-card-heading"></i>
-                        <label for="id_header__icontains" class="text-field__label form-label"> Название/описание</label>
+                        <label for="id_header__icontains" class="text-field__label form-label">
+                            Название/описание</label>
                         <input type="text" name="search" class=" text-field__input textinput form-control"
                                value="{{ request.GET.search }}"
                                id="id_header__icontains" placeholder=" Поиск">
                     </div>
-
 
                     <div class="col-md-2">
                         <i class="bi bi-calendar2-minus"></i>
@@ -42,15 +40,11 @@
                                id="id_completion_time_before"
                                value="{{ request.GET.completion_time_before }}">
                     </div>
-
-
                 </div>
-
-
 
                 <div class="row g-2">
                     <div id="div_id_priority" class="col-md-2">
-                    <i class="bi bi-fire" style="font-size: 1rem;"></i>
+                        <i class="bi bi-fire" style="font-size: 1rem;"></i>
                         <label for="id_priority" class="form-label">Важность</label>
                         <select name="priority" class="select form-select" id="id_priority">
                             <option value="" {% if not request.GET.priority %}selected{% endif %}></option>
@@ -71,35 +65,27 @@
                         <label for="id_engineers" class="form-label">Объекты</label>
                         {% include 'tree-select.html' with select_name='objects_set' current_options=current_objects objects_structure_json=objects_json %}
                     </div>
-
-
-
-
                 </div>
 
                 <div class="row g-2">
-
                     <div id="div_id_engineers" class="col mb-3">
                         <i class="bi bi-people-fill" style="font-size: 1rem;"></i>
                         <label for="id_engineers" class="form-label">Инженеры</label>
                         {% include 'tree-select.html' with select_name='engineers' current_options=current_engineers objects_structure_json=engineers_json %}
                     </div>
 
-                     <div id="div_id_tags" class="col mb-3">
-                          <i class="bi bi-tags-fill" style="font-size: 1rem;"></i>
+                    <div id="div_id_tags" class="col mb-3">
+                        <i class="bi bi-tags-fill" style="font-size: 1rem;"></i>
                         <label for="id_tags" class="form-label">Теги</label>
                         {% include 'tree-select.html' with select_name='tags' current_options=current_tags objects_structure_json=tags_json %}
                     </div>
-
-
                 </div>
 
 
                 <div class="mt-3">
-                    <button type="submit" class="btn btn-primary">Применить фильтры</button>
-                    <a href="{{ request.path }}" class="btn btn-secondary">Сбросить фильтры</a>
+                    <button type="submit" class="btn btn-primary" style="font-size: 14px;">Применить фильтры</button>
+                    <a href="{{ request.path }}" class="btn btn-secondary" style="font-size: 14px;">Сбросить фильтры</a>
                 </div>
-
 
             </div>
 

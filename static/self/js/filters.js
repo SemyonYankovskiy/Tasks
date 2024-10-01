@@ -1,17 +1,17 @@
-function updateUrl() {
-    const showMyTasksOnly = document.getElementById('showMyTasksOnlySwitch') ? document.getElementById('showMyTasksOnlySwitch').checked : null;
-    const sortOrder = document.getElementById('sortOrderSwitch') ? (document.getElementById('sortOrderSwitch').checked ? 'desc' : 'asc') : null;
-
-    const currentUrl = new URL(window.location.href);
-    const params = new URLSearchParams(currentUrl.search);
-
-    // Устанавливаем параметры
-    if (showMyTasksOnly) params.set('show_my_tasks_only', showMyTasksOnly);
-    if (sortOrder) params.set('sort_order', sortOrder);
-
-    // Обновляем URL
-    window.location.search = params.toString();
-}
+// function updateUrl() {
+//     const showMyTasksOnly = document.getElementById('showMyTasksOnlySwitch') ? document.getElementById('showMyTasksOnlySwitch').checked : null;
+//     const sortOrder = document.getElementById('sortOrderSwitch') ? (document.getElementById('sortOrderSwitch').checked ? 'desc' : 'asc') : null;
+//
+//     const currentUrl = new URL(window.location.href);
+//     const params = new URLSearchParams(currentUrl.search);
+//
+//     // Устанавливаем параметры
+//     if (showMyTasksOnly) params.set('show_my_tasks_only', showMyTasksOnly);
+//     if (sortOrder) params.set('sort_order', sortOrder);
+//
+//     // Обновляем URL
+//     window.location.search = params.toString();
+// }
 
 function toggleFilter(filterName, currentValue, secondFilterName = null, secondFilterValue = null) {
     console.log(filterName, currentValue, secondFilterName, secondFilterValue)

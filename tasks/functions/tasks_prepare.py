@@ -120,6 +120,7 @@ def get_filtered_tasks(request, obj=None):
             # Переводим время в часы и преобразуем к int
             hours_left = int(time_left.total_seconds() // 3600) if time_left.total_seconds() > 0 else 0
             task.time_left = hours_left
+            task.time_now = now_moscow
 
         else:
             task.time_left = 0  # Если дедлайн не задан

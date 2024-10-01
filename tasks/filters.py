@@ -45,7 +45,7 @@ class TaskFilter(django_filters.FilterSet):
         self.data = self.data.copy()
         # Принудительно устанавливаем show_active_task в True, если оно None
         if self.data.get("show_my_tasks_only") is None:
-            self.data["show_my_tasks_only"] = "false"
+            self.data["show_my_tasks_only"] = "true"
         # Принудительно устанавливаем show_active_task в True, если оно None
         if self.data.get("sort_order") is None:
             self.data["sort_order"] = "desc"

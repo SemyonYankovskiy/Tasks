@@ -17,16 +17,17 @@
                 {% include "components/object/object-preview.html" with tasks_count=object.tasks_count img_preview=object.img_preview title=object.name desc=object.short_description priority=object.priority groups=object.groups child_count=object.child_count slug=object.slug tags=object.tags %}
 
             {% endfor %}
+
+            {% include "components/home/../pagination.html" with pagination_data=pagination_data filter_data=filter_data %}
         {% else %}
-            <img class="me-3" src="{% static 'self/img/kitty-transparent.gif' %}" alt=""
-                 style="max-height: 150px; max-width: 150px" data-bs-toggle="tooltip"
-                 data-bs-title="Нет объектов для отображения">
-            
+
+                <img class="m-0" src="{% static 'self/img/orig.gif' %}" alt="Ничего не найдено" title="Ничего не найдено">
+
         {% endif %}
     </div>
 
 
-    {% include "components/home/../pagination.html" with pagination_data=pagination_data filter_data=filter_data %}
+
 
 
 

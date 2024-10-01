@@ -19,12 +19,11 @@
 
     <div class="px-3 py-3">
         <div class="container  px-4 py-4 rounded-4 border border-1">
+        <div class="container">
+                        {% include "components/task/tasks_container_buttons.html" with show_active_task=fp.show_active_task not_done_count=c.not_done_count show_done_task=fp.show_done_task done_count=c.done_count show_my_tasks_only=fp.show_my_tasks_only tasks_due_today_count=c.tasks_due_today_count %}
 
-            {% include "components/task/tasks_container_buttons.html" with show_active_task=fp.show_active_task not_done_count=c.not_done_count show_done_task=fp.show_done_task done_count=c.done_count show_my_tasks_only=fp.show_my_tasks_only tasks_due_today_count=c.tasks_due_today_count %}
+        </div>
 
-            <div class="d-flex justify-content-start px-4 mt-3">
-                {% include "components/task/create_task.html" %}
-            </div>
             <div class="mt-4 px-4" id="calendar"></div>
         </div>
     </div>

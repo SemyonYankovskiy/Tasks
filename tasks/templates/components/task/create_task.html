@@ -8,11 +8,11 @@
 <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
 <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 
-<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
-        data-bs-target="#staticBackdrop_create_task">
-    <i class="bi bi-plus-square" style="font-size: 1.2rem"></i>
-    Создать задачу
+<button type="button" class="btn btn-outline-primary "  style="align-self: baseline;" data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop_create_task" >
+    <i class="bi bi-plus-square"></i>
 </button>
+
 
 
 <!-- Модальное окно создания задачи -->
@@ -115,7 +115,7 @@
                         </div>
                     </div>
 
-
+                        
                     <!-- Текст задачи -->
                     <div class="mb-3 ">
                         <label for="taskText" class="form-label">
@@ -123,10 +123,7 @@
                             <span>Описание</span>
                         </label>
                         <div>
-
                             {{ ckeditor.text }}
-
-
                         </div>
 
                     </div>

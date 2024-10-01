@@ -4,7 +4,8 @@
         <h2 class="accordion-header">
             <button class="accordion-button {% if not expanded %}collapsed{% endif %} d-flex" type="button"
                     data-bs-toggle="collapse"
-                    {% if task.time_left < 24 and task.time_left > 0 %}
+
+                    {% if task.time_left < 24 and task.time_left > 0 or task.completion_time.date == task.time_now.date  %}
                     style="border: 2px solid
                             {% if task.priority == 'LOW' %} #1E90FF
                             {% elif task.priority == 'MEDIUM' %}  #FFD700
@@ -60,7 +61,7 @@
                         <!-- Заголовок задачи -->
                         <div class="col-md-9 d-flex justify-content-left align-items-center px-3" >
 
-                            <strong style="text-align: justify;">{{ task.header }}</strong>
+                            <strong>{{ task.header }}</strong>
                         </div>
                     </div>
 

@@ -1,11 +1,9 @@
 {% load static %}
 <div id="tasks" class=" p-4">
-
+    <div class="container">
     {% include "components/task/tasks_container_buttons.html" %}
-
-    <div class="d-flex justify-content-start px-4 mt-3">
-        {% include "components/task/create_task.html" %}
     </div>
+
 
     {% if tasks %}
         <div class="mt-4" id="myTabContent">

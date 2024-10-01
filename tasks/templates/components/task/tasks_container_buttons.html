@@ -1,124 +1,128 @@
-<div class="row px-2 d-flex align-content-center">
+<div class="container">
+    <div class="d-flex flex-wrap gap-2 justify-content-between">
+        <div class="d-flex gap-2 ">
+            {% if not hide_filter %}
+                {% include "components/filter_button.html" %}
+            {% endif %}
 
-    <div class="col-md-8 d-flex mb-2 px-4 gap-3">
-        <div>
-            <!-- Кнопка Активные задачи -->
-            <button class="btn {% if show_active_task == "true" %}btn-primary{% else %}btn-outline-primary{% endif %} fs-6 text"
-                    onclick="toggleFilter('show_active_task', {{ show_active_task|lower }});">
-                {% if show_active_task == 'true' %}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                         class="bi bi-eye-slash-fill" viewBox="0 0 16 16">
-                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
-                    </svg>{% else %}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                         class="bi bi-eye-fill" viewBox="0 0 16 16">
-                        <path d="m10.79 12.912-1.614-1.615a3.5 3.5 0 0 1-4.474-4.474l-2.06-2.06C.938 6.278 0 8 0 8s3 5.5 8 5.5a7.029 7.029 0 0 0 2.79-.588zM5.21 3.088A7.028 7.028 0 0 1 8 2.5c5 0 8 5.5 8 5.5s-.939 1.721-2.641 3.238l-2.062-2.062a3.5 3.5 0 0 0-4.474-4.474L5.21 3.089z"/>
-                        <path d="M5.525 7.646a2.5 2.5 0 0 0 2.829 2.829l-2.83-2.829zm4.95.708-2.829-2.83a2.5 2.5 0 0 1 2.829 2.829zm3.171 6-12-12 .708-.708 12 12-.708.708z"/>
 
-                    </svg>{% endif %}
-                Активные {{ not_done_count }}
-            </button>
+
+            <!-- Кнопки сортировки и "Показать только мои задачи" -->
+            {% if not request.user.is_superuser %}
+                {% if show_my_tasks_only %}
+
+
+                    <div class="form-check form-switch p-0">
+
+                        <!-- Кнопка "Показывать только мои задачи" с иконкой -->
+                        {% if show_my_tasks_only == "true" %}
+                            <button id="showMyTasksOnlyBtn" onclick="toggleShowMyTasksOnly()"
+                                    class="btn btn-primary">
+                                <i class="bi bi-person-lines-fill"></i>
+                                Мои задачи
+                            </button>
+                        {% else %}
+                            <button id="showMyTasksOnlyBtn" onclick="toggleShowMyTasksOnly()"
+                                    class="btn btn-outline-primary">
+                                <i class="bi bi-person-lines-fill"></i>
+                                Все задачи
+                            </button>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            <!-- Кнопка сортировки -->
+            {% if sort_order %}
+                <div class="form-check form-switch p-0">
+                    <button id="sortOrderBtn" onclick="toggleSortOrder()" class="btn btn-outline-primary">
+                        {% if sort_order == 'desc' %}
+                            <i class="bi bi-sort-down"></i>
+                        {% else %}
+                            <i class="bi bi-sort-up-alt"></i>
+                        {% endif %}
+                    </button>
+                </div>
+            {% endif %}
+
+            <!-- Кнопка для создания задачи -->
+            {% include "components/task/create_task.html" %}
+
         </div>
-        <div>
-            <!-- Кнопка вкл/выкл все задачи -->
-            <button class="btn border-0 btn-dark fs-6 text"
-                    style="background: linear-gradient(90deg, rgba(31,93,255,0.99), rgb(53,177,0))"
-                    onclick="toggleFilter('show_active_task', {{ show_active_task|lower }}, 'show_done_task', {{ show_done_task|lower }});">
-                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor"
-                     class="bi bi-link" viewBox="0 0 16 16">
-                    <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
-                    <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
-                </svg>
-            </button>
+        <!-- Кнопка "Сегодня" -->
+        {% if tasks_due_today_count %}
+            <form method="get" class="d-inline">
+                <input type="hidden" name="completion_time_after" value="{{ default_date }}">
+                <input type="hidden" name="completion_time_before" value="{{ default_date }}">
+                <button type="submit" class="btn btn-outline-dark  px-3">
+                    <i class="bi bi-exclamation-circle" style="color: red;"></i>
+
+                    Сегодня: {{ tasks_due_today_count }}
+
+                </button>
+            </form>
+        {% endif %}
+        <!-- Дополнительные кнопки для фильтров -->
+        <div class="d-flex flex-row gap-1">
+            <div class="btn-group mb-2" role="group">
+                <!-- Кнопка Активные задачи -->
+                <button class="btn {% if show_active_task == "true" %}btn-primary{% else %}btn-outline-primary{% endif %} fs-6 text"
+                        onclick="toggleFilter('show_active_task', {{ show_active_task|lower }});">
+                <span class="d-flex align-items-center gap-1">
+                   <i class="bi bi-fire"></i>
+                    <span>Активные:</span>
+                    <span>{{ not_done_count }}</span>
+                </span>
+                </button>
+
+                <!-- Кнопка вкл/выкл все задачи -->
+                <button class="btn border-0 btn-dark fs-6 text"
+                        style="background: linear-gradient(90deg, var(--bs-primary), var(--bs-success));"
+                        onclick="toggleFilter('show_active_task', {{ show_active_task|lower }}, 'show_done_task', {{ show_done_task|lower }});">
+                    <i class="bi bi-link" style="font-size: 1.2rem"></i>
+                </button>
+
+                <!-- Кнопка Завершенные задачи -->
+                <button class="btn {% if show_done_task == "true" %}btn-success{% else %}btn-outline-success{% endif %} fs-6 text"
+                        onclick="toggleFilter('show_done_task', {{ show_done_task|lower }});">
+                <span class="d-flex align-items-center gap-1">
+                    <i class="bi bi-check2-square"></i>
+                    <span>Завершенные:</span>
+                    <span>{{ done_count }}</span>
+                </span>
+                </button>
+            </div>
+
+
         </div>
-
-        <div>
-            <!-- Кнопка Завершенные задачи -->
-            <button class="btn {% if show_done_task == "true" %}btn-success{% else %}btn-outline-success{% endif %} fs-6 text"
-                    onclick="toggleFilter('show_done_task', {{ show_done_task|lower }});">
-                {% if show_done_task == 'true' %}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                         class="bi bi-eye-slash-fill" viewBox="0 0 16 16">
-                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
-                    </svg>{% else %}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                         class="bi bi-eye-fill" viewBox="0 0 16 16">
-
-                        <path d="m10.79 12.912-1.614-1.615a3.5 3.5 0 0 1-4.474-4.474l-2.06-2.06C.938 6.278 0 8 0 8s3 5.5 8 5.5a7.029 7.029 0 0 0 2.79-.588zM5.21 3.088A7.028 7.028 0 0 1 8 2.5c5 0 8 5.5 8 5.5s-.939 1.721-2.641 3.238l-2.062-2.062a3.5 3.5 0 0 0-4.474-4.474L5.21 3.089z"/>
-                        <path d="M5.525 7.646a2.5 2.5 0 0 0 2.829 2.829l-2.83-2.829zm4.95.708-2.829-2.83a2.5 2.5 0 0 1 2.829 2.829zm3.171 6-12-12 .708-.708 12 12-.708.708z"/>
-
-
-                    </svg>{% endif %}
-                Завершенные {{ done_count }}
-            </button>
-        </div>
-          {% if tasks_due_today_count %}
-{% if tasks_due_today_count %}
-
-    <form method="get" class="d-inline">
-        <input type="hidden" name="completion_time_after" value="{{ default_date}}">
-        <input type="hidden" name="completion_time_before" value="{{ default_date }}">
-        <button type="submit" class="ms-5 btn border rounded-2 border-dark px-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-calendar-week" viewBox="0 0 16 16">
-                <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
-                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
-            </svg>
-            Задач сегодня {{ tasks_due_today_count }}
-        </button>
-    </form>
-{% endif %}
-
-{% endif %}
-
     </div>
-    <div class="col-md-4 ">
-
-    </div>
-
-
 </div>
 
-<div class="row d-flex px-4 ">
 
-    <div class="col-md-8 mt-auto">
-        {% if not hide_filter %}
-            {% include "components/filter_button.html" %}
-        {% endif %}
-    </div>
+{% include "components/filter.html" %}
 
 
-    <div class="col-md-4 gap-2 ps-4 text-start mt-auto" style="min-height: 58px">
-        {% if not request.user.is_superuser %}
-            <div class="form-check form-switch ">
-                <!-- Переключатель "Показывать только мои задачи" -->
-                <input class="form-check-input" type="checkbox" role="switch"
-                       id="showMyTasksOnlySwitch"
-                       onchange="updateUrl()"
-                       {% if show_my_tasks_only != 'false' %}checked{% endif %}>
-                <label class="form-check-label" for="showMyTasksOnlySwitch"
-                       style="font-size: 18px; margin-right: 10px;">
-                    {% if not show_my_tasks_only %}Показывать все задачи{% else %}Показывать только мои
-                        задачи{% endif %}
-                </label>
-            </div>
-        {% endif %}
-        {% if sort_order %}
-            <div class="form-check form-switch">
-                <!-- Переключатель порядка сортировки задач -->
-                <input class="form-check-input" type="checkbox" role="switch"
-                       id="sortOrderSwitch"
-                       onchange="updateUrl()"
-                       {% if sort_order == 'desc' %}checked{% endif %}>
-                <label class="form-check-label" for="sortOrderSwitch"
-                       style="font-size: 18px;">
-                    {% if sort_order == 'desc' %}Новые вначале{% else %}Старые вначале{% endif %}
-                </label>
-            </div>
-        {% endif %}
-    </div>
+<script>
+    // Функция переключения "Показывать только мои задачи"
+    function toggleShowMyTasksOnly() {
+        const showMyTasksOnly = '{{ show_my_tasks_only }}' === 'true';
+        const newShowMyTasksOnly = !showMyTasksOnly;
 
+        const currentUrl = new URL(window.location.href);
+        const params = new URLSearchParams(currentUrl.search);
 
-    {% include "components/task/../filter.html" %}
-</div>
+        params.set('show_my_tasks_only', newShowMyTasksOnly);
+        window.location.search = params.toString();
+    }
+
+    // Функция переключения порядка сортировки
+    function toggleSortOrder() {
+        const sortOrder = '{{ sort_order }}' === 'desc' ? 'asc' : 'desc';
+
+        const currentUrl = new URL(window.location.href);
+        const params = new URLSearchParams(currentUrl.search);
+
+        params.set('sort_order', sortOrder);
+        window.location.search = params.toString();
+    }
+</script>
