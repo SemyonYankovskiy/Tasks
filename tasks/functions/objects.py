@@ -36,7 +36,7 @@ def get_objects_list(request) -> QuerySet[Object]:
                 output_field=CharField(),  # Поле с текстовым выводом
             ),
         )
-        .only("id", "name", "priority", "slug")  # Ограничиваем выборку только нужными полями для оптимизации
+        .only("id", "name", "priority", "slug", "zabbix_link", "notes_link", "ecstasy_link", "another_link")  # Ограничиваем выборку только нужными полями для оптимизации
         .distinct()  # Убираем дублирующиеся объекты (если были)
         .order_by("parent_id", "-id")  # Сортировка по полю `parent_id`, затем по убыванию `id`
     )

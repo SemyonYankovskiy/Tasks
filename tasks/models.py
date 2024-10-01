@@ -50,8 +50,13 @@ class Object(models.Model):
         "self", null=True, blank=True, on_delete=models.SET_NULL, related_name="children"
     )
     name = models.CharField(max_length=64)
+
     address = models.ForeignKey("Address", on_delete=models.CASCADE)
     description = RichTextUploadingField(blank=True)
+    zabbix_link = models.CharField(max_length=256, blank=True)
+    ecstasy_link = models.CharField(max_length=256, blank=True)
+    notes_link = models.CharField(max_length=256, blank=True)
+    another_link = models.CharField(max_length=256, blank=True)
     tasks = models.ManyToManyField(
         "Task", related_name="objects_set", db_table="objects_tasks_m2m", blank=True
     )
