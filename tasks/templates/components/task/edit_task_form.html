@@ -4,8 +4,7 @@
 <link href="{% static 'fileuploader/jquery.fileuploader.min.css' %}" media="all" rel="stylesheet">
 <script src="{% static 'fileuploader/jquery.fileuploader.min.js' %}" type="text/javascript"></script>
 <!-- ckeditor -->
-<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
-<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+{{ ckeditor_form.media }}
 
 <form class="text-start bg-light" method="POST" action="{% url "edit_task" task.id %}" enctype="multipart/form-data">
     {% csrf_token %}
@@ -103,9 +102,10 @@
         <div class="mb-3">
             <label for="taskText_edit_{{ task.id }}" class="form-label">
                 <i class="bi bi-card-text" style="font-size: 1.2rem;"></i>
-                <span>Описание</span>
             </label>
-            <textarea class="form-control" id="taskText_edit_{{ task.id }}" name="text" rows="4"> {{task.text }}</textarea>
+            <div>
+                {{ ckeditor_form.text_edit }}
+            </div>
         </div>
 
 

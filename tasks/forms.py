@@ -1,14 +1,17 @@
 from datetime import datetime
 
-from ckeditor.widgets import CKEditorWidget
 from django import forms
+from django_ckeditor_5.widgets import CKEditor5Widget
 
 from .models import Task, Engineer, Tag, Object, Department
 
 
-class CKEditorForm(forms.Form):
-    text = forms.CharField(widget=CKEditorWidget, label='', required=False)
+class CKEditorCreateForm(forms.Form):
+    text = forms.CharField(widget=CKEditor5Widget(), label='', required=False)
 
+
+class CKEditorEditForm(forms.Form):
+    text_edit = forms.CharField(widget=CKEditor5Widget(), label='', required=False)
 
 
 class AddTaskForm(forms.ModelForm):
@@ -105,6 +108,7 @@ class EditTaskForm(forms.ModelForm):
     )  # Поле для объектов
     completion_time_only = forms.TimeField(required=True)
     completion_date_only = forms.DateField(required=True)
+    text_edit = forms.CharField(required=False)
 
     class Meta:
         model = Task
@@ -114,7 +118,7 @@ class EditTaskForm(forms.ModelForm):
             "is_done",
             "completion_time_only",
             "completion_date_only",
-            "text",
+            "text_edit",
             "engineers_edit",
             "tags_edit",
             "files",
@@ -141,6 +145,7 @@ class EditTaskForm(forms.ModelForm):
             f"{completion_date_only} {completion_time_only}", "%Y-%m-%d %H:%M:%S"
         )
         instance.completion_time = completion_time
+        instance.text = self.cleaned_data["text_edit"]
 
         if commit:
             instance.save()

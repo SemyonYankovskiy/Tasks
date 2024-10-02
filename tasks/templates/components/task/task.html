@@ -132,7 +132,9 @@
                             </div>
                             <div class="col d-flex flex-column align-items-start border-start"
                                  style="font-size: 18px; white-space: pre-line; text-align: justify;">
-                                <span class="{% if not expanded %}spoiler-text-{{ task.id }}{% endif %}">{{ task.text|safe }}</span>
+                                <span class="{% if not expanded %}spoiler-text-{{ task.id }}{% endif %}" style="overflow: auto; width: 100%;">
+                                    {{ task.text|safe }}
+                                </span>
                                 <button class="btn btn-outline-dark toggle-spoiler mt-2"
                                         style="display: none; white-space: nowrap;">Показать
                                     больше

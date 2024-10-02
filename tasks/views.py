@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from tasks.services.tree_nodes import GroupsTree, ObjectsTagsTree
 from .filters import ObjectFilter
-from .forms import CKEditorForm
+from .forms import CKEditorEditForm, CKEditorCreateForm
 from .functions.objects import get_objects_list, add_tasks_count_to_objects
 from .functions.service import paginate_queryset, get_random_icon
 from .functions.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
@@ -134,7 +134,7 @@ def get_tasks_page(request):
 
     random_icon = get_random_icon(request)
 
-    ckeditor = CKEditorForm(request.POST)
+    ckeditor = CKEditorCreateForm(request.POST)
 
     context = {
         "pagination_data": pagination_data,
@@ -205,16 +205,20 @@ def get_task_edit_form(request, task_id: int):
     for each in current_departments_with_type:
         current_engineers.append(f"dep_{each}")
 
+    ckeditor_form = CKEditorEditForm(initial={"text_edit": task.text})
+
     context = {
         "task": task,
         **fields,
         "from_url": from_url,
         "current_engineers": current_engineers,
+        "ckeditor_form": ckeditor_form,
         # "current_tags_edit": list(task.tags.all().values_list("id", flat=True)),
         "current_tags_edit": list(task.tags.all().values_list("tag_name", flat=True)),
         "current_objects_edit": list(task.objects_set.all().values_list("id", flat=True)),
     }
     return render(request, "components/task/edit_task_form.html", context)
+
 
 @login_required
 def get_stat_page(request):

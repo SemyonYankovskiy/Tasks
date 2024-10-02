@@ -25,7 +25,6 @@
     <link rel="stylesheet" media="screen,projection" href="{% static 'utop/css/ui.totop.css' %}" />
 
 
-
     <!-- Библиотека для галереи -->
     <link rel="stylesheet" href="{% static 'nanogallery2/nanogallery2.min.css' %}" type="text/css">
     <script src="{% static 'nanogallery2/jquery.nanogallery2.min.js' %}" type="text/javascript"></script>
@@ -58,30 +57,15 @@
 {% include "components/footer.html" %}
 
 
-
 <!-- jquery -->
-    <script src="{% static 'utop/js/jquery-1.7.2.min.js' %}" type="text/javascript"></script>
     <!-- easing plugin ( optional ) -->
     <script src="{% static 'utop/js/easing.js' %}" type="text/javascript"></script>
     <!-- UItoTop plugin -->
     <script src="{% static 'utop/js/jquery.ui.totop.js' %}" type="text/javascript"></script>
     <!-- Starting the plugin -->
     <script type="text/javascript">
-        $(document).ready(function() {
-            /*
-            var defaults = {
-                  containerID: 'toTop', // fading element id
-                containerHoverID: 'toTopHover', // fading element hover id
-                scrollSpeed: 1200,
-                easingType: 'linear'
-             };
-            */
-
-            $().UItoTop({ easingType: 'easeOutQuart' });
-
-        });
+        $(document).ready(function() {$().UItoTop({ easingType: 'easeOutQuart' });});
     </script>
-
 
 </body>
 
