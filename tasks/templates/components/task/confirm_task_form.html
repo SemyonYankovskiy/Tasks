@@ -12,8 +12,8 @@
 
     <div>
         <div class="mb-3">
-            <label for="comment" class="form-label" style="display: block;">Комментарий к задаче</label>
-            <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
+            <label for="comment_{{ task_id }}" class="form-label" style="display: block;">Комментарий к задаче</label>
+            <textarea class="form-control" id="comment_{{ task_id }}" name="comment" rows="3"></textarea>
         </div>
 
     </div>
@@ -27,25 +27,20 @@
 </form>
 
 <script>
-    // Инициализируем CKEditor с возможностью загрузки изображений
-    CKEDITOR.replace('comment', {
+    // Инициализируем CKEditor для каждого комментария с task_id
+    CKEDITOR.replace('comment_{{ task_id }}', {
         toolbar: [
-            { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike'] },
-            { name: 'paragraph', items: ['NumberedList', 'BulletedList'] },
-            { name: 'clipboard', items: ['Undo', 'Redo'] },
-            { name: 'insert', items: ['Image', 'Table', 'HorizontalRule'] },
+            {name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike']},
+            {name: 'paragraph', items: ['NumberedList', 'BulletedList']},
+            {name: 'clipboard', items: ['Undo', 'Redo']},
+            {name: 'insert', items: ['Image', 'Table', 'HorizontalRule']},
         ],
-        height: 200,
-        removeButtons: 'Subscript,Superscript',
-        removePlugins: 'elementspath',
-
-        // Отключаем предупреждение о небезопасной версии
-        allowedContent: true,
-        extraAllowedContent: 'img[*]{*};',
-
-        // Указываем URL для загрузки изображений
+        height: 150,
         filebrowserUploadUrl: '/ckeditor/upload/',
         filebrowserBrowseUrl: '/ckeditor/browse/',
+
+        // Disable version warning notification
+        removePlugins: 'notification',
     });
 
     // Обработка отправки формы
