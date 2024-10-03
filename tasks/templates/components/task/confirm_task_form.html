@@ -4,9 +4,8 @@
 <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 
 <form class="text-start" id="task-form_{{ form_action }}_{{ task_id }}" action="
-
         {% if form_action == 'close' %}{% url 'close_task' task_id %}{% else %}{% url 'reopen_task' task_id %}{% endif %}"
-      method="post">
+      method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <!-- Скрытое поле для сохранения URL с фильтрами -->
     <input type="hidden" name="from_url" value="{{ request.get_full_path }}#tasks">
@@ -26,7 +25,30 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
     </div>
 </form>
+
 <script>
+    // Инициализируем CKEditor с возможностью загрузки изображений
+    CKEDITOR.replace('comment', {
+        toolbar: [
+            { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike'] },
+            { name: 'paragraph', items: ['NumberedList', 'BulletedList'] },
+            { name: 'clipboard', items: ['Undo', 'Redo'] },
+            { name: 'insert', items: ['Image', 'Table', 'HorizontalRule'] },
+        ],
+        height: 200,
+        removeButtons: 'Subscript,Superscript',
+        removePlugins: 'elementspath',
+
+        // Отключаем предупреждение о небезопасной версии
+        allowedContent: true,
+        extraAllowedContent: 'img[*]{*};',
+
+        // Указываем URL для загрузки изображений
+        filebrowserUploadUrl: '/ckeditor/upload/',
+        filebrowserBrowseUrl: '/ckeditor/browse/',
+    });
+
+    // Обработка отправки формы
     document.getElementById('submit-button{{ task_id }}').addEventListener('click', function (event) {
         event.preventDefault();  // Останавливаем стандартное поведение формы
 
@@ -34,10 +56,6 @@
         var form = document.getElementById('task-form_{{ form_action }}_{{ task_id }}');
         var fromUrlField = form.querySelector('input[name="from_url"]');
         var currentUrl = new URL(fromUrlField.value, window.location.origin);
-
-        {#// Принудительно добавляем параметры фильтров#}
-        {#currentUrl.searchParams.set('show_done_task', 'true');#}
-        {#currentUrl.searchParams.set('show_active_task', 'false');#}
 
         // Устанавливаем модифицированный URL обратно в скрытое поле
         fromUrlField.value = currentUrl.href;
