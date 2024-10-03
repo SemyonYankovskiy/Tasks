@@ -3,11 +3,11 @@ import re
 import uuid
 from datetime import datetime
 
+from ckeditor_uploader.fields import RichTextUploadingField
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, MinValueValidator
 from django.db import models
-from django_ckeditor_5.fields import CKEditor5Field
 
 
 class UserObjectGroup(models.Model):
@@ -52,7 +52,7 @@ class Object(models.Model):
     name = models.CharField(max_length=64)
 
     address = models.ForeignKey("Address", on_delete=models.CASCADE)
-    description = CKEditor5Field(blank=True)
+    description = RichTextUploadingField(blank=True)
     zabbix_link = models.CharField(max_length=256, blank=True)
     ecstasy_link = models.CharField(max_length=256, blank=True)
     notes_link = models.CharField(max_length=256, blank=True)
@@ -105,8 +105,8 @@ class Task(models.Model):
     completion_time = models.DateTimeField()
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     header = models.CharField(max_length=128)
-    text = CKEditor5Field(blank=True)
-    completion_text = CKEditor5Field(blank=True)
+    text = RichTextUploadingField(blank=True)
+    completion_text = RichTextUploadingField(blank=True)
     engineers = models.ManyToManyField(
         "Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True
     )

@@ -97,6 +97,7 @@ def get_object_page(request, object_slug):
     random_icon = get_random_icon(request)
 
     filter_context = task_filter_params(request)
+    ckeditor = CKEditorCreateForm(request.POST)
 
     context = {
         "object": obj,
@@ -109,6 +110,7 @@ def get_object_page(request, object_slug):
         "child_objects": child_objects,
         **filter_context,
         "is_objects_page": request.path.startswith("/object/"),
+        "ckeditor": ckeditor,
     }
 
     return render(request, "components/object/object-page.html", context=context)

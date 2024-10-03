@@ -1,17 +1,17 @@
 from datetime import datetime
 
+from ckeditor.widgets import CKEditorWidget
 from django import forms
-from django_ckeditor_5.widgets import CKEditor5Widget
 
 from .models import Task, Engineer, Tag, Object, Department
 
 
 class CKEditorCreateForm(forms.Form):
-    text = forms.CharField(widget=CKEditor5Widget(), label='', required=False)
+    text = forms.CharField(widget=CKEditorWidget, label='', required=False)
 
 
 class CKEditorEditForm(forms.Form):
-    text_edit = forms.CharField(widget=CKEditor5Widget(), label='', required=False)
+    text_edit = forms.CharField(widget=CKEditorWidget, label='', required=False)
 
 
 class AddTaskForm(forms.ModelForm):

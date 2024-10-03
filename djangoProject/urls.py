@@ -25,10 +25,8 @@ urlpatterns = [
     path("ajax/tasks/<int:task_id>/edit", views.get_task_edit_form, name="ajax-task-edit-form"),
 
     # CKEDITOR
-    path('ckeditor5/', include('django_ckeditor_5.urls')),
-    # path("upload/", settings.get_filename, name="get_filename"),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
 ]
-
 
 if settings.DEBUG:
     from debug_toolbar.toolbar import debug_toolbar_urls

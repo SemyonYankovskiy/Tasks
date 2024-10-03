@@ -1,3 +1,8 @@
+{% load static %}
+
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+
 <form class="text-start" id="task-form_{{ form_action }}_{{ task_id }}" action="
 
         {% if form_action == 'close' %}{% url 'close_task' task_id %}{% else %}{% url 'reopen_task' task_id %}{% endif %}"
@@ -11,6 +16,7 @@
             <label for="comment" class="form-label" style="display: block;">Комментарий к задаче</label>
             <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
         </div>
+
     </div>
     <div class="modal-footer">
         <button id="submit-button{{ task_id }}" type="submit"
