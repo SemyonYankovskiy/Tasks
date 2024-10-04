@@ -3,59 +3,53 @@
 <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
 <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 
-<form class="text-start" id="task-form_{{ form_action }}_{{ task_id }}" action="
-        {% if form_action == 'close' %}{% url 'close_task' task_id %}{% else %}{% url 'reopen_task' task_id %}{% endif %}"
-      method="post" enctype="multipart/form-data">
+<form class="text-start" id="task-form-{{ form_action }}" action="{{ action_url }}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    <!-- Скрытое поле для сохранения URL с фильтрами -->
-    <input type="hidden" name="from_url" value="{{ request.get_full_path }}#tasks">
+    <input type="hidden" name="from_url" value="{{ from_url }}">
 
     <div>
         <div class="mb-3">
-            <label for="comment_{{ task_id }}" class="form-label" style="display: block;">Комментарий к задаче</label>
+            <label for="comment_{{ task_id }}" class="form-label">Комментарий к задаче</label>
             <textarea class="form-control" id="comment_{{ task_id }}" name="comment" rows="3"></textarea>
         </div>
-
     </div>
+
     <div class="modal-footer">
-        <button id="submit-button{{ task_id }}" type="submit"
-                class="btn {% if form_action == 'close' %}btn-primary{% else %}btn-primary{% endif %}">
-            Подтвердить
-        </button>
+        <button type="submit" class="btn btn-primary">Подтвердить</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
     </div>
 </form>
 
-<script>
-    // Инициализируем CKEditor для каждого комментария с task_id
-    CKEDITOR.replace('comment_{{ task_id }}', {
-        toolbar: [
-            {name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike']},
-            {name: 'paragraph', items: ['NumberedList', 'BulletedList']},
-            {name: 'clipboard', items: ['Undo', 'Redo']},
-            {name: 'insert', items: ['Image', 'Table', 'HorizontalRule']},
-        ],
-        height: 150,
-        filebrowserUploadUrl: '/ckeditor/upload/',
-        filebrowserBrowseUrl: '/ckeditor/browse/',
-
-        // Disable version warning notification
-        removePlugins: 'notification',
-    });
-
-    // Обработка отправки формы
-    document.getElementById('submit-button{{ task_id }}').addEventListener('click', function (event) {
-        event.preventDefault();  // Останавливаем стандартное поведение формы
-
-        // Получаем текущее значение из скрытого поля с URL
-        var form = document.getElementById('task-form_{{ form_action }}_{{ task_id }}');
-        var fromUrlField = form.querySelector('input[name="from_url"]');
-        var currentUrl = new URL(fromUrlField.value, window.location.origin);
-
-        // Устанавливаем модифицированный URL обратно в скрытое поле
-        fromUrlField.value = currentUrl.href;
-
-        // Теперь отправляем форму
-        form.submit();
-    });
-</script>
+{#<script>#}
+{#    // Инициализируем CKEditor для каждого комментария с task_id#}
+{#    CKEDITOR.replace('comment_{{ task_id }}', {#}
+{#        toolbar: [#}
+{#            {name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike']},#}
+{#            {name: 'paragraph', items: ['NumberedList', 'BulletedList']},#}
+{#            {name: 'clipboard', items: ['Undo', 'Redo']},#}
+{#            {name: 'insert', items: ['Image', 'Table', 'HorizontalRule']},#}
+{#        ],#}
+{#        height: 150,#}
+{#        filebrowserUploadUrl: '/ckeditor/upload/',#}
+{#        filebrowserBrowseUrl: '/ckeditor/browse/',#}
+{##}
+{#        // Disable version warning notification#}
+{#        removePlugins: 'notification',#}
+{#    });#}
+{##}
+{#    // Обработка отправки формы#}
+{#    document.getElementById('submit-button{{ task_id }}').addEventListener('click', function (event) {#}
+{#        event.preventDefault();  // Останавливаем стандартное поведение формы#}
+{##}
+{#        // Получаем текущее значение из скрытого поля с URL#}
+{#        var form = document.getElementById('task-form_{{ form_action }}_{{ task_id }}');#}
+{#        var fromUrlField = form.querySelector('input[name="from_url"]');#}
+{#        var currentUrl = new URL(fromUrlField.value, window.location.origin);#}
+{##}
+{#        // Устанавливаем модифицированный URL обратно в скрытое поле#}
+{#        fromUrlField.value = currentUrl.href;#}
+{##}
+{#        // Теперь отправляем форму#}
+{#        form.submit();#}
+{#    });#}
+{#</script>#}

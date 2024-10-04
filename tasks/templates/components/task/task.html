@@ -181,8 +181,8 @@
 
 
                                 <div class="col text-end gap-2">
-                                    {% include "components/task/edit_task_button.html" with task_id=task.id %}
-                                    {% include "components/task/confirm_task.html" with task_id=task.id action_type="close" %}
+                                    {% include "components/task/edit_task_button.html" with task_id=task.id  %}
+                                    {% include "components/task/confirm_task_button.html" with task_id=task.id action_type="close" %}
                                 </div>
                             </div>
                         {% endif %}
@@ -190,7 +190,7 @@
                         {% if request.user.engineer in task.engineers.all or request.user.is_superuser or request.user.is_staff %}
                             <div class="text-end gap-2">
                                 {% include "components/task/edit_task_button.html" with task_id=task.id %}
-                                {% include "components/task/confirm_task.html" with task_id=task.id %}
+                                {% include "components/task/confirm_task_button.html" with task_id=task.id action_type="reopen" %}
                             </div>
                         {% endif %}
                     {% endif %}

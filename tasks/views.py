@@ -223,6 +223,29 @@ def get_task_edit_form(request, task_id: int):
 
 
 @login_required
+def get_task_action_form(request, task_id, action_type):
+    task = get_object_or_404(Task, pk=task_id)
+
+    # Determine the form action (close or reopen)
+    if action_type == 'close':
+        action_url = reverse('close_task', args=[task_id])
+        form_action = 'close'
+    else:
+        action_url = reverse('reopen_task', args=[task_id])
+        form_action = 'reopen'
+
+    context = {
+        'task_id': task_id,
+        'form_action': form_action,
+        'action_url': action_url,
+        'from_url': request.GET.get('from_url', ''),
+    }
+
+    return render(request, 'components/task/confirm_task_form.html', context)
+
+
+
+@login_required
 def get_stat_page(request):
     # Выбираем всех инженеров с данными по активным и завершённым задачам
     engineers = (Engineer.objects.all()

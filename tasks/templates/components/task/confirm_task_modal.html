@@ -1,0 +1,50 @@
+<div class="modal fade" id="taskActionModal" data-bs-backdrop="static" data-bs-keyboard="false"
+     tabindex="-1" aria-labelledby="taskActionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="taskActionModalLabel">Action</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="task-modal-body">
+                <!-- Task modal content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const taskActionModal = new bootstrap.Modal('#taskActionModal', {});
+
+    function loadTaskModal(taskID, formAction) {
+        const currentUrlWithFilters = window.location.pathname + location.search;  // Capture the current URL with filters
+
+        // Условие для задания текста в зависимости от formAction
+        let modalTitle;
+        if (formAction === "close") {
+            modalTitle = "Закрыть задачу";
+        } else if (formAction === "reopen") {
+            modalTitle = "Вернуть задачу в работу";
+        } else {
+            modalTitle = "Действие с задачей";  // Заголовок по умолчанию
+        }
+
+        // Устанавливаем заголовок
+        $('#taskActionModalLabel').text(modalTitle);
+
+        // Show modal and load content
+        taskActionModal.show();
+
+
+
+
+        // Load the appropriate form (close/reopen) dynamically into the modal's body
+        $("#task-modal-body").load(`/ajax/tasks/${taskID}/action/${formAction}?from_url=` + encodeURIComponent(currentUrlWithFilters));
+    }
+</script>
+<style>
+
+    #taskActionModal {
+        z-index: 1100; /* или любое значение больше, чем у других модальных окон */
+    }
+</style>

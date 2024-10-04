@@ -176,6 +176,7 @@ def reopen_task(request, task_id):
 
         task.completion_text += pattern + comment
         task.save()
+        messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' возвращена в работу")
 
     return HttpResponseRedirect(redirect_to)
 
@@ -220,5 +221,6 @@ def close_task(request, task_id):
 
         task.completion_text += pattern + comment
         task.save()
+        messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' закрыта")
 
     return HttpResponseRedirect(redirect_to)

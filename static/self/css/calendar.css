@@ -32,7 +32,7 @@
 
 .taskDone div {
     background-color: #00CC00;
-    border-radius: 5px;
+    /*border-radius: 5px;*/
     color: #ffffff;
     text-align: left;
     font-weight: 700;
