@@ -13,50 +13,77 @@ from .functions.objects import get_objects_list, add_tasks_count_to_objects
 from .functions.service import paginate_queryset, get_random_icon
 from .functions.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
 from .models import Object, Task, Engineer
+from django.core.cache import cache
 
 
 @login_required
 def get_home(request):
-    # Создаем фильтр с параметрами запроса
-    user_filter = ObjectFilter(request.GET, queryset=get_objects_list(request))
-
-    # Применяем фильтр к запросу
-    filtered_objects = user_filter.qs
-
-    # Получаем номер страницы из запроса
     page_number = request.GET.get("page")
-    per_page = request.GET.get("per_page", 8)  # Значение по умолчанию
-    pagination_data = paginate_queryset(filtered_objects, page_number, per_page)
-    objects_qs = pagination_data["page_obj"]
+    if page_number is None:
+        page_number = 1
+    cache_key = f'objects-page:{page_number}:{request.user.username}'
 
-    add_tasks_count_to_objects(queryset=objects_qs, user=request.user, field_name="tasks_count")
+    # Получаем данные из кэша
+    cached_data = cache.get(cache_key)
 
-    tags = ObjectsTagsTree({"user": request.user}).get_nodes()
-    groups = GroupsTree({"user": request.user}).get_nodes()
+    # =========== Кеширование =========== #
+    if cached_data is None:
+        # =========== Фильтр =========== #
+        tags = ObjectsTagsTree({"user": request.user}).get_nodes()  # объекты в виде деревьев для модуля Tree Select
+        groups = GroupsTree({"user": request.user}).get_nodes()
 
+        user_filter = ObjectFilter(request.GET, queryset=get_objects_list(request))  # Создаем фильтр с параметрами запроса
+        filtered_objects = user_filter.qs  # Применяем фильтр к запросу
+
+        # Счётчик применённых фильтров
+        not_count_params = ["page", "per_page"]
+        params_count = len([param for key, param in request.GET.items() if param and key not in not_count_params])
+
+
+        # =========== Пагинация =========== #
+        per_page = request.GET.get("per_page", 8)  # Значение по умолчанию
+        pagination_data = paginate_queryset(filtered_objects, page_number, per_page)
+        objects_qs = pagination_data["page_obj"]
+
+        # TODO: убрать дублирование SQL запросов
+        add_tasks_count_to_objects(queryset=objects_qs, user=request.user, field_name="tasks_count")
+
+        # Сохраняем данные в кэш
+        cached_data = {
+            "objects_qs": objects_qs,
+            "pagination_data": pagination_data,
+            "tags": tags,
+            "groups": groups,
+            "current_path": request.path,
+            "params_count": params_count,
+        }
+        cache.set(cache_key, cached_data, timeout=60)  # Установите нужное время кэширования
+    else:
+        # Используем закэшированные данные
+        objects_qs = cached_data["objects_qs"]
+        pagination_data = cached_data["pagination_data"]
+        tags = cached_data["tags"]
+        groups = cached_data["groups"]
+        params_count = cached_data["params_count"]
+
+
+
+    # Формируем строку с параметрами фильтра для пагинатора
     exclude_params = ["page"]
     filter_data = {key: value for key, value in request.GET.items() if key not in exclude_params}
-
-    # Формируем строку с параметрами фильтра
     filter_url = urlencode(filter_data, doseq=True)
 
-    random_icon = get_random_icon(request)
-
-    not_count_params = ["page", "per_page"]
-    # Передаем отфильтрованные объекты в контекст
     context = {
         "objects_qs": objects_qs,
         "pagination_data": pagination_data,
         "filter_data": filter_url,
         "tags_json": tags,
-        "random_icon": random_icon,
+        "random_icon": get_random_icon(request),
         "current_tags": request.GET.getlist("tags"),
         "groups_json": groups,
         "current_groups": request.GET.getlist("groups"),
         "current_page": request.path,
-        "params_count": len(
-            [param for key, param in request.GET.items() if param and key not in not_count_params]
-        ),
+        "params_count": params_count,
     }
 
     return render(request, "components/home/home.html", context=context)
@@ -242,7 +269,6 @@ def get_task_action_form(request, task_id, action_type):
     }
 
     return render(request, 'components/task/confirm_task_form.html', context)
-
 
 
 @login_required

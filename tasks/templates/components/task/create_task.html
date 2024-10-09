@@ -171,6 +171,13 @@
 
     }
 </style>
+<style>
+
+    .django-ckeditor-widget{
+        width: 100% !important;
+    }
+
+</style>
 
 <script type="text/javascript">
     $(document).ready(function () {
@@ -187,22 +194,9 @@
         $('#files').contents().filter(function () {
             return this.nodeType === 3; // Текстовый узел
         }).remove();
-
-        // Или замена текста на пустую строку:
-        // $('#files').contents().filter(function() {
-        //     return this.nodeType === 3; // Текстовый узел
-        // }).each(function() {
-        //     this.nodeValue = ''; // Заменяем текст на пустую строку
-        // });
     });
 
 </script>
 
 
-<style>
 
-    .django-ckeditor-widget{
-        width: 100% !important;
-    }
-
-</style>

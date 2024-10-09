@@ -12,6 +12,7 @@ psycopg2-binary = "^2.9.9"
 gunicorn = "^23.0.0"
 redis = "^5.0.8"
 django-ckeditor = "^6.7.1"
+django-redis = "^5.4.0"
 
 
 [tool.poetry.group.dev.dependencies]

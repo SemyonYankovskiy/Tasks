@@ -119,14 +119,20 @@ if os.getenv("DJANGO_REDIS_CACHE_URL"):
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.redis.RedisCache",
-            "LOCATION": os.getenv("DJANGO_REDIS_CACHE_URL"),
-        }
+            # "LOCATION": os.getenv("DJANGO_REDIS_CACHE_URL"),
+            'LOCATION': 'redis://127.0.0.1:6379/1',  # URL Redis-сервера
+            'OPTIONS':
+                {
+                   'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                },
+         }
+
     }
 
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
+    # Password validation
+    # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [
+    AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
@@ -175,8 +181,8 @@ LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 LOGIN_URL = "user/login/"
 
-
 # ==============================  CKEDITOR ==================================
+
 
 def get_filename(file_name: str, request) -> str:
     return str(uuid.uuid4()) + "-" + file_name
@@ -193,7 +199,7 @@ CKEDITOR_CONFIGS = {
             ['Source', '-', 'Bold', 'Italic']
         ],
         'toolbar_YourCustomToolbarConfig': [
-            {'name': 'styles', 'items': [ 'Font', 'FontSize', 'Styles', 'Format',]},
+            {'name': 'styles', 'items': ['Font', 'FontSize', 'Styles', 'Format', ]},
             {'name': 'colors', 'items': ['TextColor', 'BGColor']},
 
             {'name': 'paragraph',
@@ -201,11 +207,11 @@ CKEDITOR_CONFIGS = {
                        'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', ]},
             {'name': 'links', 'items': ['Link', 'Unlink']},
             {'name': 'insert',
-             'items': ['Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak',]},
+             'items': ['Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', ]},
             '/',  # put this to force next toolbar on new line
             {'name': 'basicstyles',
              'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', ]},
-{'name': 'basicstyles',
+            {'name': 'basicstyles',
              'items': ['RemoveFormat', ]},
             '/',
 
