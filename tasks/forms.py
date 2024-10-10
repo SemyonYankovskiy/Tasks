@@ -2,6 +2,7 @@ from datetime import datetime
 
 from ckeditor.widgets import CKEditorWidget
 from django import forms
+from django.core.exceptions import ValidationError
 
 from .models import Task, Engineer, Tag, Object, Department
 
@@ -191,33 +192,53 @@ class EditTaskForm(forms.ModelForm):
         return instance
 
 
+
+class CKEditorEditObjForm(forms.Form):
+    description = forms.CharField(widget=CKEditorWidget, label='', required=False)
+
+
 class ObjectForm(forms.ModelForm):
+    obj_tags_edit = forms.ModelMultipleChoiceField(queryset=Tag.objects.all(), required=False)
+
     class Meta:
         model = Object
         fields = [
-            'priority',
-            'parent',
-            'name',
-            'address',
-            'description',
-            'zabbix_link',
-            'ecstasy_link',
-            'notes_link',
-            'another_link',
-            'tasks',
-            'tags',
-            'files',
-            'groups',
-            'slug',
+            'name', 'priority', 'parent', 'description', 'zabbix_link',
+            'ecstasy_link', 'notes_link', 'another_link', 'tasks', 'obj_tags_edit', 'files', 'groups'
         ]
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 5}),
-            'zabbix_link': forms.URLInput(attrs={'placeholder': 'Введите ссылку на Zabbix'}),
-            'ecstasy_link': forms.URLInput(attrs={'placeholder': 'Введите ссылку на Ecstasy'}),
-            'notes_link': forms.URLInput(attrs={'placeholder': 'Введите ссылку на Notes'}),
-            'another_link': forms.URLInput(attrs={'placeholder': 'Введите другую ссылку'}),
-            'priority': forms.Select(),
-            'parent': forms.Select(),
-            'name': forms.TextInput(attrs={'placeholder': 'Введите имя объекта'}),
-            'slug': forms.TextInput(attrs={'placeholder': 'Введите slug'}),
+            'description': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
+            'tasks': forms.CheckboxSelectMultiple(),
+            'files': forms.CheckboxSelectMultiple(),
+            'groups': forms.CheckboxSelectMultiple(),
         }
+
+    def save(self, commit=True):
+        instance: Object = super().save(commit=False)
+
+        if commit:
+            instance.save()
+
+        # Проверка наличия данных в cleaned_data
+        if 'obj_tags_edit' in self.cleaned_data and self.cleaned_data['obj_tags_edit']:
+            instance.tags.set(self.cleaned_data["obj_tags_edit"])
+        else:
+            print("No tags provided or cleaned_data does not contain obj_tags_edit.")
+
+        return instance
+
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     parent = cleaned_data.get('parent')
+    #
+    #     if parent == self.instance:
+    #         raise ValidationError("Рекурсия")
+    #
+    #     # Проверка на циклическую ссылку
+    #     current_parent = parent
+    #     while current_parent:
+    #         if current_parent == self.instance:
+    #             raise ValidationError("Твой выбранный родитель это твой же потомок, осуждаем")
+    #         current_parent = current_parent.parent
+    #
+    #     return cleaned_data

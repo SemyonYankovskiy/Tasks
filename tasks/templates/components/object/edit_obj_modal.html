@@ -1,20 +1,31 @@
 <!-- Модальное окно редактирования задачи -->
-<div class="modal fade" id="edit_object_{{ object_id }}" data-bs-backdrop="static" data-bs-keyboard="false"
+<div class="modal fade" id="ObjEditModal" data-bs-backdrop="static" data-bs-keyboard="false"
      tabindex="-1"
-     aria-labelledby="editObjLabel" aria-hidden="true">
+     aria-labelledby="ObjEditLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="editObjLabel">Редактировать объект</h1>
+                <h1 class="modal-title fs-5" id="ObjEditLabel">Редактировать объект</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
             </div>
 
             {# Здесь будет загружена форма редактирования #}
-            <div id="task-edit-form"></div>
+            <div id="edit-object-form"></div>
 
         </div>
     </div>
 </div>
+
+<script>
+    const ModalEditObj = new bootstrap.Modal('#ObjEditModal', {})
+
+function showEditObjModal(slug) {
+    const currentUrlWithFilters = window.location.pathname+location.search;  // Получаем текущий URL с фильтрами
+    ModalEditObj.show();
+    // Передаем текущий URL с фильтрами в запрос на сервер через параметр
+    $("#edit-object-form").load("/ajax/objects/" + slug + "/edit?from_url=" + encodeURIComponent(currentUrlWithFilters));
+}
+</script>
 
 
 

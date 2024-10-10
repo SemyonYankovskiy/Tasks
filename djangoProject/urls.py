@@ -11,6 +11,7 @@ urlpatterns = [
     path("create-task/", tasks_actions.create_task, name="create_task"),
     path("take_task/<int:task_id>/", tasks_actions.take_task, name="take_task"),
     path("edit-task/<int:task_id>/", tasks_actions.edit_task, name="edit_task"),
+    path("edit-obj/<slug:slug>/", objects.edit_object, name="edit_object"),
     path("close_task/<int:task_id>/", tasks_actions.close_task, name="close_task"),
     path("reopen_task/<int:task_id>/", tasks_actions.reopen_task, name="reopen_task"),
     path("tasks/", views.get_tasks_page, name="tasks"),  # Страница задач
@@ -23,6 +24,7 @@ urlpatterns = [
     path("user/", include("user.urls", namespace="user")),
     path("ajax/tasks/<int:task_id>/", views.get_task_view, name="ajax-show-task"),
     path("ajax/tasks/<int:task_id>/edit", views.get_task_edit_form, name="ajax-task-edit-form"),
+    path("ajax/objects/<slug:slug>/edit", views.get_obj_edit_form, name="ajax-obj-edit-form"),
     path('ajax/tasks/<int:task_id>/action/<str:action_type>', views.get_task_action_form, name='ajax-task-action-form'),
 
     # CKEDITOR

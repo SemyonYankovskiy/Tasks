@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from tasks.services.tree_nodes import GroupsTree, ObjectsTagsTree
 from .filters import ObjectFilter
-from .forms import CKEditorEditForm, CKEditorCreateForm
+from .forms import CKEditorEditForm, CKEditorCreateForm, CKEditorEditObjForm
 from .functions.objects import get_objects_list, add_tasks_count_to_objects
 from .functions.service import paginate_queryset, get_random_icon
 from .functions.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
@@ -244,6 +244,30 @@ def get_task_edit_form(request, task_id: int):
         "current_objects_edit": list(task.objects_set.all().values_list("id", flat=True)),
     }
     return render(request, "components/task/edit_task_form.html", context)
+
+
+
+@login_required
+def get_obj_edit_form(request, slug: int):
+
+    obj = get_object_or_404(Object, slug=slug)
+    groups = GroupsTree({"user": request.user}).get_nodes()
+    tags = ObjectsTagsTree({"user": request.user}).get_nodes()
+
+
+    ckeditor__obj_form = CKEditorEditObjForm(initial={"description": obj.description})
+
+    context = {
+        "object": obj,
+        "ckeditor__obj_form": ckeditor__obj_form,
+
+        "edit_tags_json": tags,
+        "edit_current_tags": list(obj.tags.all().values_list("tag_name", flat=True)),
+
+        "edit_groups_json": groups,
+        "edit_current_groups": list(obj.groups.all().values_list("id", flat=True)),
+    }
+    return render(request, "components/object/edit_obj_form.html", context)
 
 
 @login_required

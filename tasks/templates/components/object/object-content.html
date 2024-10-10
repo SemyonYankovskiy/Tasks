@@ -25,7 +25,7 @@
             {% endif %}
         </div>
         <div class="col  d-flex justify-content-end align-items-center">
-            {% include "components/object/edit_obj_button.html" with object_id=object.id %}
+            {% include "components/object/edit_obj_button.html" with object_slug=object.slug %}
         </div>
     </div>
 
@@ -146,4 +146,4 @@
 </div>
 
 
-{% include "components/object/edit_obj_modal.html" with object_id=object.id %}
+{% include "components/object/edit_obj_modal.html" %}
