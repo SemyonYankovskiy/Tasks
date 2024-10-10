@@ -76,7 +76,7 @@ class Object(models.Model):
     def clean(self):
         # Check if the object is trying to set itself as a parent
         if self.parent == self:
-            raise ValidationError("Сходи нахер со своей рекурсией")
+            raise ValidationError("Рекурсия")
 
         # Check if the parent object is trying to set itself as a parent
         if self.parent:
@@ -87,7 +87,7 @@ class Object(models.Model):
             while current_parent:
                 if current_parent == self:
                     raise ValidationError(
-                        "инцест в дереве наследования объектов. Твой выбранный родитель это твой же потомок, осуждаем"
+                        "Твой выбранный родитель это твой же потомок, осуждаем"
                     )
                 # Move up the chain
                 current_parent = current_parent.parent

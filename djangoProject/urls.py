@@ -5,7 +5,7 @@ from django.urls import include
 from django.urls import path
 
 from tasks import views
-from tasks.functions import tasks_actions
+from tasks.functions import tasks_actions, objects
 
 urlpatterns = [
     path("create-task/", tasks_actions.create_task, name="create_task"),

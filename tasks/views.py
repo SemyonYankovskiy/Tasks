@@ -18,10 +18,10 @@ from django.core.cache import cache
 
 @login_required
 def get_home(request):
-    page_number = request.GET.get("page")
-    if page_number is None:
-        page_number = 1
-    cache_key = f'objects-page:{page_number}:{request.user.username}'
+    page_number = request.GET.get("page", 1)  # Упрощение получения номера страницы
+    # Используем фильтры для создания уникального кэш-ключа
+    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page"]})
+    cache_key = f'objects-page:{page_number}:{request.user.username}:{filter_params}'
 
     # Получаем данные из кэша
     cached_data = cache.get(cache_key)
@@ -29,23 +29,21 @@ def get_home(request):
     # =========== Кеширование =========== #
     if cached_data is None:
         # =========== Фильтр =========== #
-        tags = ObjectsTagsTree({"user": request.user}).get_nodes()  # объекты в виде деревьев для модуля Tree Select
+        tags = ObjectsTagsTree({"user": request.user}).get_nodes()
         groups = GroupsTree({"user": request.user}).get_nodes()
 
-        user_filter = ObjectFilter(request.GET, queryset=get_objects_list(request))  # Создаем фильтр с параметрами запроса
+        user_filter = ObjectFilter(request.GET, queryset=get_objects_list(request))
         filtered_objects = user_filter.qs  # Применяем фильтр к запросу
 
         # Счётчик применённых фильтров
         not_count_params = ["page", "per_page"]
         params_count = len([param for key, param in request.GET.items() if param and key not in not_count_params])
 
-
         # =========== Пагинация =========== #
-        per_page = request.GET.get("per_page", 8)  # Значение по умолчанию
+        per_page = request.GET.get("per_page", 8)
         pagination_data = paginate_queryset(filtered_objects, page_number, per_page)
         objects_qs = pagination_data["page_obj"]
 
-        # TODO: убрать дублирование SQL запросов
         add_tasks_count_to_objects(queryset=objects_qs, user=request.user, field_name="tasks_count")
 
         # Сохраняем данные в кэш
@@ -57,7 +55,7 @@ def get_home(request):
             "current_path": request.path,
             "params_count": params_count,
         }
-        cache.set(cache_key, cached_data, timeout=60)  # Установите нужное время кэширования
+        cache.set(cache_key, cached_data, timeout=60)
     else:
         # Используем закэшированные данные
         objects_qs = cached_data["objects_qs"]
@@ -65,8 +63,6 @@ def get_home(request):
         tags = cached_data["tags"]
         groups = cached_data["groups"]
         params_count = cached_data["params_count"]
-
-
 
     # Формируем строку с параметрами фильтра для пагинатора
     exclude_params = ["page"]
@@ -87,6 +83,7 @@ def get_home(request):
     }
 
     return render(request, "components/home/home.html", context=context)
+
 
 
 @login_required

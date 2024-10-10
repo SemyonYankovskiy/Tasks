@@ -189,3 +189,35 @@ class EditTaskForm(forms.ModelForm):
             instance.save()
 
         return instance
+
+
+class ObjectForm(forms.ModelForm):
+    class Meta:
+        model = Object
+        fields = [
+            'priority',
+            'parent',
+            'name',
+            'address',
+            'description',
+            'zabbix_link',
+            'ecstasy_link',
+            'notes_link',
+            'another_link',
+            'tasks',
+            'tags',
+            'files',
+            'groups',
+            'slug',
+        ]
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 5}),
+            'zabbix_link': forms.URLInput(attrs={'placeholder': 'Введите ссылку на Zabbix'}),
+            'ecstasy_link': forms.URLInput(attrs={'placeholder': 'Введите ссылку на Ecstasy'}),
+            'notes_link': forms.URLInput(attrs={'placeholder': 'Введите ссылку на Notes'}),
+            'another_link': forms.URLInput(attrs={'placeholder': 'Введите другую ссылку'}),
+            'priority': forms.Select(),
+            'parent': forms.Select(),
+            'name': forms.TextInput(attrs={'placeholder': 'Введите имя объекта'}),
+            'slug': forms.TextInput(attrs={'placeholder': 'Введите slug'}),
+        }

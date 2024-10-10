@@ -1,9 +1,13 @@
 from django.db.models import Count, OuterRef, Subquery, Case, When, Value, CharField, QuerySet
 from django.db.models.functions import Concat, Substr, Length
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
 
 from tasks.models import Object, AttachedFile
 from user.models import User
 from .tasks_prepare import permission_filter
+from ..forms import ObjectForm
 
 
 def get_objects_list(request) -> QuerySet[Object]:
@@ -36,7 +40,8 @@ def get_objects_list(request) -> QuerySet[Object]:
                 output_field=CharField(),  # Поле с текстовым выводом
             ),
         )
-        .only("id", "name", "priority", "slug", "zabbix_link", "notes_link", "ecstasy_link", "another_link")  # Ограничиваем выборку только нужными полями для оптимизации
+        .only("id", "name", "priority", "slug", "zabbix_link", "notes_link", "ecstasy_link",
+              "another_link")  # Ограничиваем выборку только нужными полями для оптимизации
         .distinct()  # Убираем дублирующиеся объекты (если были)
         .order_by("parent_id", "-id")  # Сортировка по полю `parent_id`, затем по убыванию `id`
     )
@@ -44,9 +49,11 @@ def get_objects_list(request) -> QuerySet[Object]:
 
 
 def add_tasks_count_to_objects(queryset: QuerySet[Object], user: User, field_name: str) -> QuerySet[Object]:
-
     for obj in queryset:
         count: int = permission_filter(user).filter(objects_set=obj, is_done=False).count()
         setattr(obj, field_name, count)
 
     return queryset
+
+
+
