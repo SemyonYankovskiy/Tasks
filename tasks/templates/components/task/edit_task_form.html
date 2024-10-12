@@ -18,8 +18,9 @@
         <div class="d-flex gap-2">
             <!-- Заголовок задачи -->
             <div class="mb-3 w-100">
-                <label for="taskHeader_edit_{{ task.id }}" class="form-label">Заголовок<span
-                        style="color: red;"> *</span></label>
+                <label for="taskHeader_edit_{{ task.id }}" class="form-label"> <i class="bi bi-card-heading"
+                                                                                  style="font-size: 1.2rem;"></i>
+                    <span>Заголовок</span></label>
                 <input type="text" class="form-control" id="taskHeader_edit_{{ task.id }}" name="header"
                        value="{{ task.header }}" required>
             </div>
@@ -41,12 +42,6 @@
 
         </div>
 
-        <!-- Статус выполнения -->
-        <div class="mb-3 form-check form-switch">
-            <input type="checkbox" class="form-check-input" id="taskIsDone_edit_{{ task.id }}" role="switch"
-                   name="is_done" {% if task.is_done %}checked{% endif %}>
-            <label class="form-check-label" for="taskIsDone_edit_{{ task.id }}">Задача выполнена</label>
-        </div>
 
         <div class="d-flex gap-2">
 
@@ -80,16 +75,16 @@
 
         <div class="d-flex gap-2">
             <!-- Выбор инженеров -->
-            <div class="mb-3">
+            <div class="mb-3 col-6">
                 <label for="taskEngineers_edit_{{ task.id }}" class="form-label">
                     <i class="bi bi-people-fill" style="font-size: 1.2rem;"></i>
-                    <span>Инженеры<span style="color: red;"> *</span></span>
+                    <span>Инженеры<span style="color: red;"> *</span></span>
                 </label>
                 {% include 'tree-select.html' with select_name='engineers_edit' current_options=current_engineers task_id=task.id objects_structure_json=engineers_json %}
             </div>
 
-            <!-- Выбор тегов  -->
-            <div class="mb-3" style="min-width: 500px">
+            <!-- Выбор тегов -->
+            <div class="mb-3 col-6">
                 <label for="taskTags_edit_{{ task.id }}" class="form-label">
                     <i class="bi bi-tags-fill" style="font-size: 1.2rem;"></i>
                     <span>Теги</span>
@@ -99,10 +94,11 @@
         </div>
 
 
-       <!-- Текст задачи -->
+        <!-- Текст задачи -->
         <div class="mb-3">
             <label for="taskText_edit_{{ task.id }}" class="form-label">
                 <i class="bi bi-card-text" style="font-size: 1.2rem;"></i>
+                <span>Описание</span>
             </label>
             <div>
                 {{ ckeditor_form.text_edit }}
@@ -118,9 +114,27 @@
     </div>
 
 
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-        <button type="submit" class="btn btn-primary">Сохранить</button>
+    <div class="modal-footer row d-flex justify-content-between mx-1">
+        <div class="col">
+            <!-- Статус выполнения -->
+            <div class="mb-3 form-check form-switch">
+                <input type="checkbox" class="form-check-input" id="taskIsDone_edit_{{ task.id }}" role="switch"
+                       name="is_done" {% if task.is_done %}checked{% endif %} onchange="updateTaskStatus(this)">
+                <label class="form-check-label" for="taskIsDone_edit_{{ task.id }}" id="taskStatusLabel_{{ task.id }}"
+                       style="color: #0d6efd">
+                    {% if task.is_done %}
+                        Задача завершена
+                    {% else %}
+                        Задача не завершена
+                    {% endif %}
+                </label>
+            </div>
+        </div>
+        <div class="col d-flex justify-content-end gap-2">
+            
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+
     </div>
 </form>
 
@@ -188,4 +202,17 @@
         }).remove();
     });
 
+</script>
+<script>
+    // Функция обновления текста и стиля на основе состояния чекбокса
+    function updateTaskStatus(checkbox) {
+        const label = document.getElementById('taskStatusLabel_{{ task.id }}');
+        if (checkbox.checked) {
+            label.textContent = 'Задача завершена';
+            label.style.color = 'green';
+        } else {
+            label.textContent = 'Задача не завершена';
+            label.style.color = '#0d6efd';
+        }
+    }
 </script>

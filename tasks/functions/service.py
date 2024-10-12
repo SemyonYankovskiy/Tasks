@@ -27,9 +27,7 @@ def get_random_icon(request):
     return icon_path
 
 
-def remove_unused_task_attached_files(
-    file_uploader_data: str, task: Task, *, delete_orphan_files: bool = False
-):
+def remove_unused_attached_files(file_uploader_data: str, qs_object, *, delete_orphan_files: bool = False):
     """Удаляет прикрепленные к задачам файлы, которые не используются"""
 
     try:
@@ -47,10 +45,10 @@ def remove_unused_task_attached_files(
 
         # Создаем список URL адресов файлов, которые должны ОСТАТЬСЯ у этой задачи.
         files_urls = [f["file"] for f in not_deleted_files]
-        for db_file in task.files.all():  # Смотрим уже имеющиеся файлы у задачи.
+        for db_file in qs_object.files.all():  # Смотрим уже имеющиеся файлы у задачи.
             # Если файла нет в списке оставшихся, то его нужно открепить от этой задачи.
             if db_file.file.url not in files_urls:
-                task.files.remove(db_file)  # Удаляем связь задачи и файла.
+                qs_object.files.remove(db_file)  # Удаляем связь задачи и файла.
 
                 # Если нужно удалять файлы, то удаляем их.
                 if delete_orphan_files:

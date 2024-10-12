@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 
 from tasks.forms import AddTaskForm, EditTaskForm
-from tasks.functions.service import remove_unused_task_attached_files
+from tasks.functions.service import remove_unused_attached_files
 from tasks.models import Task, AttachedFile, Engineer, Tag
 
 
@@ -104,7 +104,7 @@ def edit_task(request, task_id):
             updated_task = form.save()
 
             # Удаляем неиспользуемые прикрепленные файлы
-            remove_unused_task_attached_files(request.POST.get("fileuploader-list-files"), updated_task)
+            remove_unused_attached_files(request.POST.get("fileuploader-list-files"), updated_task)
 
             # Обработка прикрепленных файлов
             for file in request.FILES.getlist("files[]"):

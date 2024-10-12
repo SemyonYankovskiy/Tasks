@@ -192,7 +192,6 @@ class EditTaskForm(forms.ModelForm):
         return instance
 
 
-
 class CKEditorEditObjForm(forms.Form):
     description = forms.CharField(widget=CKEditorWidget, label='', required=False)
 
@@ -209,8 +208,7 @@ class ObjectForm(forms.ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
             'tasks': forms.CheckboxSelectMultiple(),
-            'files': forms.CheckboxSelectMultiple(),
-            'groups': forms.CheckboxSelectMultiple(),
+
         }
 
     def save(self, commit=True):
@@ -219,11 +217,17 @@ class ObjectForm(forms.ModelForm):
         if commit:
             instance.save()
 
-        # Проверка наличия данных в cleaned_data
-        if 'obj_tags_edit' in self.cleaned_data and self.cleaned_data['obj_tags_edit']:
-            instance.tags.set(self.cleaned_data["obj_tags_edit"])
+        # Обновление групп
+        if 'groups' in self.cleaned_data and self.cleaned_data['groups']:
+            instance.groups.set(self.cleaned_data['groups'])  # Здесь вы должны передавать список ID групп
         else:
-            print("No tags provided or cleaned_data does not contain obj_tags_edit.")
+            instance.groups.clear()  # Если ничего не передано, удаляем все группы
+
+        # Обновление тегов
+        if 'obj_tags_edit' in self.cleaned_data:
+            instance.tags.set(self.cleaned_data["obj_tags_edit"])  # Установите теги
+        else:
+            instance.tags.clear()  # Удалите все теги, если нет переданных данных
 
         return instance
 

@@ -194,6 +194,7 @@ CKEDITOR_FILENAME_GENERATOR = "djangoProject.settings.get_filename"
 
 CKEDITOR_CONFIGS = {
     'default': {
+        'height': 150,
         # 'skin': 'office2013',
         'toolbar_Basic': [
             ['Source', '-', 'Bold', 'Italic']

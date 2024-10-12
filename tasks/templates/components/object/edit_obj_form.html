@@ -48,7 +48,7 @@
                     <option value="LOW" {% if object.priority == 'LOW' %}selected{% endif %}>Низкий</option>
                 </select>
             </div>
-            <!-- Выбор объектов  -->
+            <!-- Выбор Группы  -->
             <div class="mb-3">
                 <label for="objGroup_edit_{{ object.id }}" class="form-label">
                     <i class="bi bi-box" style="font-size: 1.2rem;"></i>
@@ -79,7 +79,11 @@
             </div>
         </div>
 
-
+         <!-- Загрузка файлов (псевдокод для примера) -->
+        <div id="obj_files" class="mb-3">
+            <input class="form-control" type="file" id="objFilesEdit" name="files" multiple>
+        </div>
+    
     </div>
 
     <div class="modal-footer">
@@ -88,68 +92,68 @@
     </div>
 </form>
 
-{##}
-{#<style>#}
-{#    .fileuploader-input-button {#}
-{#        background-color: var(--bs-blue) !important;#}
-{#        border-radius: 10px !important;#}
-{#        background-image: none !important;#}
-{##}
-{#        display: none !important;#}
-{#    }#}
-{##}
-{##}
-{#    .fileuploader-input-caption {#}
-{#        border-radius: 10px !important;#}
-{#        margin-right: 0 !important;#}
-{#    }#}
-{##}
-{#    .fileuploader {#}
-{#        padding: 0; /* Опционально: внутренние отступы */#}
-{#    }#}
-{##}
-{#    .fileuploader-input {#}
-{#        background-color: #fafafa; /* Цвет фона для области выбора файлов */#}
-{##}
-{#    }#}
-{#</style>#}
-{##}
-{#<script>#}
-{#    $(document).ready(function () {#}
-{#        $('#taskFilesEdit').fileuploader({#}
-{#            addMore: true,#}
-{#            limit: 10,#}
-{#            {% if task.files.all %}#}
-{#                files: [#}
-{#                    {% for f in task.files.all %}#}
-{#                        {#}
-{#                            name: '{{ f.clear_file_name }}', // file name#}
-{#                            size: {{f.file.size}}, // file size in bytes#}
-{#                            type: 'image/png', // file MIME type#}
-{#                            file: '{{ f.file.url }}', // file path#}
-{#                            local: '{{ f.file.url }}', // file path in listInput (optional)#}
-{#                            data: {#}
-{#                                thumbnail: '{{ f.file.url }}', // item custom thumbnail; if false will disable the thumbnail (optional)#}
-{#                                readerCrossOrigin: 'anonymous', // fix image cross-origin issue (optional)#}
-{#                                readerForce: true, // prevent the browser cache of the image (optional)#}
-{#                                readerSkip: true, // skip file from reading by rendering a thumbnail (optional)#}
-{#                                popup: true, // remove the popup for this file (optional)#}
-{#                                listProps: {}, // custom key: value attributes in the fileuploader's list (optional)#}
-{#                                your_own_attribute: 'your own value'#}
-{#                            }#}
-{#                        },#}
-{#                    {% endfor %}#}
-{#                ],#}
-{#            {% endif %}#}
-{#        });#}
-{#        // Замена текста#}
-{#        $('.fileuploader-input-caption span').text('Добавить файлы');#}
-{#        $('.fileuploader-input-button span').text('Выберите файл');#}
-{##}
-{#        // Удаление всего текста внутри div с id="files"#}
-{#        $('#filess').contents().filter(function () {#}
-{#            return this.nodeType === 3; // Текстовый узел#}
-{#        }).remove();#}
-{#    });#}
-{##}
-{#</script>#}
+
+<style>
+    .fileuploader-input-button {
+        background-color: var(--bs-blue) !important;
+        border-radius: 10px !important;
+        background-image: none !important;
+
+        display: none !important;
+    }
+
+
+    .fileuploader-input-caption {
+        border-radius: 10px !important;
+        margin-right: 0 !important;
+    }
+
+    .fileuploader {
+        padding: 0; /* Опционально: внутренние отступы */
+    }
+
+    .fileuploader-input {
+        background-color: #fafafa; /* Цвет фона для области выбора файлов */
+
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        $('#objFilesEdit').fileuploader({
+            addMore: true,
+            limit: 10,
+            {% if object.files.all %}
+                files: [
+                    {% for f in object.files.all %}
+                        {
+                            name: '{{ f.clear_file_name }}', // file name
+                            size: {{f.file.size}}, // file size in bytes
+                            type: 'image/png', // file MIME type
+                            file: '{{ f.file.url }}', // file path
+                            local: '{{ f.file.url }}', // file path in listInput (optional)
+                            data: {
+                                thumbnail: '{{ f.file.url }}', // item custom thumbnail; if false will disable the thumbnail (optional)
+                                readerCrossOrigin: 'anonymous', // fix image cross-origin issue (optional)
+                                readerForce: true, // prevent the browser cache of the image (optional)
+                                readerSkip: true, // skip file from reading by rendering a thumbnail (optional)
+                                popup: true, // remove the popup for this file (optional)
+                                listProps: {}, // custom key: value attributes in the fileuploader's list (optional)
+                                your_own_attribute: 'your own value'
+                            }
+                        },
+                    {% endfor %}
+                ],
+            {% endif %}
+        });
+        // Замена текста
+        $('.fileuploader-input-caption span').text('Добавить файлы');
+        $('.fileuploader-input-button span').text('Выберите файл');
+
+        // Удаление всего текста внутри div с id="files"
+        $('#obj_files').contents().filter(function () {
+            return this.nodeType === 3; // Текстовый узел
+        }).remove();
+    });
+
+</script>

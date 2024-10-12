@@ -18,6 +18,7 @@
             :options="options"
             @search:blur="addNewTag"
             placeholder="Смотря какой tags"
+            style="width: 100%"
     >
     </v-select>
 </div>
@@ -33,10 +34,13 @@
         },
         methods: {
             changeTags(tags) {
+                console.log('Выбранные теги:', tags); // Логируем текущие выбранные теги
                 this.selected = tags.map(tag => tag.label);
+                console.log('Обновленный массив selected:', this.selected); // Логируем обновленный массив
             },
             addNewTag(newTag) {
                 if (newTag && !this.selected.includes(newTag)) {
+                    console.log('Новые теги:', newTag); // Логируем текущие выбранные теги
                     const newTagObject = {label: newTag, id: null};  // Создаем объект с label (имя тега) и id = null
                     this.options.push(newTagObject);  // Добавляем новый тег в массив опций
                     this.selected.push(newTagObject);  // Добавляем новый тег в выбранные значения

@@ -2,12 +2,13 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count, OuterRef, Subquery, Case, When, Value, CharField, QuerySet
 from django.db.models.functions import Concat, Substr, Length
 from django.db.transaction import atomic
-
+import json
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.urls import reverse
 from tasks.models import Object, AttachedFile
 from user.models import User
+from .service import remove_unused_attached_files
 from .tasks_actions import create_tags
 from .tasks_prepare import permission_filter
 from ..forms import ObjectForm
@@ -66,20 +67,35 @@ def edit_object(request, slug):
     # Получаем объект по slug
     obj = get_object_or_404(Object, slug=slug)
 
-    redirect_to = reverse("home")  # Путь к редиректу после редактирования
-    print("1", redirect_to)
+    # Определяем путь для редиректа по умолчанию
+    redirect_to = reverse("home")
+
     if request.method == "POST":
-
+        print("POST Data:", request.POST)
         post_data = create_tags(request.POST, "obj_tags_edit")  # Сохраняем теги и возвращаем
-
-        # Создаём форму с данными из POST-запроса
         form = ObjectForm(post_data, request.FILES, instance=obj)
 
         if form.is_valid():
+
             updated_object = form.save()  # Сохраняем изменения в объекте
+
+            # Удаляем неиспользуемые прикрепленные файлы
+            remove_unused_attached_files(request.POST.get("fileuploader-list-files"), updated_object)
+
+            # Обработка прикрепленных файлов
+            for file in request.FILES.getlist("files[]"):
+                updated_object.files.add(AttachedFile.objects.create(file=file))
+            updated_object.save()
+
             messages.add_message(request, messages.SUCCESS, f"Объект '{updated_object.name}' отредактирован")
+
+            redirect_to = reverse("show-object", kwargs={"object_slug": updated_object.slug})
+
         else:
             messages.add_message(request, messages.WARNING, form.errors)
 
     return redirect(redirect_to)
+
+
+
 
