@@ -202,8 +202,9 @@ class ObjectForm(forms.ModelForm):
     class Meta:
         model = Object
         fields = [
-            'name', 'priority', 'parent', 'description', 'zabbix_link',
-            'ecstasy_link', 'notes_link', 'another_link', 'tasks', 'obj_tags_edit', 'files', 'groups'
+            'name', 'priority', 'description',
+            'zabbix_link', 'ecstasy_link', 'notes_link', 'another_link',
+            'obj_tags_edit', 'files', 'groups'
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4, 'cols': 40}),

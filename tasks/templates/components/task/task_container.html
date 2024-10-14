@@ -13,11 +13,13 @@
                 {% include "components/task/task.html" %}
             {% endfor %}
         </div>
-
+        {% include 'components/pagination.html' %}
     {% else %}
-        <div class="d-flex justify-content-left mt-3">Задач для отображения нет.</div>
+        <div class="d-flex justify-content-left mt-3 px-4">
+            <span>Задач для отображения нет</span>
+        </div>
     {% endif %}
-    {% include 'components/pagination.html' %}
+    
     </div>
 
     {% include 'components/task/edit_task_modal.html' %}
