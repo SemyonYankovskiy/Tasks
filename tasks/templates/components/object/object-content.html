@@ -48,17 +48,17 @@
         {# ============== Groups & TAGS & LINKS ============== #}
         <div class="row my-3">
             <div class="col d-flex flex-wrap gap-2 align-items-center">
-            <div class="me-3">
-                               {% for group in object.groups.all %}
-                    <span class="badge bg-primary text-white" style="padding: 6px">
+                <div class="me-3">
+                    {% for group in object.groups.all %}
+                        <span class="badge bg-primary text-white" style="padding: 6px">
                 {{ group }}
             </span>
-                {% endfor %}
-            </div>
-            <div>
-                {% if object.tags.all %}
-                    {% for tag in object.tags.all %}
-                        <span class="badge bg-primary-subtle text-dark">
+                    {% endfor %}
+                </div>
+                <div>
+                    {% if object.tags.all %}
+                        {% for tag in object.tags.all %}
+                            <span class="badge bg-primary-subtle text-dark">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                          class="bi bi-tag" viewBox="0 0 16 16">
                       <path d="M6 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-1 0a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"></path>
@@ -66,34 +66,34 @@
                     </svg>
                     {{ tag }}
                 </span>
-                    {% endfor %}
-                {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                </div>
+
 
             </div>
 
-
-            </div>
-
-            <div class="col d-flex justify-content-end align-items-center gap-3">
+            <div class="col d-flex justify-content-end align-items-center gap-3 ">
                 {% if object.zabbix_link %}
-                    <a href="{{ object.zabbix_link }}" target="_blank" class=""
+                    <a href="{{ object.zabbix_link }}" target="_blank" class="link-button"
                        style="text-decoration: none;  color: #666;">
                         <img width="24" height="24" src="{% static 'self/img/zab.png' %}" alt="zabbix"/> </a>
                 {% endif %}
                 {% if object.ecstasy_link %}
-                    <a href="{{ object.ecstasy_link }}" target="_blank" class=""
+                    <a href="{{ object.ecstasy_link }}" target="_blank" class="link-button"
                        style="text-decoration: none;  color: #666;">
                         <img width="24" height="24" src="{% static 'self/img/ecstasy.png' %}" alt="ecstasy"/> </a>
                 {% endif %}
 
                 {% if object.notes_link %}
-                    <a href="{{ object.notes_link }}" target="_blank" class=""
+                    <a href="{{ object.notes_link }}" target="_blank" class="link-button"
                        style="text-decoration: none;  color: #666;">
                         <img width="24" height="24" src="{% static 'self/img/note.svg' %}" alt="notes"/> </a>
                 {% endif %}
 
                 {% if object.another_link %}
-                    <a href="{{ object.another_link }}" target="_blank" class=""
+                    <a href="{{ object.another_link }}" target="_blank" class="link-button"
                        style="text-decoration: none;  color: #666;">
                         <i class="bi bi-link-45deg m-0 p-0" style="font-size: 1.5rem"></i> </a>
                 {% endif %}
@@ -102,15 +102,17 @@
 
 
         {# ============== MEDIA ============== #}
-        <div class="row d-flex justify-content-between">
-            <div class="col pt-2">
-                {% include "components/files/gallery.html" with files=object.files.all id=object.id type="object" %}
-            </div>
 
-            <div class="col">
-                {% include "components/files/attached_files.html" with files=object.files.all %}
-            </div>
+        <div class="row d-flex justify-content-between">
+            {% if images %}
+                {% include "components/files/gallery.html" %}
+            {% endif %}
+
+            {% if non_images %}
+                {% include "components/files/attached_files.html" %}
+            {% endif %}
         </div>
+
 
         {# ============== TEXT ============== #}
         <div class="px-4 mt-2 ">
@@ -145,18 +147,22 @@
 
 
     </div>
-
-</div>
-
-<div class="collapse" id="collapseChildren">
-    <div class="container d-flex p-4 my-3 justify-content-center flex-wrap">
-        {% if child_objects %}
-            {% for object in child_objects %}
-                {% include "components/object/object-preview.html" with img_preview=object.img_preview title=object.name desc=object.short_description slug=object.slug priority=object.priority groups=object.groups  tags=object.tags %}
-            {% endfor %}
-        {% endif %}
+    <div class="collapse shadow rounded ms-4" id="collapseChildren"
+         style="position: absolute;  z-index: 1000; backdrop-filter: blur(10px); border: solid 1px #aeaeae">
+        <div class="container d-flex p-4 my-3 justify-content-center flex-wrap">
+            {% if child_objects %}
+                {% for object in child_objects %}
+                    {% include "components/object/object-preview.html" with img_preview=object.img_preview title=object.name desc=object.short_description slug=object.slug priority=object.priority groups=object.groups  tags=object.tags %}
+                {% endfor %}
+            {% endif %}
+        </div>
     </div>
 </div>
 
 
 {% include "components/object/edit_obj_modal.html" %}
+<style>
+    .link-button:hover {
+        transform: scale(1.1); /* Увеличение карточки при наведении */
+    }
+</style>

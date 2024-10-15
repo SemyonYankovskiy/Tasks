@@ -11,9 +11,10 @@
 
     <v-select
             @option:selected="changeTags"
+            clearable
             taggable
             multiple
-            v-model="value"
+            v-model="selected"
             :reduce="(option) => option.label"
             :options="options"
             @search:blur="addNewTag"

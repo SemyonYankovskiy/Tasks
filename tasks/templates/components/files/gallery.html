@@ -1,20 +1,22 @@
 {% load static %}
-<div id="nanogallery2_{{ type }}_{{ id }}_{% now 'H_m_s' %}"  data-nanogallery2='{
-        "thumbnailWidth": "auto",
-        "thumbnailHeight": "150",
-        "thumbnailLabel": {
-          "position": "overImageOnBottom"
-        },
-        "galleryDisplayMode": "rows",
-        "galleryMaxRows": 1,
-        "thumbnailAlignment": "center",
-        "thumbnailOpenImage": true
-      }'>
-    {% for file in files %}
-        {% if file.is_image %}
-        <a href="{{ file.file.url }}"></a>
-        {% endif %}
-    {% endfor %}
-</div>
+<div class="col {% if not images %}col-12{% else %}col{% endif %} pt-2">
 
-<script type="text/javascript" src="{% static 'nanogallery2/jquery.nanogallery2.min.js' %}"></script>
+    <div id="nanogallery2_{{ type }}_{{ id }}_{% now 'H_m_s' %}" data-nanogallery2='{
+                    "thumbnailWidth": "auto",
+                    "thumbnailHeight": "150",
+                    "thumbnailLabel": {
+                      "position": "overImageOnBottom"
+                    },
+                    "galleryDisplayMode": "rows",
+                    "galleryMaxRows": 1,
+                    "thumbnailAlignment": "center",
+                    "thumbnailOpenImage": true
+                  }'>
+        {% for file in images %}
+            <a href="{{ file.file.url }}"></a>
+        {% endfor %}
+    </div>
+    <script type="text/javascript"
+            src="{% static 'nanogallery2/jquery.nanogallery2.min.js' %}"></script>
+
+</div>

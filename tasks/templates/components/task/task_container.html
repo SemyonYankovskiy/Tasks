@@ -15,8 +15,11 @@
         </div>
         {% include 'components/pagination.html' %}
     {% else %}
-        <div class="d-flex justify-content-left mt-3 px-4">
-            <span>Задач для отображения нет</span>
+        <div class="d-flex justify-content-between mt-3 px-4">
+        <span>Задач для отображения нет</span>
+            {% if show_cat %}
+        <img class="m-0" src="{% static 'self/img/bongo-cat-cat-meme.gif' %}" alt="Задач нет" title="Задач нет">
+            {% endif %}
         </div>
     {% endif %}
     

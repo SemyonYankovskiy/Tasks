@@ -15,6 +15,8 @@ from .functions.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_task
 from .models import Object, Task, Engineer
 from django.core.cache import cache
 
+from .services.tree_nodes.tree_nodes import AllTagsTree
+
 
 @login_required
 def get_home(request):
@@ -106,6 +108,17 @@ def get_object_page(request, object_slug):
     if obj is None:
         raise Http404()
 
+    if obj:
+        # Получаем все связанные файлы
+        attached_files = obj.files.all()
+
+        # Разделяем файлы на изображения и не-изображения
+        images = [file for file in attached_files if file.is_image()]
+        non_images = [file for file in attached_files if not file.is_image()]
+    else:
+        images = []
+        non_images = []
+
     # Получаем связанные задачи с учетом фильтров
     filtered_tasks_data = get_filtered_tasks(request, obj=obj)
 
@@ -125,6 +138,8 @@ def get_object_page(request, object_slug):
 
     context = {
         "object": obj,
+        "images": images,
+        "non_images": non_images,
         "object_id_list": [obj.id],
         "tasks": tasks,
         "counters": filtered_tasks_data.tasks_counters,
@@ -252,7 +267,7 @@ def get_obj_edit_form(request, slug: int):
 
     obj = get_object_or_404(Object, slug=slug)
     groups = GroupsTree({"user": request.user}).get_nodes()
-    tags = ObjectsTagsTree({"user": request.user}).get_nodes()
+    tags = AllTagsTree({"user": request.user}).get_nodes()
 
 
     ckeditor__obj_form = CKEditorEditObjForm(initial={"description": obj.description})

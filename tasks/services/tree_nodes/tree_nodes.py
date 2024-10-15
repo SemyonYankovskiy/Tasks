@@ -28,6 +28,22 @@ class ObjectsTagsTree(Tree):
         return result
 
 
+class AllTagsTree(Tree):
+    """
+    Возвращает дерево всех тегов.
+    """
+
+    def _get_queryset(self):
+        # Возвращаем все теги без фильтрации
+        return Tag.objects.all()
+
+    def get_nodes(self) -> list[Node]:
+        # Получаем все теги
+        qs = self._get_queryset()
+        result: list[Node] = [{"id": tag.id, "label": tag.tag_name} for tag in qs]
+        return result
+
+
 class TasksTagsTree(Tree):
 
     def _get_queryset(self):

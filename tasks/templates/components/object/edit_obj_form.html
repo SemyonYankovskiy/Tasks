@@ -17,11 +17,11 @@
     <div class="modal-body p-4">
 
         <div class="d-flex gap-2">
-            <!-- Заголовок задачи -->
+            <!-- Заголовок  -->
             <div class="mb-3 w-100">
                 <label for="objHeader_edit_{{ object.id }}" class="form-label">
                     <i class="bi bi-card-heading" style="font-size: 1.2rem;"></i>
-                    <span>Заголовок</span></label>
+                    <span>Заголовок<span style="color: red;"> *</span></span></label>
                 <input type="text" class="form-control" id="objHeader_edit_{{ object.id }}" name="name"
                        value="{{ object.name }}" required>
             </div>
@@ -29,9 +29,9 @@
 
         </div>
 
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 pe-3">
 
-            <!-- Приоритет задачи -->
+            <!-- Приоритет -->
             <div class="mb-3 col-2">
                 <label for="objPriority_edit_{{ object.id }}" class="form-label">
                     <i class="bi bi-fire" style="font-size: 1.2rem;"></i>
@@ -52,7 +52,7 @@
             <div class="mb-3 col-5">
                 <label for="objGroup_edit_{{ object.id }}" class="form-label">
                     <i class="bi bi-box" style="font-size: 1.2rem;"></i>
-                    <span>Группы</span>
+                    <span>Группа<span style="color: red;"> *</span></span>
                 </label>
                 {% include 'tree-select.html' with select_name='groups' current_options=edit_current_groups objects_structure_json=edit_groups_json %}
             </div>
