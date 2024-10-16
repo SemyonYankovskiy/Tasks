@@ -102,17 +102,15 @@
 
 
         {# ============== MEDIA ============== #}
-
         <div class="row d-flex justify-content-between">
-            {% if images %}
-                {% include "components/files/gallery.html" %}
+            {% if obj_images %}
+                {% include "components/files/gallery.html" with images=obj_images id=object.id type="object" %}
             {% endif %}
 
-            {% if non_images %}
-                {% include "components/files/attached_files.html" %}
+            {% if obj_files %}
+                {% include "components/files/attached_files.html" with files=obj_files %}
             {% endif %}
         </div>
-
 
         {# ============== TEXT ============== #}
         <div class="px-4 mt-2 ">

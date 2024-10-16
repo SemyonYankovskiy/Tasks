@@ -113,8 +113,8 @@ def get_object_page(request, object_slug):
         attached_files = obj.files.all()
 
         # Разделяем файлы на изображения и не-изображения
-        images = [file for file in attached_files if file.is_image()]
-        non_images = [file for file in attached_files if not file.is_image()]
+        images = [file for file in attached_files if file.is_image]  # Используем поле is_image
+        non_images = [file for file in attached_files if not file.is_image]  # Используем поле is_image
     else:
         images = []
         non_images = []
@@ -138,8 +138,8 @@ def get_object_page(request, object_slug):
 
     context = {
         "object": obj,
-        "images": images,
-        "non_images": non_images,
+        "obj_images": images,
+        "obj_files": non_images,
         "object_id_list": [obj.id],
         "tasks": tasks,
         "counters": filtered_tasks_data.tasks_counters,

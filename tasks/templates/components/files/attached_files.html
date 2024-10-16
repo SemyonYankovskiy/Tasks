@@ -1,8 +1,9 @@
 {% load static %}
-<div class="col {% if not images %}col-12{% else %}col{% endif %}">
+<div class="col {% if not files %}col-12{% else %}col{% endif %}">
     <div class="attached-files mt-2">
         <div class="files-grid">
-            {% for file in non_images %}
+            {% for file in files %}
+                {% if not file.is_image %}
                 <div class="file-item">
                     <div class="file-content d-flex align-items-center p-2">
                         <a href="{{ file.file.url }}" download="{{ file.clear_file_name }}"
@@ -66,6 +67,7 @@
                         </a>
                     </div>
                 </div>
+                {% endif %}
             {% endfor %}
         </div>
     </div>

@@ -174,6 +174,7 @@ def upload_directory_path(instance, filename):
 class AttachedFile(models.Model):
     file = models.FileField(upload_to=upload_directory_path, max_length=254)
     extension = models.CharField(max_length=10, blank=True)  # Поле для хранения расширения файла
+    is_image = models.BooleanField(default=False)  # Новое поле для указания, является ли файл изображением
 
     class Meta:
         db_table = "attached_files"
@@ -184,14 +185,15 @@ class AttachedFile(models.Model):
     def clear_file_name(self):
         return re.search(r".+\/\S{8}-\S{4}-\S{4}-\S{4}-\S{12}_\._(.+)", self.file.name).group(1)
 
-    def is_image(self) -> bool:
-        return self.extension in [".jpeg", ".jpg", ".png"]
-
     def save(self, *args, **kwargs):
         if self.file:
             # Определение расширения файла
             _, file_extension = os.path.splitext(self.file.name)
             self.extension = file_extension.lower()  # Приведение расширения к нижнему регистру
+
+            # Установка поля is_image на основе расширения
+            self.is_image = self.extension in [".jpeg", ".jpg", ".png"]
+
         super().save(*args, **kwargs)
 
 

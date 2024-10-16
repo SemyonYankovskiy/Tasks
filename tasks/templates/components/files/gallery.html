@@ -13,7 +13,10 @@
                     "thumbnailOpenImage": true
                   }'>
         {% for file in images %}
-            <a href="{{ file.file.url }}"></a>
+            {% if file.is_image %}
+            	<a href="{{ file.file.url }}"></a>
+            {% endif %} 
+            
         {% endfor %}
     </div>
     <script type="text/javascript"
