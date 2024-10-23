@@ -76,30 +76,30 @@
 
 
             <div class="col d-flex align-items-center">
-                <img width="16" height="16" src="{% static 'self/img/zab.png' %}" alt="zabbix" class="me-2"/>
+                <img width="24" height="24" src="{% static 'self/img/zab.png' %}" alt="zabbix" class="me-2"/>
                 <input type="text" class="form-control" id="objLink_Zabbix_edit_{{ object.id }}" name="zabbix_link"
-                       value="{{ object.zabbix_link }}" required>
+                       value="{{ object.zabbix_link }}" >
             </div>
 
             <div class="col d-flex align-items-center">
-                <img width="16" height="16" src="{% static 'self/img/ecstasy.png' %}" alt="ecstasy" class="me-2"/>
+                <img width="24" height="24" src="{% static 'self/img/ecstasy.png' %}" alt="ecstasy" class="me-2"/>
                 <input type="text" class="form-control" id="objLink_ecstasy_edit_{{ object.id }}" name="ecstasy_link"
-                       value="{{ object.ecstasy_link }}" required>
+                       value="{{ object.ecstasy_link }}" >
             </div>
         </div>
 
         <div class="row mt-1 ps-2 mb-2">
             <div class="col d-flex align-items-center">
-                <img width="16" height="16" src="{% static 'self/img/note.svg' %}" alt="notes" class="me-2"/>
+                <img width="24" height="24" src="{% static 'self/img/note.svg' %}" alt="notes" class="me-2"/>
                 <input type="text" class="form-control" id="objLink_notes_edit_{{ object.id }}" name="notes_link"
-                       value="{{ object.notes_link }}" required>
+                       value="{{ object.notes_link }}" >
             </div>
 
             <div class="col d-flex align-items-center">
-                <i class="bi bi-link-45deg m-0 p-0" style="font-size: 1rem"></i>
+                <i class="bi bi-link-45deg m-0 p-0" style="font-size: 1.5rem"></i>
                 <input type="text" class="form-control ms-2" id="objLink_another_edit_{{ object.id }}"
                        name="another_link"
-                       value="{{ object.another_link }}" required>
+                       value="{{ object.another_link }}" >
             </div>
         </div>
 

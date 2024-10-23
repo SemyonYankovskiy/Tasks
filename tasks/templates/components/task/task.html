@@ -1,6 +1,6 @@
 {% load static %}
-<div class="accordion" id="accordionPanelsStayOpenExample">
-    <div class="accordion-item bg-light border rounded {% if not expanded %}shadow{% else %}shadow-sm{% endif %} mx-3 my-3">
+<div class="accordion " id="accordionPanelsStayOpenExample">
+    <div class="accordion-item bg-white border rounded {% if not expanded %}shadow{% else %}shadow-sm{% endif %} mx-3 my-3">
         <h2 class="accordion-header">
             <button class="accordion-button {% if not expanded %}collapsed{% endif %} d-flex" type="button"
                     data-bs-toggle="collapse"
@@ -66,8 +66,12 @@
 
                     </div>
 
-                    {# -- 2 Строка -- #}
-                    <div class="row mt-3">
+
+
+                </div>
+            </button>
+                                                    {# -- 2 Строка -- #}
+                    <div class="row my-2 mx-3 px-1" style="font-size: medium">
                         {# ============== OBJECTS ============== #}
                         <div class="col d-flex justify-content-left px-4 ">
                             <div class="d-flex flex-wrap justify-content-left  align-items-center gap-2 mt-2">
@@ -105,14 +109,12 @@
                             </div>
                         </div>
                     </div>
-
-                </div>
-            </button>
         </h2>
 
 
+
         <div id="collapse{{ task.id }}" class="accordion-collapse collapse {% if expanded %}show{% endif %}">
-            <div class="accordion-body bg-white">
+            <div class="accordion-body pb-3 px-3 bg-white">
                 <div class="container text-center px-0">
                     {# ============== MEDIA ============== #}
 
@@ -206,12 +208,18 @@
         box-shadow: none;
         outline: none;
         background-color: white;
+        color: black;
     }
 
     /* Убираем синюю подсветку, если аккордеон активен */
     .accordion-button:not(.collapsed) {
         box-shadow: none;
         background-color: white;
+        color: black;
+    }
+
+    .accordion-body{
+        padding: 0;
     }
 
 

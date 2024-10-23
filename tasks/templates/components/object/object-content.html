@@ -2,7 +2,7 @@
 <div class="container text-center  mt-2 shadow rounded border-top border-3">
     {# ============== NAV BUTTON & EDIT ============== #}
     <div class="row mb-2 d-flex p-3">
-        <div class="col d-flex justify-content-left ">
+        <div class="col d-flex justify-content-left px-3 pt-3">
             {% if object.parent_slug %}
 
                 <a href="{% url 'show-object' object.parent_slug %}" class="btn btn-outline-primary X">
@@ -102,7 +102,7 @@
 
 
         {# ============== MEDIA ============== #}
-        <div class="row d-flex justify-content-between">
+        <div class="d-flex justify-content-between">
             {% if obj_images %}
                 {% include "components/files/gallery.html" with images=obj_images id=object.id type="object" %}
             {% endif %}
@@ -145,8 +145,9 @@
 
 
     </div>
-    <div class="collapse shadow rounded ms-4" id="collapseChildren"
-         style="position: absolute;  z-index: 1000; backdrop-filter: blur(10px); border: solid 1px #aeaeae">
+    <div class="collapse" id="collapseChildren"
+{#         style="position: absolute;  z-index: 1000; backdrop-filter: blur(10px); border: solid 1px #aeaeae"#}
+    >
         <div class="container d-flex p-4 my-3 justify-content-center flex-wrap">
             {% if child_objects %}
                 {% for object in child_objects %}

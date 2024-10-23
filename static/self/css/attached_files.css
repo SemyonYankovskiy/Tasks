@@ -2,12 +2,12 @@
 .files-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 10px;
+    /*gap: 10px;*/
 }
 
 .file-item {
     background-color: transparent;
-    border: 1px solid #ddd;
+    /*border: 1px solid #ddd;*/
     border-radius: 4px;
     display: flex;
     flex-direction: column;
