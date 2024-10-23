@@ -119,12 +119,8 @@ if os.getenv("DJANGO_REDIS_CACHE_URL"):
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.redis.RedisCache",
-            # "LOCATION": os.getenv("DJANGO_REDIS_CACHE_URL"),
-            'LOCATION': 'redis://127.0.0.1:6379/1',  # URL Redis-сервера
-            'OPTIONS':
-                {
-                   'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-                },
+            "LOCATION": os.getenv("DJANGO_REDIS_CACHE_URL"),
+
          }
 
     }
