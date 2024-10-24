@@ -1,11 +1,10 @@
 {% load static %}
+{% load humanize %}
+
 <div class="accordion " id="accordionPanelsStayOpenExample">
     <div class="accordion-item bg-white border rounded {% if not expanded %}shadow{% else %}shadow-sm{% endif %} mx-3 my-3">
-        <h2 class="accordion-header">
-            <button class="accordion-button {% if not expanded %}collapsed{% endif %} d-flex" type="button"
-                    data-bs-toggle="collapse"
-
-                    {% if task.time_left < 24 and task.time_left > 0 or task.completion_time.date == task.time_now.date %}
+        <h2 class="accordion-header rounded"
+                            {% if task.time_left < 24 and task.time_left > 0 or task.completion_time.date == task.time_now.date %}
                     style="border: 2px solid
                             {% if task.priority == 'LOW' %} #1E90FF
                             {% elif task.priority == 'MEDIUM' %}  #FFD700
@@ -15,8 +14,11 @@
                             !important;"
                     {% else %}
                     style="border-bottom: 1px solid gainsboro;"
-                    {% endif %}
+                    style="border-bottom: 0;"
+                    {% endif %}>
 
+            <button class="accordion-button pb-1 ps-2 pt-3 ps-4{% if not expanded %}collapsed{% endif %} d-flex" type="button"
+                    data-bs-toggle="collapse"
                     data-bs-target="#collapse{{ task.id }}"
                     aria-expanded="{% if expanded %}true{% else %}false{% endif %}"
                     aria-controls="collapse{{ task.id }}">
@@ -25,7 +27,7 @@
                     <div class="d-flex flex-row w-100 align-items-center ms-0">
 
                         {# ============== PRIORITY ============== #}
-                        <div class="col-md-1 d-flex justify-content-center align-items-center "
+                        <div class="d-flex justify-content-center align-items-center "
                              style="max-width: 48px">
                             {% if task.is_done == False %}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
@@ -50,17 +52,22 @@
                         </div>
 
                         {# ============== DATETIME ============== #}
-                        <div class="col-md-2 d-flex align-items-center border-end border-start gap-2 px-3">
+                        <div class="col-md-2 d-flex align-items-center gap-2 ms-2 px-1">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                                  class="bi bi-calendar-week" viewBox="0 0 16 16">
                                 <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"></path>
                                 <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"></path>
                             </svg>
-                            <span class="ms-2">{{ task.completion_time|date:"d.m.Y H:i" }}</span>
+                            {% if task.completion_time|date:"Y-m-d" == default_date %}
+                                <span class="ms-2">{{ task.completion_time|naturaltime }}</span>
+                            {% else %}
+                                <span class="ms-2">{{ task.completion_time|date:"d.m.Y H:i" }}</span>
+                            {% endif %}
+
                         </div>
 
                         {# ============== HEADER ============== #}
-                        <div class="col-md-9 d-flex justify-content-left align-items-center px-3">
+                        <div class="d-flex justify-content-left align-items-center px-3">
                             <strong>{{ task.header }}</strong>
                         </div>
 
@@ -70,16 +77,16 @@
 
                 </div>
             </button>
-                                                    {# -- 2 Строка -- #}
-                    <div class="row my-2 mx-3 px-1" style="font-size: medium">
+            {# -- 2 Строка -- #}
+                    <div class="row pb-3 pt-2 mx-2 px-1 " style="font-size: medium">
                         {# ============== OBJECTS ============== #}
-                        <div class="col d-flex justify-content-left px-4 ">
+                        <div class="col d-flex justify-content-left">
                             <div class="d-flex flex-wrap justify-content-left  align-items-center gap-2 mt-2">
-                                <i class="bi bi-compass" style="font-size: 1.2rem;"></i>
+                                <i class="bi bi-grid pe-2" style="font-size: 1.2rem;"></i>
                                 {% if task.objects_set.all %}
                                     {% for obj in task.objects_set.all %}
 
-                                        <span class="badge bg-dark-subtle text-black">{{ obj.name }}</span>
+                                        <a href="{% url "tasks" %}?objects_set={{ obj.id }}" class="badge bg-dark-subtle text-black" style="text-decoration: none; ">{{ obj.name }}</a>
 
                                     {% endfor %}
                                 {% else %}
@@ -95,14 +102,14 @@
                                 {% if task.engineers.all %}
                                     {% for engineer in task.engineers.all %}
                                         <div>
-                                            <span class="badge bg-secondary">{{ engineer.first_name }} {{ engineer.second_name }}</span>
+                                            <a href="{% url "tasks" %}?engineers=eng_{{ engineer.id }}" class="badge bg-secondary" style="text-decoration: none; ">{{ engineer.first_name }} {{ engineer.second_name }}</a>
                                         </div>
                                     {% endfor %}
                                 {% endif %}
                                 {% if task.departments.all %}
                                     {% for departments in task.departments.all %}
                                         <div>
-                                            <span class="badge bg-secondary">{{ departments }}</span>
+                                            <a href="{% url "tasks" %}?engineers=dep_{{ departments.id }}" class="badge bg-secondary" style="text-decoration: none; ">{{ departments }}</a>
                                         </div>
                                     {% endfor %}
                                 {% endif %}
@@ -113,8 +120,8 @@
 
 
 
-        <div id="collapse{{ task.id }}" class="accordion-collapse collapse {% if expanded %}show{% endif %}">
-            <div class="accordion-body pb-3 px-3 bg-white">
+        <div id="collapse{{ task.id }}" class="accordion-collapse  collapse {% if expanded %}show{% endif %}">
+            <div class="accordion-body pb-2 px-3 rounded bg-white">
                 <div class="container text-center px-0">
                     {# ============== MEDIA ============== #}
 
@@ -131,7 +138,7 @@
                     {% if task.text %}
                         <div class="d-flex flex-column align-items-start mt-2"
                              style="font-size: 16px;  text-align: justify;">
-                        <span class="ps-2" style="overflow: auto; width: 100%;">
+                        <span class="px-4" style="overflow: auto; width: 100%;">
                                     {{ task.text|safe }}
                                 </span>
                         </div>
@@ -163,11 +170,16 @@
 
                     {# ============== TAGS ============== #}
                     {% if task.tags.all %}
-                        <div class="row my-3 text-muted">
+                        <div class="row my-3 ps-2 text-muted">
                             <div class="col d-flex flex-wrap justify-content-start  align-items-center gap-2">
-                                <i class="bi bi-tags ms-3 me-2" style="font-size: 1.2rem;"></i>
+
                                 {% for tag in task.tags.all %}
-                                    <span class="badge bg-primary-subtle text-dark">{{ tag.tag_name }}</span>
+                                    <a href="{% url "tasks" %}?tags={{ tag.id }}" class="badge bg-primary-subtle text-dark" style="text-decoration: none; ">    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                         class="bi bi-tag" viewBox="0 0 16 16">
+                      <path d="M6 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-1 0a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"></path>
+                      <path d="M2 1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 1 6.586V2a1 1 0 0 1 1-1zm0 5.586 7 7L13.586 9l-7-7H2v4.586z"></path>
+                    </svg>
+                                        {{ tag.tag_name }}</a>
                                 {% endfor %}
                             </div>
                         </div>
@@ -176,9 +188,11 @@
                     {# ============== TASK BUTTONS ============== #}
                     {% if not task.is_done %}
                         {% if request.user.engineer in task.engineers.all or request.user.engineer.department in task.departments.all or request.user.is_superuser or request.user.is_staff %}
-                            <div class="row text-start border-top pt-3">
+                            <div class="row text-start pt-2 border-top px-1">
                                 <div class="col">
+                                    {% if request.user.engineer  %}
                                     {% include "components/task/take_task_button.html" with task_id=task.id %}
+                                    {% endif %}
                                 </div>
                                 <div class="col text-end gap-2">
                                     {% include "components/task/edit_task_button.html" with task_id=task.id %}

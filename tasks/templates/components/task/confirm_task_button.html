@@ -3,5 +3,5 @@
 
         onclick="loadTaskModal('{{ task_id }}', '{{ action_type }}')">
     <i class="bi bi-check-circle"></i>
-    {% if action_type == 'close' %}Закрыть задачу{% else %}Вернуть задачу в работу{% endif %}
+    {% if action_type == 'close' %}{% else %}Вернуть задачу в работу{% endif %}
 </button>
