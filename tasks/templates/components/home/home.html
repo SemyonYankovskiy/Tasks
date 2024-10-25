@@ -8,7 +8,9 @@
     <!-- Список объектов -->
     <div class="container d-flex p-3 justify-content-center flex-wrap">
 
-        {% include "components/home/home_filter.html" %}
+                    {% include "components/home/home_filter.html" %}
+
+
 
         {% if objects_qs %}
 
@@ -18,13 +20,16 @@
 
             {% endfor %}
 
-            {% include "components/home/../pagination.html" with pagination_data=pagination_data filter_data=filter_data %}
         {% else %}
 
                 <img class="m-0" src="{% static 'self/img/orig.gif' %}" alt="Ничего не найдено" title="Ничего не найдено">
 
         {% endif %}
     </div>
+    <div class="mt-5">
+                        {% include "components/home/../pagination.html" with pagination_data=pagination_data filter_data=filter_data %}
+
+            </div>
 
 
 

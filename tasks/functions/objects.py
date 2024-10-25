@@ -1,18 +1,17 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, OuterRef, Subquery, Case, When, Value, CharField, QuerySet
 from django.db.models.functions import Concat, Substr, Length
 from django.db.transaction import atomic
-import json
-from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
+
 from tasks.models import Object, AttachedFile
 from user.models import User
 from .service import remove_unused_attached_files
 from .tasks_actions import create_tags
 from .tasks_prepare import permission_filter
 from ..forms import ObjectForm
-from ..services.tree_nodes import GroupsTree
 
 
 def get_objects_list(request) -> QuerySet[Object]:
@@ -71,7 +70,7 @@ def edit_object(request, slug):
     redirect_to = reverse("home")
 
     if request.method == "POST":
-        print("POST Data:", request.POST)
+
         post_data = create_tags(request.POST, "obj_tags_edit")  # Сохраняем теги и возвращаем
         form = ObjectForm(post_data, request.FILES, instance=obj)
 
