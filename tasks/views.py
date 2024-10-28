@@ -1,6 +1,7 @@
 from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.db.models import Count, Q, F
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
@@ -13,8 +14,6 @@ from .functions.objects import get_objects_list, add_tasks_count_to_objects
 from .functions.service import paginate_queryset, get_random_icon
 from .functions.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
 from .models import Object, Task, Engineer
-from django.core.cache import cache
-
 from .services.tree_nodes.tree_nodes import AllTagsTree
 
 
@@ -23,7 +22,7 @@ def get_home(request):
     page_number = request.GET.get("page", 1)  # Упрощение получения номера страницы
     # Используем фильтры для создания уникального кэш-ключа
     filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page"]})
-    cache_key = f'objects-page:{page_number}:{request.user.username}:{filter_params}'
+    cache_key = f'objects-page:{page_number}:{request.user}:{filter_params}'
 
     # Получаем данные из кэша
     cached_data = cache.get(cache_key)
@@ -87,9 +86,7 @@ def get_home(request):
     return render(request, "components/home/home.html", context=context)
 
 
-
-@login_required
-def get_object_page(request, object_slug):
+def get_obj(object_slug, user):
     # Получаем основной объект
     obj = (
         Object.objects.filter(slug=object_slug)
@@ -100,59 +97,166 @@ def get_object_page(request, object_slug):
             done_tasks_count=Count("id", filter=Q(tasks__is_done=True)),
             undone_tasks_count=Count("id", filter=Q(tasks__is_done=False)),
         )
-        .filter(groups__users=request.user)
+        .filter(groups__users=user)
         .first()
     )
+    return obj
 
-    # Если объект не найден, выбрасываем исключение 404 (страница не найдена)
-    if obj is None:
-        raise Http404()
 
-    if obj:
+@login_required
+def get_object_page(request, object_slug):
+    # Получаем номер страницы из запроса
+    page_number = request.GET.get("page", 1)
+    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page"]})
+
+    cache_key = f'{object_slug}_page:{page_number}:{request.user.username}:{filter_params}'
+
+    # Получаем данные из кэша
+    cached_data = cache.get(cache_key)
+
+    # =========== Кеширование =========== #
+    if cached_data is None:
+        obj = get_obj(object_slug, request.user)
+        if obj is None:
+            raise Http404()
+
         # Получаем все связанные файлы
         attached_files = obj.files.all()
 
         # Разделяем файлы на изображения и не-изображения
         images = [file for file in attached_files if file.is_image]  # Используем поле is_image
         non_images = [file for file in attached_files if not file.is_image]  # Используем поле is_image
+
+        # Получаем связанные задачи с учетом фильтров
+        filtered_tasks_data = get_filtered_tasks(request, obj=obj)
+        counters = filtered_tasks_data.tasks_counters
+
+        # Используем функцию пагинации
+        pagination_data = paginate_queryset(filtered_tasks_data.tasks, page_number, per_page=8)
+
+        tasks = pagination_data["page_obj"]
+
+        child_objects = get_objects_list(request).filter(parent=obj)
+
+        random_icon = get_random_icon(request)
+
+        filter_context = task_filter_params(request)
+        filter_params = filtered_tasks_data.filter_params
+        object_id_list = [obj.id]
+
+        # Сохраняем данные в кэш
+        cached_data = {
+            "object": obj,
+            "obj_images": images,
+            "obj_files": non_images,
+            "tasks": tasks,
+            "counters": counters,
+            "random_icon": random_icon,
+            "pagination_data": pagination_data,
+            "child_objects": child_objects,
+            "filter_context": filter_context,
+            "filter_params": filter_params,
+            "object_id_list": object_id_list
+        }
+        cache.set(cache_key, cached_data, timeout=60)
     else:
-        images = []
-        non_images = []
+        # Используем закэшированные данные
+        obj = cached_data["object"]
+        images = cached_data["obj_images"]
+        non_images = cached_data["obj_files"]
+        tasks = cached_data["tasks"]
+        random_icon = cached_data["random_icon"]
+        pagination_data = cached_data["pagination_data"]
+        child_objects = cached_data["child_objects"]
+        filter_context = cached_data["filter_context"]
+        filter_params = cached_data["filter_params"]
+        counters = cached_data["counters"]
+        object_id_list = cached_data["object_id_list"]
 
-    # Получаем связанные задачи с учетом фильтров
-    filtered_tasks_data = get_filtered_tasks(request, obj=obj)
-
-    # Получаем номер страницы из запроса
-    page_number = request.GET.get("page")
-    # Используем функцию пагинации
-    pagination_data = paginate_queryset(filtered_tasks_data.tasks, page_number, per_page=8)
-
-    tasks = pagination_data["page_obj"]
-
-    child_objects = get_objects_list(request).filter(parent=obj)
-
-    random_icon = get_random_icon(request)
-
-    filter_context = task_filter_params(request)
     ckeditor = CKEditorCreateForm(request.POST)
 
     context = {
         "object": obj,
         "obj_images": images,
         "obj_files": non_images,
-        "object_id_list": [obj.id],
         "tasks": tasks,
-        "counters": filtered_tasks_data.tasks_counters,
-        "filter_params": filtered_tasks_data.filter_params,
+        **filter_context,
+        "filter_params": filter_params,
         "random_icon": random_icon,
         "pagination_data": pagination_data,
         "child_objects": child_objects,
-        **filter_context,
-        "is_objects_page": request.path.startswith("/object/"),
         "ckeditor": ckeditor,
+        "counters": counters,
+        "object_id_list": object_id_list,
     }
 
     return render(request, "components/object/object-page.html", context=context)
+
+
+# @login_required
+# def get_object_page(request, object_slug):
+#     # Получаем основной объект
+#     obj = (
+#         Object.objects.filter(slug=object_slug)
+#         .prefetch_related("files", "tags", "groups")
+#         .annotate(
+#             parent_name=F("parent__name"),
+#             parent_slug=F("parent__slug"),
+#             done_tasks_count=Count("id", filter=Q(tasks__is_done=True)),
+#             undone_tasks_count=Count("id", filter=Q(tasks__is_done=False)),
+#         )
+#         .filter(groups__users=request.user)
+#         .first()
+#     )
+#
+#     # Если объект не найден, выбрасываем исключение 404 (страница не найдена)
+#     if obj is None:
+#         raise Http404()
+#
+#     if obj:
+#         # Получаем все связанные файлы
+#         attached_files = obj.files.all()
+#
+#         # Разделяем файлы на изображения и не-изображения
+#         images = [file for file in attached_files if file.is_image]  # Используем поле is_image
+#         non_images = [file for file in attached_files if not file.is_image]  # Используем поле is_image
+#     else:
+#         images = []
+#         non_images = []
+#
+#     # Получаем связанные задачи с учетом фильтров
+#     filtered_tasks_data = get_filtered_tasks(request, obj=obj)
+#
+#     # Получаем номер страницы из запроса
+#     page_number = request.GET.get("page")
+#     # Используем функцию пагинации
+#     pagination_data = paginate_queryset(filtered_tasks_data.tasks, page_number, per_page=8)
+#
+#     tasks = pagination_data["page_obj"]
+#
+#     child_objects = get_objects_list(request).filter(parent=obj)
+#
+#     random_icon = get_random_icon(request)
+#
+#     filter_context = task_filter_params(request)
+#     ckeditor = CKEditorCreateForm(request.POST)
+#     context = {
+#         "object": obj,
+#         "obj_images": images,
+#         "obj_files": non_images,
+#         "object_id_list": [obj.id],
+#         "tasks": tasks,
+#         "counters": filtered_tasks_data.tasks_counters,
+#         "filter_params": filtered_tasks_data.filter_params,
+#         "random_icon": random_icon,
+#         "pagination_data": pagination_data,
+#         "child_objects": child_objects,
+#         **filter_context,
+#         "is_objects_page": request.path.startswith("/object/"),
+#         "ckeditor": ckeditor,
+#     }
+#
+#     return render(request, "components/object/object-page.html", context=context)
 
 
 @login_required
