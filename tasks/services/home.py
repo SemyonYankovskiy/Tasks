@@ -1,9 +1,11 @@
+from django.core.cache import cache
 from django.db.models import Count, OuterRef, Subquery, Case, When, Value, CharField, QuerySet
 from django.db.models.functions import Concat, Substr, Length
 
 from tasks.models import Object, AttachedFile
-from user.models import User
+from .service import paginate_queryset
 from .tasks_prepare import permission_filter
+from ..filters import ObjectFilter, get_homepage_filter_components
 
 
 def get_objects_list(request) -> QuerySet[Object]:
@@ -52,15 +54,30 @@ def get_objects_list(request) -> QuerySet[Object]:
     return objects
 
 
+def get_homepage_content(cache_key, request, page_number):
+    """
+    :return: cached_data
+    """
+    # =========== Фильтр =========== #
+    filtered_objects = ObjectFilter(request.GET, queryset=get_objects_list(request)).qs
+    params_count = ObjectFilter(request.GET, queryset=get_objects_list(request)).applied_filters_count
+    # для сохранения фильтров при пагинации
+    filter_url = ObjectFilter(request.GET, queryset=get_objects_list(request)).filter_url
+    homepage_filter_components = get_homepage_filter_components(request)
 
+    # =========== Пагинация =========== #
+    per_page = request.GET.get("per_page", 2)
+    pagination_data = paginate_queryset(filtered_objects, page_number, per_page)
 
-
-def add_tasks_count_to_objects(queryset: QuerySet[Object], user: User, field_name: str) -> QuerySet[Object]:
-    for obj in queryset:
-        count: int = permission_filter(user).filter(objects_set=obj, is_done=False).count()
-        setattr(obj, field_name, count)
-
-    return queryset
+    cached_data = {
+        "objects_qs": pagination_data["page_obj"],
+        "pagination_data": pagination_data,
+        "filter_data": filter_url,
+        "params_count": params_count,
+        **homepage_filter_components
+    }
+    cache.set(cache_key, cached_data, timeout=60)
+    return cached_data
 
 
 
