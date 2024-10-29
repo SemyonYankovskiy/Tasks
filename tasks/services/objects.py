@@ -1,3 +1,4 @@
+
 from django.core.cache import cache
 from django.db.models import Count, OuterRef, Subquery, Case, When, Value, CharField, QuerySet
 from django.db.models.functions import Concat, Substr, Length
@@ -5,7 +6,7 @@ from django.db.models.functions import Concat, Substr, Length
 from tasks.models import Object, AttachedFile
 from .service import paginate_queryset
 from .tasks_prepare import permission_filter
-from ..filters import ObjectFilter, get_homepage_filter_components
+from ..filters import ObjectFilter
 
 
 def get_objects_list(request) -> QuerySet[Object]:
@@ -54,30 +55,32 @@ def get_objects_list(request) -> QuerySet[Object]:
     return objects
 
 
-def get_homepage_content(cache_key, request, page_number):
+def get_objects(request, filter_params, page_number, per_page):
     """
-    :return: cached_data
+    Возвращает список объектов. Если не применяются фильтры - возвращает объекты из кэша
     """
-    # =========== Фильтр =========== #
-    filtered_objects = ObjectFilter(request.GET, queryset=get_objects_list(request)).qs
-    params_count = ObjectFilter(request.GET, queryset=get_objects_list(request)).applied_filters_count
-    # для сохранения фильтров при пагинации
-    filter_url = ObjectFilter(request.GET, queryset=get_objects_list(request)).filter_url
-    homepage_filter_components = get_homepage_filter_components(request)
+    cache_key = f'objects-page:{page_number}:{request.user}'
+    cached_data = cache.get(cache_key) if not filter_params else None
 
-    # =========== Пагинация =========== #
-    per_page = request.GET.get("per_page", 2)
+    if cached_data:
+        return cached_data
+
+    # ======= Фильтрация ======= #
+    filtered_objects = ObjectFilter(request.GET, queryset=get_objects_list(request)).qs
+
+    # ======= Пагинация ======= #
     pagination_data = paginate_queryset(filtered_objects, page_number, per_page)
 
-    cached_data = {
+    result = {
         "objects_qs": pagination_data["page_obj"],
         "pagination_data": pagination_data,
-        "filter_data": filter_url,
-        "params_count": params_count,
-        **homepage_filter_components
     }
-    cache.set(cache_key, cached_data, timeout=60)
-    return cached_data
+
+    # Кэшируем результат, если отсутствуют фильтры
+    if not filter_params:
+        cache.set(cache_key, result, timeout=60)
+
+    return result
 
 
 

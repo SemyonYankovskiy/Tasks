@@ -1,16 +1,16 @@
 from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
-from django.core.cache import cache
 from django.db.models import Count, Q, F
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from tasks.services.home import get_objects_list, get_homepage_content
+from tasks.services.objects import get_objects_list, get_objects
 from tasks.services.service import paginate_queryset
 from tasks.services.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
 from tasks.services.tree_nodes import GroupsTree
+from .filters import ObjectFilter, get_homepage_filter_components
 from .forms import CKEditorEditForm, CKEditorCreateForm, CKEditorEditObjForm
 from .models import Object, Task, Engineer
 from .services.tree_nodes.tree_nodes import AllTagsTree
@@ -19,14 +19,21 @@ from .services.tree_nodes.tree_nodes import AllTagsTree
 @login_required
 def get_home(request):
     page_number = request.GET.get("page", 1)
+    per_page = request.GET.get("per_page", 2)
     filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page"]})
-    cache_key = f'objects-page:{page_number}:{request.user}:{filter_params}'
 
-    cached_data = cache.get(cache_key)
-    if cached_data is None:
-        cached_data = get_homepage_content(cache_key, request, page_number)
+    objects = get_objects(request, filter_params, page_number, per_page)
 
-    context = {**cached_data}
+    params_count = ObjectFilter(request.GET, queryset=get_objects_list(request)).applied_filters_count
+    # для сохранения фильтров при пагинации
+    filter_url = ObjectFilter(request.GET, queryset=get_objects_list(request)).filter_url
+    homepage_filter_components = get_homepage_filter_components(request)
+
+    context = {**objects,
+               **homepage_filter_components,
+               "filter_data": filter_url,
+               "params_count": params_count,
+               }
     return render(request, "components/home/home.html", context=context)
 
 
