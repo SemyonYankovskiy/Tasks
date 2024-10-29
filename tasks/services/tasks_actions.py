@@ -9,8 +9,8 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 
 from tasks.forms import AddTaskForm, EditTaskForm
-from tasks.functions.service import remove_unused_attached_files
 from tasks.models import Task, AttachedFile, Engineer, Tag
+from tasks.services.service import remove_unused_attached_files
 
 
 @atomic

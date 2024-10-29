@@ -6,8 +6,8 @@
                 {% if user.is_authenticated %}
                     <div class="col-md-2 d-flex align-items-center">
                         <a href="{% url 'home' %}" class=" mx-3 mt-2">
-                            {% if random_icon %}
-                                <img src="{% static random_icon %}" alt="Random Icon" class="icon"
+                            {% if header_icon %}
+                                <img src="{% static header_icon %}" alt="Random Icon" class="icon"
                                      style="max-height: 150px; max-width: 150px"/>
                             {% else %}
                                 <p>No icon available.</p>
@@ -17,7 +17,7 @@
 
                     <div class="col-md-10 d-flex justify-content-end">
                         <ul class="nav nav-pills mx-5">
-                            <li class="nav-item {% if current_page == '/' or is_objects_page %}active{% endif %}">
+                            <li class="nav-item {% if current_page == '/' or objects_page %}active{% endif %}">
                                 <a href="{% url 'home' %}" class="nav-link p-0 ">
                                     <img width="32" height="32" src="{% static 'self/img/grid.svg' %}"
                                          class="bi d-block mx-auto mb-3" alt="objects"/>

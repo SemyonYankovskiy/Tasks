@@ -1,11 +1,16 @@
+from urllib.parse import urlencode
+
 import django_filters
 from django.db.models import Q
 
 from .models import Object, Task, Engineer
+from .services.tree_nodes import ObjectsTagsTree, GroupsTree
 
 
 class ObjectFilter(django_filters.FilterSet):
     search = django_filters.CharFilter(method="search_filter")
+    not_count_params = ["page", "per_page"]
+    exclude_params = ["page"]
 
     class Meta:
         model = Object
@@ -13,6 +18,38 @@ class ObjectFilter(django_filters.FilterSet):
 
     def search_filter(self, queryset, name: str, value: str):
         return queryset.filter(Q(name__icontains=value) | Q(description__icontains=value))
+
+    @property
+    def applied_filters_count(self):
+        """
+        Считаем только те параметры, которые не в списке `not_count_params` и имеют значение
+        :return:  int
+        """
+        return len([
+            param for param, value in self.data.items()
+            if value and param not in self.not_count_params
+        ])
+
+    @property
+    def filter_url(self):
+        """
+        Формируем строку URL с параметрами, исключая параметры из `exclude_params`
+        """
+        filter_data = {key: value for key, value in self.data.items() if key not in self.exclude_params}
+        return urlencode(filter_data, doseq=True)
+
+
+def get_homepage_filter_components(request):
+    """
+    Возвращает словарь с древовидной структурой + текущее значение тегов и групп
+    :param request:
+    :return: dict
+    """
+    return {"tags_json": ObjectsTagsTree({"user": request.user}).get_nodes(),
+            "groups_json": GroupsTree({"user": request.user}).get_nodes(),
+            "current_tags": request.GET.getlist("tags"),
+            "current_groups": request.GET.getlist("groups"), }
+
 
 
 class TaskFilter(django_filters.FilterSet):

@@ -1,30 +1,7 @@
 import datetime
 import json
-import os
-import random
 
-from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-
-from djangoProject import settings
-from tasks.models import Task
-
-
-@login_required
-def get_random_icon(request):
-    # Папка с иконками
-    icon_directory = os.path.join(settings.BASE_DIR, "static/self/img/lazy")
-
-    # Получаем список файлов в папке
-    icon_pull = os.listdir(icon_directory)
-
-    # Если файлы есть, выбираем случайную иконку
-    icon = random.choice(icon_pull) if icon_pull else None
-
-    # Формируем путь для шаблона
-    icon_path = f"self/img/lazy/{icon}" if icon else None
-
-    return icon_path
 
 
 def remove_unused_attached_files(file_uploader_data: str, qs_object, *, delete_orphan_files: bool = False):
@@ -86,6 +63,11 @@ def paginate_queryset(queryset, page_number, per_page):
         "last_page_number": total_pages,
         "per_page": per_page,
     }
+
+
+def pagination_homepage():
+
+    pass
 
 
 def default_date():

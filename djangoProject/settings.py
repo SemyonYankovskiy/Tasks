@@ -85,6 +85,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "djangoProject.extra_processors.get_random_icon",
+                "djangoProject.extra_processors.get_current_page",
             ],
         },
     },

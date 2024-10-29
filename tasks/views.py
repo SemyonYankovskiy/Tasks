@@ -1,96 +1,150 @@
-from urllib.parse import urlencode
-
 from django.contrib.auth.decorators import login_required
-from django.core.cache import cache
 from django.db.models import Count, Q, F
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from tasks.services.tree_nodes import GroupsTree, ObjectsTagsTree
-from .filters import ObjectFilter
+from tasks.services.many_objects import get_objects_list
+from tasks.services.service import paginate_queryset
+from tasks.services.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
+from tasks.services.tree_nodes import GroupsTree
+from .filters import ObjectFilter, get_homepage_filter_components
 from .forms import CKEditorEditForm, CKEditorCreateForm, CKEditorEditObjForm
-from .functions.objects import get_objects_list, add_tasks_count_to_objects
-from .functions.service import paginate_queryset, get_random_icon
-from .functions.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
 from .models import Object, Task, Engineer
 from .services.tree_nodes.tree_nodes import AllTagsTree
 
 
-def create_home_page_cache(cache_key, request, page_number):
-    # =========== Фильтр =========== #
-    tags = ObjectsTagsTree({"user": request.user}).get_nodes()
-    groups = GroupsTree({"user": request.user}).get_nodes()
-
-    user_filter = ObjectFilter(request.GET, queryset=get_objects_list(request))
-    filtered_objects = user_filter.qs  # Применяем фильтр к запросу
-
-    # Счётчик применённых фильтров
-    not_count_params = ["page", "per_page"]
-    params_count = len([param for key, param in request.GET.items() if param and key not in not_count_params])
-
-    # =========== Пагинация =========== #
-    per_page = request.GET.get("per_page", 8)
-    pagination_data = paginate_queryset(filtered_objects, page_number, per_page)
-    objects_qs = pagination_data["page_obj"]
-
-    add_tasks_count_to_objects(queryset=objects_qs, user=request.user, field_name="tasks_count")
-
-    # Сохраняем данные в кэш
-    cached_data = {
-        "objects_qs": objects_qs,
-        "pagination_data": pagination_data,
-        "tags": tags,
-        "groups": groups,
-        "current_path": request.path,
-        "params_count": params_count,
-    }
-    cache.set(cache_key, cached_data, timeout=60)
-    return cached_data
-
 @login_required
 def get_home(request):
-    page_number = request.GET.get("page", 1)  # Упрощение получения номера страницы
-    # Используем фильтры для создания уникального кэш-ключа
-    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page"]})
-    cache_key = f'objects-page:{page_number}:{request.user}:{filter_params}'
+    # =========== Фильтр =========== #
+    filtered_objects = ObjectFilter(request.GET, queryset=get_objects_list(request)).qs
+    params_count = ObjectFilter(request.GET, queryset=get_objects_list(request)).applied_filters_count
+    # для сохранения фильтров при пагинации
+    filter_url = ObjectFilter(request.GET, queryset=get_objects_list(request)).filter_url
+    homepage_filter_components = get_homepage_filter_components(request)
 
-    # Получаем данные из кэша
-    cached_data = cache.get(cache_key)
-
-    # =========== Кеширование =========== #
-    if cached_data is None:
-        cached_data = create_home_page_cache(cache_key, request, page_number)
-
-    # Используем закэшированные данные
-    objects_qs = cached_data["objects_qs"]
-    pagination_data = cached_data["pagination_data"]
-    tags = cached_data["tags"]
-    groups = cached_data["groups"]
-    params_count = cached_data["params_count"]
-
-    # Формируем строку с параметрами фильтра для пагинатора
-    exclude_params = ["page"]
-    filter_data = {key: value for key, value in request.GET.items() if key not in exclude_params}
-    filter_url = urlencode(filter_data, doseq=True)
+    # =========== Пагинация =========== #
+    page_number = request.GET.get("page", 1)
+    per_page = request.GET.get("per_page", 8)
+    pagination_data = paginate_queryset(filtered_objects, page_number, per_page)
 
     context = {
-        "objects_qs": objects_qs,
+        "objects_qs": pagination_data["page_obj"],
         "pagination_data": pagination_data,
         "filter_data": filter_url,
-        "tags_json": tags,
-        "random_icon": get_random_icon(request),
-        "current_tags": request.GET.getlist("tags"),
-        "groups_json": groups,
-        "current_groups": request.GET.getlist("groups"),
-        "current_page": request.path,
         "params_count": params_count,
+        **homepage_filter_components
     }
-
     return render(request, "components/home/home.html", context=context)
 
 
 def get_obj(object_slug, user):
+    # Получаем основной объект
+    obj = (
+        Object.objects.filter(slug=object_slug)
+            .prefetch_related("files", "tags", "groups")
+            .annotate(
+            parent_name=F("parent__name"),
+            parent_slug=F("parent__slug"),
+            done_tasks_count=Count("id", filter=Q(tasks__is_done=True)),
+            undone_tasks_count=Count("id", filter=Q(tasks__is_done=False)),
+        )
+            .filter(groups__users=user)
+            .first()
+    )
+    return obj
+
+
+# @login_required
+# def get_object_page(request, object_slug):
+#     # Получаем номер страницы из запроса
+#     page_number = request.GET.get("page", 1)
+#     filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page"]})
+#
+#     cache_key = f'{object_slug}_page:{page_number}:{request.user.username}:{filter_params}'
+#
+#     # Получаем данные из кэша
+#     cached_data = cache.get(cache_key)
+#
+#     # =========== Кеширование =========== #
+#     if cached_data is None:
+#         obj = get_obj(object_slug, request.user)
+#         if obj is None:
+#             raise Http404()
+#
+#         # Получаем все связанные файлы
+#         attached_files = obj.files.all()
+#
+#         # Разделяем файлы на изображения и не-изображения
+#         images = [file for file in attached_files if file.is_image]  # Используем поле is_image
+#         non_images = [file for file in attached_files if not file.is_image]  # Используем поле is_image
+#
+#         # Получаем связанные задачи с учетом фильтров
+#         filtered_tasks_data = get_filtered_tasks(request, obj=obj)
+#         counters = filtered_tasks_data.tasks_counters
+#
+#         # Используем функцию пагинации
+#         pagination_data = paginate_queryset(filtered_tasks_data.tasks, page_number, per_page=8)
+#
+#         tasks = pagination_data["page_obj"]
+#
+#         child_objects = get_objects_list(request).filter(parent=obj)
+#
+#         filter_context = task_filter_params(request)
+#         filter_params = filtered_tasks_data.filter_params
+#         object_id_list = [obj.id]
+#
+#         # Сохраняем данные в кэш
+#         cached_data = {
+#             "object": obj,
+#             "obj_images": images,
+#             "obj_files": non_images,
+#             "tasks": tasks,
+#             "counters": counters,
+#
+#             "pagination_data": pagination_data,
+#             "child_objects": child_objects,
+#             "filter_context": filter_context,
+#             "filter_params": filter_params,
+#             "object_id_list": object_id_list
+#         }
+#         cache.set(cache_key, cached_data, timeout=60)
+#     else:
+#         # Используем закэшированные данные
+#         obj = cached_data["object"]
+#         images = cached_data["obj_images"]
+#         non_images = cached_data["obj_files"]
+#         tasks = cached_data["tasks"]
+#
+#         pagination_data = cached_data["pagination_data"]
+#         child_objects = cached_data["child_objects"]
+#         filter_context = cached_data["filter_context"]
+#         filter_params = cached_data["filter_params"]
+#         counters = cached_data["counters"]
+#         object_id_list = cached_data["object_id_list"]
+#
+#     ckeditor = CKEditorCreateForm(request.POST)
+#
+#     context = {
+#         "object": obj,
+#         "obj_images": images,
+#         "obj_files": non_images,
+#         "tasks": tasks,
+#         **filter_context,
+#         "filter_params": filter_params,
+#
+#         "pagination_data": pagination_data,
+#         "child_objects": child_objects,
+#         "ckeditor": ckeditor,
+#         "counters": counters,
+#         "object_id_list": object_id_list,
+#     }
+#
+#     return render(request, "components/object/object-page.html", context=context)
+
+
+@login_required
+def get_object_page(request, object_slug):
     # Получаем основной объект
     obj = (
         Object.objects.filter(slug=object_slug)
@@ -101,166 +155,54 @@ def get_obj(object_slug, user):
             done_tasks_count=Count("id", filter=Q(tasks__is_done=True)),
             undone_tasks_count=Count("id", filter=Q(tasks__is_done=False)),
         )
-        .filter(groups__users=user)
+        .filter(groups__users=request.user)
         .first()
     )
-    return obj
 
+    # Если объект не найден, выбрасываем исключение 404 (страница не найдена)
+    if obj is None:
+        raise Http404()
 
-@login_required
-def get_object_page(request, object_slug):
-    # Получаем номер страницы из запроса
-    page_number = request.GET.get("page", 1)
-    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page"]})
-
-    cache_key = f'{object_slug}_page:{page_number}:{request.user.username}:{filter_params}'
-
-    # Получаем данные из кэша
-    cached_data = cache.get(cache_key)
-
-    # =========== Кеширование =========== #
-    if cached_data is None:
-        obj = get_obj(object_slug, request.user)
-        if obj is None:
-            raise Http404()
-
+    if obj:
         # Получаем все связанные файлы
         attached_files = obj.files.all()
 
         # Разделяем файлы на изображения и не-изображения
         images = [file for file in attached_files if file.is_image]  # Используем поле is_image
         non_images = [file for file in attached_files if not file.is_image]  # Используем поле is_image
-
-        # Получаем связанные задачи с учетом фильтров
-        filtered_tasks_data = get_filtered_tasks(request, obj=obj)
-        counters = filtered_tasks_data.tasks_counters
-
-        # Используем функцию пагинации
-        pagination_data = paginate_queryset(filtered_tasks_data.tasks, page_number, per_page=8)
-
-        tasks = pagination_data["page_obj"]
-
-        child_objects = get_objects_list(request).filter(parent=obj)
-
-        random_icon = get_random_icon(request)
-
-        filter_context = task_filter_params(request)
-        filter_params = filtered_tasks_data.filter_params
-        object_id_list = [obj.id]
-
-        # Сохраняем данные в кэш
-        cached_data = {
-            "object": obj,
-            "obj_images": images,
-            "obj_files": non_images,
-            "tasks": tasks,
-            "counters": counters,
-            "random_icon": random_icon,
-            "pagination_data": pagination_data,
-            "child_objects": child_objects,
-            "filter_context": filter_context,
-            "filter_params": filter_params,
-            "object_id_list": object_id_list
-        }
-        cache.set(cache_key, cached_data, timeout=60)
     else:
-        # Используем закэшированные данные
-        obj = cached_data["object"]
-        images = cached_data["obj_images"]
-        non_images = cached_data["obj_files"]
-        tasks = cached_data["tasks"]
-        random_icon = cached_data["random_icon"]
-        pagination_data = cached_data["pagination_data"]
-        child_objects = cached_data["child_objects"]
-        filter_context = cached_data["filter_context"]
-        filter_params = cached_data["filter_params"]
-        counters = cached_data["counters"]
-        object_id_list = cached_data["object_id_list"]
+        images = []
+        non_images = []
 
+    # Получаем связанные задачи с учетом фильтров
+    filtered_tasks_data = get_filtered_tasks(request, obj=obj)
+
+    # Получаем номер страницы из запроса
+    page_number = request.GET.get("page")
+    # Используем функцию пагинации
+    pagination_data = paginate_queryset(filtered_tasks_data.tasks, page_number, per_page=8)
+
+    tasks = pagination_data["page_obj"]
+
+    child_objects = get_objects_list(request).filter(parent=obj)
+
+    filter_context = task_filter_params(request)
     ckeditor = CKEditorCreateForm(request.POST)
-
     context = {
         "object": obj,
         "obj_images": images,
         "obj_files": non_images,
+        "object_id_list": [obj.id],
         "tasks": tasks,
-        **filter_context,
-        "filter_params": filter_params,
-        "random_icon": random_icon,
+        "counters": filtered_tasks_data.tasks_counters,
+        "filter_params": filtered_tasks_data.filter_params,
         "pagination_data": pagination_data,
         "child_objects": child_objects,
+        **filter_context,
         "ckeditor": ckeditor,
-        "counters": counters,
-        "object_id_list": object_id_list,
     }
 
     return render(request, "components/object/object-page.html", context=context)
-
-
-# @login_required
-# def get_object_page(request, object_slug):
-#     # Получаем основной объект
-#     obj = (
-#         Object.objects.filter(slug=object_slug)
-#         .prefetch_related("files", "tags", "groups")
-#         .annotate(
-#             parent_name=F("parent__name"),
-#             parent_slug=F("parent__slug"),
-#             done_tasks_count=Count("id", filter=Q(tasks__is_done=True)),
-#             undone_tasks_count=Count("id", filter=Q(tasks__is_done=False)),
-#         )
-#         .filter(groups__users=request.user)
-#         .first()
-#     )
-#
-#     # Если объект не найден, выбрасываем исключение 404 (страница не найдена)
-#     if obj is None:
-#         raise Http404()
-#
-#     if obj:
-#         # Получаем все связанные файлы
-#         attached_files = obj.files.all()
-#
-#         # Разделяем файлы на изображения и не-изображения
-#         images = [file for file in attached_files if file.is_image]  # Используем поле is_image
-#         non_images = [file for file in attached_files if not file.is_image]  # Используем поле is_image
-#     else:
-#         images = []
-#         non_images = []
-#
-#     # Получаем связанные задачи с учетом фильтров
-#     filtered_tasks_data = get_filtered_tasks(request, obj=obj)
-#
-#     # Получаем номер страницы из запроса
-#     page_number = request.GET.get("page")
-#     # Используем функцию пагинации
-#     pagination_data = paginate_queryset(filtered_tasks_data.tasks, page_number, per_page=8)
-#
-#     tasks = pagination_data["page_obj"]
-#
-#     child_objects = get_objects_list(request).filter(parent=obj)
-#
-#     random_icon = get_random_icon(request)
-#
-#     filter_context = task_filter_params(request)
-#     ckeditor = CKEditorCreateForm(request.POST)
-#     context = {
-#         "object": obj,
-#         "obj_images": images,
-#         "obj_files": non_images,
-#         "object_id_list": [obj.id],
-#         "tasks": tasks,
-#         "counters": filtered_tasks_data.tasks_counters,
-#         "filter_params": filtered_tasks_data.filter_params,
-#         "random_icon": random_icon,
-#         "pagination_data": pagination_data,
-#         "child_objects": child_objects,
-#         **filter_context,
-#         "is_objects_page": request.path.startswith("/object/"),
-#         "ckeditor": ckeditor,
-#     }
-#
-#     return render(request, "components/object/object-page.html", context=context)
 
 
 @login_required
@@ -273,25 +215,21 @@ def get_tasks_page(request):
     filter_context = task_filter_params(request)  # Получаем текущие параметры фильтра из url
 
     # Пагинация
-    page_number = request.GET.get("page")  # Получаем номер страницы из запроса
-    per_page = request.GET.get(
-        "per_page", 8
-    )  # Получаем количество отображаемых элементов пагинации из селектора
+    page_number = request.GET.get("page", 1)
+    per_page = request.GET.get("per_page", 8)
 
     # Тут теперь хранятся и задачи и параметры пагинатора
     pagination_data = paginate_queryset(filtered_task.tasks, page_number, per_page)
-
-    random_icon = get_random_icon(request)
 
     ckeditor = CKEditorCreateForm(request.POST)
 
     context = {
         "pagination_data": pagination_data,
-        "random_icon": random_icon,
+
         "counters": filtered_task.tasks_counters,
         "filter_params": filtered_task.filter_params,
         **filter_context,
-        "current_page": request.path,
+
         "ckeditor": ckeditor,
 
     }
@@ -329,8 +267,7 @@ def get_calendar_page(request):
         {
             "tasks": tasks,
             **filter_context,
-            "random_icon": get_random_icon(request),
-            "current_page": request.path,
+
             "c": tasks.tasks_counters,
             "fp": tasks.filter_params,
         },
@@ -369,14 +306,11 @@ def get_task_edit_form(request, task_id: int):
     return render(request, "components/task/edit_task_form.html", context)
 
 
-
 @login_required
 def get_obj_edit_form(request, slug: int):
-
     obj = get_object_or_404(Object, slug=slug)
     groups = GroupsTree({"user": request.user}).get_nodes()
     tags = AllTagsTree({"user": request.user}).get_nodes()
-
 
     ckeditor__obj_form = CKEditorEditObjForm(initial={"description": obj.description})
 
@@ -419,12 +353,12 @@ def get_task_action_form(request, task_id, action_type):
 def get_stat_page(request):
     # Выбираем всех инженеров с данными по активным и завершённым задачам
     engineers = (Engineer.objects.all()
-                 .prefetch_related("tasks")
-                 .select_related("department")
-                 .annotate(
-                     active_task_count=Count('tasks', filter=Q(tasks__is_done=False)),  # Подсчёт активных задач
-                     completed_task_count=Count('tasks', filter=Q(tasks__is_done=True))  # Подсчёт завершённых задач
-                 ))
+        .prefetch_related("tasks")
+        .select_related("department")
+        .annotate(
+        active_task_count=Count('tasks', filter=Q(tasks__is_done=False)),  # Подсчёт активных задач
+        completed_task_count=Count('tasks', filter=Q(tasks__is_done=True))  # Подсчёт завершённых задач
+    ))
 
     # Собираем данные для каждого инженера
     engineer_stats = []
@@ -438,7 +372,7 @@ def get_stat_page(request):
         })
 
     context = {
-        'random_icon': get_random_icon(request),  # Ваша функция для получения случайного значка (если нужно)
+
         'engineer_stats': engineer_stats,
     }
 

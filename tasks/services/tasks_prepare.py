@@ -6,8 +6,8 @@ from zoneinfo import ZoneInfo
 from django.db.models import Q, Count, Case, When, QuerySet
 
 from tasks.filters import TaskFilter, TaskFilterByDone
-from tasks.functions.service import default_date
 from tasks.models import Task, Engineer
+from tasks.services.service import default_date
 from tasks.services.tree_nodes import TasksTagsTree, ObjectsTree, EngineersTree
 from user.models import User
 
