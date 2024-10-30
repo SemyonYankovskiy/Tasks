@@ -8,6 +8,10 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, MinValueValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+from tasks.services.cache_version import CacheVersion
 
 
 class UserObjectGroup(models.Model):
@@ -46,24 +50,17 @@ class Object(models.Model):
         LOW = "LOW", "Низкий"
 
     priority = models.CharField(choices=Priority.choices, max_length=10)
-    parent = models.ForeignKey(
-        "self", null=True, blank=True, on_delete=models.SET_NULL, related_name="children"
-    )
+    parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, related_name="children")
     name = models.CharField(max_length=64)
-
     address = models.ForeignKey("Address", on_delete=models.CASCADE)
     description = RichTextUploadingField(blank=True)
     zabbix_link = models.CharField(max_length=256, blank=True)
     ecstasy_link = models.CharField(max_length=256, blank=True)
     notes_link = models.CharField(max_length=256, blank=True)
     another_link = models.CharField(max_length=256, blank=True)
-    tasks = models.ManyToManyField(
-        "Task", related_name="objects_set", db_table="objects_tasks_m2m", blank=True
-    )
+    tasks = models.ManyToManyField("Task", related_name="objects_set", db_table="objects_tasks_m2m", blank=True)
     tags = models.ManyToManyField("Tag", related_name="objects_set", db_table="objects_tags_m2m", blank=True)
-    files = models.ManyToManyField(
-        "AttachedFile", related_name="objects_set", db_table="objects_files_m2m", blank=True
-    )
+    files = models.ManyToManyField("AttachedFile", related_name="objects_set", db_table="objects_files_m2m", blank=True)
     groups = models.ManyToManyField("ObjectGroup", related_name="objects_set", db_table="objects_groups_m2m")
     slug = models.SlugField(max_length=255, unique=True, db_index=True)
 
@@ -281,3 +278,10 @@ class Address(models.Model):
 
     def __repr__(self):
         return f"Address: ({self.__str__()})"
+
+
+@receiver(post_save, sender=Object)
+def update_cache_version(sender, created, **kwargs):
+    global_cache_key = "object_cache"
+    cache_version = CacheVersion(global_cache_key)
+    cache_version.increment_cache_version()

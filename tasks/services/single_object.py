@@ -26,7 +26,7 @@ def edit_object(request, slug):
 
         if form.is_valid():
 
-            updated_object = form.save()  # Сохраняем изменения в объекте
+            updated_object = form.save(commit=False)  # Сохраняем изменения в объекте
 
             # Удаляем неиспользуемые прикрепленные файлы
             remove_unused_attached_files(request.POST.get("fileuploader-list-files"), updated_object)

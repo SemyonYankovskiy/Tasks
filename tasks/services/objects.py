@@ -4,6 +4,7 @@ from django.db.models import Count, OuterRef, Subquery, Case, When, Value, CharF
 from django.db.models.functions import Concat, Substr, Length
 
 from tasks.models import Object, AttachedFile
+from .cache_version import CacheVersion
 from .service import paginate_queryset
 from .tasks_prepare import permission_filter
 from ..filters import ObjectFilter
@@ -60,7 +61,13 @@ def get_objects(request, filter_params, page_number, per_page):
     Возвращает список объектов. Если не применяются фильтры - возвращает объекты из кэша
     """
     cache_key = f'objects-page:{page_number}:{request.user}'
-    cached_data = cache.get(cache_key) if not filter_params else None
+
+    global_cache_key = "object_cache"
+    cache_version = CacheVersion(global_cache_key)
+    cache_version_value = cache_version.get_cache_version()
+    print("cache_version", cache_version_value)
+
+    cached_data = cache.get(cache_key, version=cache_version_value) if not filter_params else None
 
     if cached_data:
         return cached_data
@@ -78,7 +85,7 @@ def get_objects(request, filter_params, page_number, per_page):
 
     # Кэшируем результат, если отсутствуют фильтры
     if not filter_params:
-        cache.set(cache_key, result, timeout=60)
+        cache.set(cache_key, result, timeout=600, version=cache_version_value)
 
     return result
 
