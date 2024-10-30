@@ -8,9 +8,9 @@ from django.urls import reverse
 
 from tasks.services.objects import get_objects_list, get_objects
 from tasks.services.service import paginate_queryset
-from tasks.services.tasks_prepare import get_filtered_tasks, get_m2m_fields_for_tasks, task_filter_params
+from tasks.services.tasks_prepare import get_filtered_tasks, task_filter_params
 from tasks.services.tree_nodes import GroupsTree
-from .filters import ObjectFilter, get_homepage_filter_components
+from .filters import ObjectFilter, get_current_filter_params, get_fields_for_filter
 from .forms import CKEditorEditForm, CKEditorCreateForm, CKEditorEditObjForm
 from .models import Object, Task, Engineer
 from .services.tree_nodes.tree_nodes import AllTagsTree
@@ -24,13 +24,17 @@ def get_home(request):
 
     objects = get_objects(request, filter_params, page_number, per_page)
 
+    filter_fields_items = get_fields_for_filter(request.user, "objects")
+
+    current_filter_params = get_current_filter_params(request, "objects")
+
     params_count = ObjectFilter(request.GET, queryset=get_objects_list(request)).applied_filters_count
     # для сохранения фильтров при пагинации
     filter_url = ObjectFilter(request.GET, queryset=get_objects_list(request)).filter_url
-    homepage_filter_components = get_homepage_filter_components(request)
 
     context = {**objects,
-               **homepage_filter_components,
+               **current_filter_params,
+               **filter_fields_items,
                "filter_data": filter_url,
                "params_count": params_count,
                }
@@ -147,15 +151,15 @@ def get_object_page(request, object_slug):
     # Получаем основной объект
     obj = (
         Object.objects.filter(slug=object_slug)
-        .prefetch_related("files", "tags", "groups")
-        .annotate(
+            .prefetch_related("files", "tags", "groups")
+            .annotate(
             parent_name=F("parent__name"),
             parent_slug=F("parent__slug"),
             done_tasks_count=Count("id", filter=Q(tasks__is_done=True)),
             undone_tasks_count=Count("id", filter=Q(tasks__is_done=False)),
         )
-        .filter(groups__users=request.user)
-        .first()
+            .filter(groups__users=request.user)
+            .first()
     )
 
     # Если объект не найден, выбрасываем исключение 404 (страница не найдена)
@@ -276,8 +280,8 @@ def get_calendar_page(request):
 @login_required
 def get_task_edit_form(request, task_id: int):
     task = get_object_or_404(Task, pk=task_id)
-    fields = get_m2m_fields_for_tasks(request.user)
-
+    fields = get_fields_for_filter(request.user, "tasks")
+    print(fields)
     from_url = request.GET.get("from_url", reverse("tasks"))
 
     current_engineers_with_type = list(task.engineers.all().values_list("id", flat=True))
@@ -298,7 +302,6 @@ def get_task_edit_form(request, task_id: int):
         "from_url": from_url,
         "current_engineers": current_engineers,
         "ckeditor_form": ckeditor_form,
-        # "current_tags_edit": list(task.tags.all().values_list("id", flat=True)),
         "current_tags_edit": list(task.tags.all().values_list("tag_name", flat=True)),
         "current_objects_edit": list(task.objects_set.all().values_list("id", flat=True)),
     }

@@ -62,10 +62,9 @@ def get_objects(request, filter_params, page_number, per_page):
     """
     cache_key = f'objects-page:{page_number}:{request.user}'
 
-    global_cache_key = "object_cache"
-    cache_version = CacheVersion(global_cache_key)
+    version_cache_key = "object_cache"
+    cache_version = CacheVersion(version_cache_key)
     cache_version_value = cache_version.get_cache_version()
-    print("cache_version", cache_version_value)
 
     cached_data = cache.get(cache_key, version=cache_version_value) if not filter_params else None
 

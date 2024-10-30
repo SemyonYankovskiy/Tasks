@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 
 from django.db.models import Q, Count, Case, When, QuerySet
 
-from tasks.filters import TaskFilter, TaskFilterByDone
+from tasks.filters import TaskFilter, TaskFilterByDone, get_fields_for_filter, get_current_filter_params
 from tasks.models import Task, Engineer
 from tasks.services.service import default_date
 from tasks.services.tree_nodes import TasksTagsTree, ObjectsTree, EngineersTree
@@ -190,9 +190,12 @@ def task_filter_params(request):
     if request.GET.get("completion_time_after") and request.GET.get("completion_time_before"):
         params_count -= 1
 
+    fields = get_fields_for_filter(user=request.user, page="tasks")
+    current_params = get_current_filter_params(request=request, page="tasks")
+
     return {
-        **get_m2m_fields_for_tasks(request.user),
-        "current_tags": request.GET.getlist("tags"),
+        **fields,
+        **current_params,
         "current_engineers": request.GET.getlist("engineers"),
         "current_objects": request.GET.getlist("objects_set"),
         "filter_data": filter_url,

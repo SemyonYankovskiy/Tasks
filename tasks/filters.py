@@ -1,10 +1,12 @@
 from urllib.parse import urlencode
 
 import django_filters
+from django.core.cache import cache
 from django.db.models import Q
 
 from .models import Object, Task, Engineer
-from .services.tree_nodes import ObjectsTagsTree, GroupsTree
+from .services.cache_version import CacheVersion
+from .services.tree_nodes import ObjectsTagsTree, GroupsTree, TasksTagsTree, ObjectsTree, EngineersTree
 
 
 class ObjectFilter(django_filters.FilterSet):
@@ -39,17 +41,59 @@ class ObjectFilter(django_filters.FilterSet):
         return urlencode(filter_data, doseq=True)
 
 
-def get_homepage_filter_components(request):
+def get_fields_for_filter(user, page):
     """
-    Возвращает словарь с древовидной структурой + текущее значение тегов и групп
-    :param request:
-    :return: dict
+    Возвращает древовидную структуру полей для отображения в фильтре
     """
-    return {"tags_json": ObjectsTagsTree({"user": request.user}).get_nodes(),
-            "groups_json": GroupsTree({"user": request.user}).get_nodes(),
-            "current_tags": request.GET.getlist("tags"),
-            "current_groups": request.GET.getlist("groups"), }
 
+    cache_key = f'filter_fields:{page}:{user}'
+    version_cache_key = f"filter_fields_cache_{page}"
+    cache_version = CacheVersion(version_cache_key)
+    cache_version_value = cache_version.get_cache_version()
+    context = {"user": user}
+
+    # Попытка получить данные из кеша
+    cached_data = cache.get(cache_key, version=cache_version_value)
+    if cached_data:
+        return cached_data
+
+    # Заполняем filter_fields_content в зависимости от страницы
+    if page == "objects":
+        filter_fields_content = {
+            "tags_json": ObjectsTagsTree(context).get_nodes(),
+            "groups_json": GroupsTree(context).get_nodes()
+        }
+    elif page == "tasks":
+        filter_fields_content = {
+            "tags_json": TasksTagsTree(context).get_nodes(),
+            "engineers_json": EngineersTree(context).get_nodes(),
+            "objects_json": ObjectsTree(context).get_nodes()
+        }
+    else:
+        # Обработка неизвестного значения page
+        raise ValueError(f"Неизвестное значение параметра 'page': {page}")
+
+    # Устанавливаем данные в кеш
+    cache.set(cache_key, filter_fields_content, timeout=600, version=cache_version_value)
+    return filter_fields_content
+
+
+def get_current_filter_params(request, page):
+    if page == "objects":
+        current_params = {
+            "current_tags": request.GET.getlist("tags"),
+            "current_groups": request.GET.getlist("groups")}
+
+    elif page == "tasks":
+        current_params = {
+            "current_tags": request.GET.getlist("tags"),
+            "current_engineers": request.GET.getlist("engineers"),
+            "current_objects": request.GET.getlist("objects_set")}
+    else:
+        # Обработка неизвестного значения page
+        raise ValueError(f"Неизвестное значение параметра 'page': {page}")
+
+    return current_params
 
 
 class TaskFilter(django_filters.FilterSet):

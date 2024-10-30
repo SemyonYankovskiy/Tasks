@@ -115,6 +115,7 @@ class Task(models.Model):
         "AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True
     )
     creator = models.ForeignKey(get_user_model(), related_name="created_tasks", on_delete=models.PROTECT)
+
     # slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
 
     class Meta:
@@ -282,6 +283,27 @@ class Address(models.Model):
 
 @receiver(post_save, sender=Object)
 def update_cache_version(sender, created, **kwargs):
-    global_cache_key = "object_cache"
-    cache_version = CacheVersion(global_cache_key)
-    cache_version.increment_cache_version()
+    CacheVersion("object_cache").increment_cache_version()
+    CacheVersion("filter_fields_cache_tasks").increment_cache_version()
+
+@receiver(post_save, sender=Tag)
+def update_cache_version(sender, created, **kwargs):
+    CacheVersion("filter_fields_cache_objects").increment_cache_version()
+    CacheVersion("filter_fields_cache_tasks").increment_cache_version()
+
+
+@receiver(post_save, sender=ObjectGroup)
+def update_cache_version(sender, created, **kwargs):
+    CacheVersion("filter_fields_cache_objects").increment_cache_version()
+
+
+
+@receiver(post_save, sender=Engineer)
+def update_cache_version(sender, created, **kwargs):
+    CacheVersion("filter_fields_cache_tasks").increment_cache_version()
+
+
+@receiver(post_save, sender=Department)
+def update_cache_version(sender, created, **kwargs):
+    CacheVersion("filter_fields_cache_tasks").increment_cache_version()
+
