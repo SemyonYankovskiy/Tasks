@@ -6,6 +6,7 @@ from django.db.models import Q
 
 from .models import Object, Task, Engineer
 from .services.cache_version import CacheVersion
+from .services.service import default_date
 from .services.tree_nodes import ObjectsTagsTree, GroupsTree, TasksTagsTree, ObjectsTree, EngineersTree
 
 
@@ -67,7 +68,9 @@ def get_fields_for_filter(user, page):
         filter_fields_content = {
             "tags_json": TasksTagsTree(context).get_nodes(),
             "engineers_json": EngineersTree(context).get_nodes(),
-            "objects_json": ObjectsTree(context).get_nodes()
+            "objects_json": ObjectsTree(context).get_nodes(),
+            "default_date": default_date(),
+            "default_time": "17:30",
         }
     else:
         # Обработка неизвестного значения page
@@ -89,6 +92,7 @@ def get_current_filter_params(request, page):
             "current_tags": request.GET.getlist("tags"),
             "current_engineers": request.GET.getlist("engineers"),
             "current_objects": request.GET.getlist("objects_set")}
+
     else:
         # Обработка неизвестного значения page
         raise ValueError(f"Неизвестное значение параметра 'page': {page}")
@@ -167,6 +171,35 @@ class TaskFilter(django_filters.FilterSet):
     @staticmethod
     def search_filter(queryset, name: str, value: str):
         return queryset.filter(Q(header__icontains=value) | Q(text__icontains=value))
+
+    @property
+    def applied_filters_count(self):
+        """
+        Считаем только те параметры, которые не в списке `not_count_params` и имеют значение
+        :return:  int
+        """
+        not_count_params = ["show_my_tasks_only", "sort_order", "page", "show_active_task", "show_done_task",
+                            "per_page"]
+
+        applied_params = [param for key, param in self.data.items() if param and key not in not_count_params]
+
+        # Количество примененных фильтров
+        params_count = len(applied_params)
+
+        # Проверяем наличие completion_time_after и completion_time_before и учитываем их как один фильтр
+        if self.data.get("completion_time_after") and self.data.get("completion_time_before"):
+            params_count -= 1
+
+        return params_count
+
+    @property
+    def filter_url(self):
+        """
+        Формируем строку URL с параметрами, исключая параметры из `exclude_params`
+        """
+        filter_data = {key: value for key, value in self.data.items() if key not in ["page"]}
+        return urlencode(filter_data, doseq=True)
+
 
 
 class TaskFilterByDone(django_filters.FilterSet):

@@ -1,16 +1,14 @@
 from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Q, F
-from django.http import Http404
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from tasks.services.objects import get_objects_list, get_objects
-from tasks.services.service import paginate_queryset
-from tasks.services.tasks_prepare import get_filtered_tasks, task_filter_params
+from tasks.services.objects import get_objects_list, get_objects, get_single_object
+from tasks.services.tasks_prepare import get_filtered_tasks, get_tasks
 from tasks.services.tree_nodes import GroupsTree
-from .filters import ObjectFilter, get_current_filter_params, get_fields_for_filter
+from .filters import ObjectFilter, get_current_filter_params, get_fields_for_filter, TaskFilter
 from .forms import CKEditorEditForm, CKEditorCreateForm, CKEditorEditObjForm
 from .models import Object, Task, Engineer
 from .services.tree_nodes.tree_nodes import AllTagsTree
@@ -28,92 +26,37 @@ def get_home(request):
 
     current_filter_params = get_current_filter_params(request, "objects")
 
-    params_count = ObjectFilter(request.GET, queryset=get_objects_list(request)).applied_filters_count
-    # для сохранения фильтров при пагинации
-    filter_url = ObjectFilter(request.GET, queryset=get_objects_list(request)).filter_url
+    obj_filter = ObjectFilter(request.GET, queryset=get_objects_list(request))
 
     context = {**objects,
                **current_filter_params,
                **filter_fields_items,
-               "filter_data": filter_url,
-               "params_count": params_count,
+               "filter_data": obj_filter.filter_url,  # для сохранения фильтров при пагинации
+               "params_count": obj_filter.applied_filters_count,
                }
     return render(request, "components/home/home.html", context=context)
 
 
-def get_obj(object_slug, user):
-    # Получаем основной объект
-    obj = (
-        Object.objects.filter(slug=object_slug)
-            .prefetch_related("files", "tags", "groups")
-            .annotate(
-            parent_name=F("parent__name"),
-            parent_slug=F("parent__slug"),
-            done_tasks_count=Count("id", filter=Q(tasks__is_done=True)),
-            undone_tasks_count=Count("id", filter=Q(tasks__is_done=False)),
-        )
-            .filter(groups__users=user)
-            .first()
-    )
-    return obj
+
 
 
 @login_required
 def get_object_page(request, object_slug):
-    # Получаем основной объект
-    obj = (
-        Object.objects.filter(slug=object_slug)
-            .prefetch_related("files", "tags", "groups")
-            .annotate(
-            parent_name=F("parent__name"),
-            parent_slug=F("parent__slug"),
-            done_tasks_count=Count("id", filter=Q(tasks__is_done=True)),
-            undone_tasks_count=Count("id", filter=Q(tasks__is_done=False)),
-        )
-            .filter(groups__users=request.user)
-            .first()
-    )
+    page_number = request.GET.get("page", 1)
+    per_page = request.GET.get("per_page", 1)
+    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page", ]})
 
-    # Если объект не найден, выбрасываем исключение 404 (страница не найдена)
-    if obj is None:
-        raise Http404()
+    obj = get_single_object(request.user, object_slug)
 
-    if obj:
-        # Получаем все связанные файлы
-        attached_files = obj.files.all()
+    tasks = get_tasks(request, filter_params, page_number, per_page)
 
-        # Разделяем файлы на изображения и не-изображения
-        images = [file for file in attached_files if file.is_image]  # Используем поле is_image
-        non_images = [file for file in attached_files if not file.is_image]  # Используем поле is_image
-    else:
-        images = []
-        non_images = []
-
-    # Получаем связанные задачи с учетом фильтров
-    filtered_tasks_data = get_filtered_tasks(request, obj=obj)
-
-    # Получаем номер страницы из запроса
-    page_number = request.GET.get("page")
-    # Используем функцию пагинации
-    pagination_data = paginate_queryset(filtered_tasks_data.tasks, page_number, per_page=8)
-
-    tasks = pagination_data["page_obj"]
-
-    child_objects = get_objects_list(request).filter(parent=obj)
-
-    filter_context = task_filter_params(request)
+    child_objects = get_objects_list(request).filter(parent=obj["object"])
     ckeditor = CKEditorCreateForm(request.POST)
+
     context = {
-        "object": obj,
-        "obj_images": images,
-        "obj_files": non_images,
-        "object_id_list": [obj.id],
-        "tasks": tasks,
-        "counters": filtered_tasks_data.tasks_counters,
-        "filter_params": filtered_tasks_data.filter_params,
-        "pagination_data": pagination_data,
+        **obj,
+        **tasks,
         "child_objects": child_objects,
-        **filter_context,
         "ckeditor": ckeditor,
     }
 
@@ -122,31 +65,25 @@ def get_object_page(request, object_slug):
 
 @login_required
 def get_tasks_page(request):
-    """
-    Рендер страницы с задачами
-    """
-    filtered_task = get_filtered_tasks(request)  # Получаем qs объект
-
-    filter_context = task_filter_params(request)  # Получаем текущие параметры фильтра из url
-
-    # Пагинация
     page_number = request.GET.get("page", 1)
-    per_page = request.GET.get("per_page", 8)
+    per_page = request.GET.get("per_page", 1)
+    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page", ]})
 
-    # Тут теперь хранятся и задачи и параметры пагинатора
-    pagination_data = paginate_queryset(filtered_task.tasks, page_number, per_page)
+    tasks = get_tasks(request, filter_params, page_number, per_page)
+    fields = get_fields_for_filter(user=request.user, page="tasks")
 
+    current_filter_params = get_current_filter_params(request=request, page="tasks")
+
+    task_filter = TaskFilter(request.GET)
     ckeditor = CKEditorCreateForm(request.POST)
 
     context = {
-        "pagination_data": pagination_data,
-
-        "counters": filtered_task.tasks_counters,
-        "filter_params": filtered_task.filter_params,
-        **filter_context,
-
+        **tasks,
+        **fields,
+        "current_filter_params": current_filter_params,  # для TreeSelect
+        "filter_data": task_filter.filter_url,  # для сохранения фильтров при пагинации
+        "params_count": task_filter.applied_filters_count,
         "ckeditor": ckeditor,
-
     }
 
     return render(request, "components/task/tasks_page.html", context=context)
@@ -169,14 +106,14 @@ def get_task_view(request, task_id: int):
 @login_required
 def get_calendar_page(request):
     tasks = get_filtered_tasks(request)
-    filter_context = task_filter_params(request)
+    # filter_context = task_filter_params(request)
 
     return render(
         request,
         "components/calendar/calendar.html",
         {
             "tasks": tasks,
-            **filter_context,
+            # **filter_context,
 
             "c": tasks.tasks_counters,
             "fp": tasks.filter_params,

@@ -6,7 +6,7 @@
     <div class="container">
 
 
-            {% include "components/task/task_container.html" with tasks=pagination_data.page_obj not_done_count=counters.not_done_count done_count=counters.done_count show_my_tasks_only=filter_params.show_my_tasks_only sort_order=filter_params.sort_order show_active_task=filter_params.show_active_task show_done_task=filter_params.show_done_task tasks_due_today_count=counters.tasks_due_today_count show_cat=True %}
+            {% include "components/task/task_container.html" with tasks=pagination_data.page_obj not_done_count=task_count.not_done_count done_count=task_count.done_count show_my_tasks_only=filter_params.show_my_tasks_only sort_order=filter_params.sort_order show_active_task=filter_params.show_active_task show_done_task=filter_params.show_done_task tasks_due_today_count=task_count.tasks_due_today_count show_cat=True %}
 
 
     </div>

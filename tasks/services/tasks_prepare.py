@@ -1,14 +1,14 @@
 import datetime
 from dataclasses import dataclass
-from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
 
+from django.core.cache import cache
 from django.db.models import Q, Count, Case, When, QuerySet
 
-from tasks.filters import TaskFilter, TaskFilterByDone, get_fields_for_filter, get_current_filter_params
+from tasks.filters import TaskFilter, TaskFilterByDone
 from tasks.models import Task, Engineer
-from tasks.services.service import default_date
-from tasks.services.tree_nodes import TasksTagsTree, ObjectsTree, EngineersTree
+from tasks.services.cache_version import CacheVersion
+from tasks.services.service import paginate_queryset
 from user.models import User
 
 
@@ -139,67 +139,36 @@ def get_filtered_tasks(request, obj=None):
     )
 
 
-def get_m2m_fields_for_tasks(user):
+def get_tasks(request, filter_params, page_number, per_page):
     """
-    Возвращает поля m2m задач, для отображения в фильтре задач
+    Возвращает список объектов. Если не применяются фильтры - возвращает объекты из кэша
     """
-    context = {"user": user}
+    cache_key = f'tasks-page:{page_number}:{request.user}'
 
-    tasks_tags_tree = TasksTagsTree(context).get_nodes()
-    objects_tree = ObjectsTree(context).get_nodes()
-    engineers_tree = EngineersTree(context).get_nodes()
+    version_cache_key = "tasks_version_cache"
+    cache_version = CacheVersion(version_cache_key)
+    cache_version_value = cache_version.get_cache_version()
 
-    # Возвращаем данные для использования в фильтрах
-    return {
-        "tags_json": tasks_tags_tree,
-        "engineers_json": engineers_tree,
-        "objects_json": objects_tree,
+    cached_data = cache.get(cache_key, version=cache_version_value) if not filter_params else None
+
+    if cached_data:
+        return cached_data
+
+    filtered_task = get_filtered_tasks(request)
+    pagination_data = paginate_queryset(filtered_task.tasks, page_number, per_page)
+
+    result = {
+        "tasks": pagination_data["page_obj"],
+        "pagination_data": pagination_data,
+        "task_count": filtered_task.tasks_counters,
+        "filter_params": filtered_task.filter_params,
     }
 
+    # Кэшируем результат, если отсутствуют фильтры
+    if not filter_params:
+        cache.set(cache_key, result, timeout=600, version=cache_version_value)
 
-def task_filter_params(request):
-    """
-    Возвращает текущие параметры фильтра, количество примененных фильтров,
-    поля m2m, строку с параметрами фильтра для сохранения состояния фильтра
-    """
+    return result
 
-    # Параметры, которые не нужно учитывать при подсчёте количества активных фильтров
-    not_count_params = [
-        "show_my_tasks_only",
-        "sort_order",
-        "page",
-        "show_active_task",
-        "show_done_task",
-        "per_page",
-    ]
 
-    # Параметры, которые исключаются из URL
-    exclude_params = ["page", "per_page"]
-    filter_data = {key: value for key, value in request.GET.items() if key not in exclude_params}
 
-    # Формируем строку с параметрами фильтра для последующего использования в шаблонах
-    filter_url = urlencode(filter_data, doseq=True) + "#tasks"
-
-    # Логика подсчёта активных фильтров
-    applied_params = [param for key, param in request.GET.items() if param and key not in not_count_params]
-
-    # Количество примененных фильтров
-    params_count = len(applied_params)
-
-    # Проверяем наличие completion_time_after и completion_time_before и учитываем их как один фильтр
-    if request.GET.get("completion_time_after") and request.GET.get("completion_time_before"):
-        params_count -= 1
-
-    fields = get_fields_for_filter(user=request.user, page="tasks")
-    current_params = get_current_filter_params(request=request, page="tasks")
-
-    return {
-        **fields,
-        **current_params,
-        "current_engineers": request.GET.getlist("engineers"),
-        "current_objects": request.GET.getlist("objects_set"),
-        "filter_data": filter_url,
-        "params_count": params_count,
-        "default_date": default_date(),
-        "default_time": "17:30",
-    }

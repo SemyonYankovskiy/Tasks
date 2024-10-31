@@ -281,10 +281,17 @@ class Address(models.Model):
         return f"Address: ({self.__str__()})"
 
 
+@receiver(post_save, sender=Task)
+def update_cache_version(sender, created, **kwargs):
+    CacheVersion("tasks_version_cache").increment_cache_version()
+
+
 @receiver(post_save, sender=Object)
 def update_cache_version(sender, created, **kwargs):
     CacheVersion("object_cache").increment_cache_version()
+    CacheVersion("single_obj_version_cache").increment_cache_version()
     CacheVersion("filter_fields_cache_tasks").increment_cache_version()
+
 
 @receiver(post_save, sender=Tag)
 def update_cache_version(sender, created, **kwargs):
