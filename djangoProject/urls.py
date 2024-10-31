@@ -15,7 +15,6 @@ urlpatterns = [
     path("close_task/<int:task_id>/", tasks_actions.close_task, name="close_task"),
     path("reopen_task/<int:task_id>/", tasks_actions.reopen_task, name="reopen_task"),
     path("tasks/", views.get_tasks_page, name="tasks"),  # Страница задач
-    path("map/", views.get_map_page, name="map"),  # Страница карты
     path("calendar/", views.get_calendar_page, name="calendar"),  # Страница карты
     path("stat/", views.get_stat_page, name="stat"),  # Страница карты
     path("object/<slug:object_slug>/", views.get_object_page, name="show-object"),

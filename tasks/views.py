@@ -58,94 +58,6 @@ def get_obj(object_slug, user):
     return obj
 
 
-# @login_required
-# def get_object_page(request, object_slug):
-#     # Получаем номер страницы из запроса
-#     page_number = request.GET.get("page", 1)
-#     filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page"]})
-#
-#     cache_key = f'{object_slug}_page:{page_number}:{request.user.username}:{filter_params}'
-#
-#     # Получаем данные из кэша
-#     cached_data = cache.get(cache_key)
-#
-#     # =========== Кеширование =========== #
-#     if cached_data is None:
-#         obj = get_obj(object_slug, request.user)
-#         if obj is None:
-#             raise Http404()
-#
-#         # Получаем все связанные файлы
-#         attached_files = obj.files.all()
-#
-#         # Разделяем файлы на изображения и не-изображения
-#         images = [file for file in attached_files if file.is_image]  # Используем поле is_image
-#         non_images = [file for file in attached_files if not file.is_image]  # Используем поле is_image
-#
-#         # Получаем связанные задачи с учетом фильтров
-#         filtered_tasks_data = get_filtered_tasks(request, obj=obj)
-#         counters = filtered_tasks_data.tasks_counters
-#
-#         # Используем функцию пагинации
-#         pagination_data = paginate_queryset(filtered_tasks_data.tasks, page_number, per_page=8)
-#
-#         tasks = pagination_data["page_obj"]
-#
-#         child_objects = get_objects_list(request).filter(parent=obj)
-#
-#         filter_context = task_filter_params(request)
-#         filter_params = filtered_tasks_data.filter_params
-#         object_id_list = [obj.id]
-#
-#         # Сохраняем данные в кэш
-#         cached_data = {
-#             "object": obj,
-#             "obj_images": images,
-#             "obj_files": non_images,
-#             "tasks": tasks,
-#             "counters": counters,
-#
-#             "pagination_data": pagination_data,
-#             "child_objects": child_objects,
-#             "filter_context": filter_context,
-#             "filter_params": filter_params,
-#             "object_id_list": object_id_list
-#         }
-#         cache.set(cache_key, cached_data, timeout=60)
-#     else:
-#         # Используем закэшированные данные
-#         obj = cached_data["object"]
-#         images = cached_data["obj_images"]
-#         non_images = cached_data["obj_files"]
-#         tasks = cached_data["tasks"]
-#
-#         pagination_data = cached_data["pagination_data"]
-#         child_objects = cached_data["child_objects"]
-#         filter_context = cached_data["filter_context"]
-#         filter_params = cached_data["filter_params"]
-#         counters = cached_data["counters"]
-#         object_id_list = cached_data["object_id_list"]
-#
-#     ckeditor = CKEditorCreateForm(request.POST)
-#
-#     context = {
-#         "object": obj,
-#         "obj_images": images,
-#         "obj_files": non_images,
-#         "tasks": tasks,
-#         **filter_context,
-#         "filter_params": filter_params,
-#
-#         "pagination_data": pagination_data,
-#         "child_objects": child_objects,
-#         "ckeditor": ckeditor,
-#         "counters": counters,
-#         "object_id_list": object_id_list,
-#     }
-#
-#     return render(request, "components/object/object-page.html", context=context)
-
-
 @login_required
 def get_object_page(request, object_slug):
     # Получаем основной объект
@@ -252,11 +164,6 @@ def get_task_view(request, task_id: int):
         "form_type": "collapse",
     }
     return render(request, "components/task/task.html", context=context)
-
-
-@login_required
-def get_map_page(request):
-    return render(request, "components/map/map.html")
 
 
 @login_required
