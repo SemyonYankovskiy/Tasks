@@ -6,12 +6,11 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
 from tasks.services.objects import get_objects, get_single_object, get_child_objects
-from tasks.services.tasks_prepare import get_filtered_tasks, get_tasks
+from tasks.services.tasks_prepare import get_tasks
 from tasks.services.tree_nodes import GroupsTree
 from .filters import ObjectFilter, get_current_filter_params, get_fields_for_filter, TaskFilter
 from .forms import CKEditorEditForm, CKEditorCreateForm, CKEditorEditObjForm
 from .models import Object, Task, Engineer
-from .services.service import paginate_queryset
 from .services.tree_nodes.tree_nodes import AllTagsTree
 
 
@@ -77,7 +76,6 @@ def get_tasks_page(request):
 
     tasks = get_tasks(request, filter_params, page_number, per_page)
 
-
     fields = get_fields_for_filter(user=request.user, page="tasks")
     current_filter_params = get_current_filter_params(request=request, page="tasks")
 
@@ -112,20 +110,23 @@ def get_task_view(request, task_id: int):
 
 @login_required
 def get_calendar_page(request):
-    tasks = get_filtered_tasks(request)
-    # filter_context = task_filter_params(request)
+    page_number = request.GET.get("page", 1)
+    per_page = request.GET.get("per_page", 1000)
+    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page", ]})
 
-    return render(
-        request,
-        "components/calendar/calendar.html",
-        {
-            "tasks": tasks,
-            # **filter_context,
+    tasks = get_tasks(request, filter_params, page_number, per_page)
+    fields = get_fields_for_filter(user=request.user, page="tasks")
+    current_filter_params = get_current_filter_params(request=request, page="tasks")
+    task_filter = TaskFilter(request.GET)
 
-            "c": tasks.tasks_counters,
-            "fp": tasks.filter_params,
-        },
-    )
+    context = {
+        **tasks,
+        **fields,
+        "current_filter_params": current_filter_params,  # для TreeSelect
+        "params_count": task_filter.applied_filters_count,
+    }
+
+    return render(request, "components/calendar/calendar.html", context=context)
 
 
 @login_required

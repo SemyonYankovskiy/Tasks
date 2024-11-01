@@ -20,7 +20,7 @@
     <div class="px-3 py-3">
         <div class="container  px-3 ">
         <div class="container">
-                        {% include "components/task/tasks_container_buttons.html" with show_active_task=fp.show_active_task not_done_count=c.not_done_count show_done_task=fp.show_done_task done_count=c.done_count show_my_tasks_only=fp.show_my_tasks_only tasks_due_today_count=c.tasks_due_today_count %}
+        {% include "components/task/tasks_container_buttons.html" with not_done_count=task_count.not_done_count done_count=task_count.done_count show_my_tasks_only=filter_params.show_my_tasks_only sort_order=filter_params.sort_order show_active_task=filter_params.show_active_task show_done_task=filter_params.show_done_task tasks_due_today_count=task_count.tasks_due_today_count %}
 
         </div>
 
@@ -104,7 +104,7 @@
                 },
 
                 events: [
-                    {% for task in tasks.tasks %}
+                    {% for task in tasks %}
                         {
                             title: '{{ task.header }}',
                             start: '{{ task.completion_time|date:"Y-m-d\TH:i:s" }}',
