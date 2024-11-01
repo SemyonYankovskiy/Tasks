@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.db.models import Count, Q, F
+from django.db.models import Max
 from django.db.models import OuterRef, Subquery, Case, When, Value, CharField, QuerySet
 from django.db.models.functions import Concat, Substr, Length
 from django.db.transaction import atomic
@@ -21,37 +22,30 @@ from ..filters import ObjectFilter
 
 
 def get_objects_list(user) -> QuerySet[Object]:
-    """
-    Создает запрос к базе данных для получения объектов и добавляет дополнительные поля
-    через аннотации и подзапросы, такие как превью изображения, количество дочерних объектов и задач.
-    """
-
-    # Подзапрос для получения первого файла изображения (jpeg, jpg, png) для каждого объекта
     image_subquery = (
         AttachedFile.objects.filter(objects_set=OuterRef("pk"), file__iregex=r"\.(jpeg|jpg|png)$")
-        .order_by("id")
-        .values("file")[:1]
+        .values("file")
+        .annotate(image_file=Max("file"))
+        .values("image_file")
     )
 
-    # Подзапрос для подсчета активных задач (не завершенных) для каждого объекта
     tasks_count_subquery = (
         permission_filter(user)
         .filter(objects_set=OuterRef("pk"), is_done=False)
-        .values('objects_set')
+        .values("objects_set")
         .annotate(tasks_count=Count("id"))
-        .values("tasks_count")
+        .values("tasks_count")[:1]
     )
 
-    # Основной запрос для получения списка объектов
     objects = (
         Object.objects.all()
         .prefetch_related("tags", "groups")
         .filter(groups__users=user)
         .annotate(
-            img_preview=Subquery(image_subquery),  # Добавляем превью изображения как подзапрос
+            img_preview=Subquery(image_subquery, output_field=CharField()),  # Используем подзапрос с одним значением
             child_count=Count("children", distinct=True),  # Подсчет уникальных дочерних объектов
             description_length=Length("description"),
-            tasks_count=Subquery(tasks_count_subquery, output_field=CharField()),  # Добавляем счетчик задач
+            tasks_count=Subquery(tasks_count_subquery, output_field=CharField()),  # Используем подзапрос с одним значением
             short_description=Case(
                 When(description_length__gt=53, then=Concat(Substr("description", 1, 50), Value("..."))),
                 default="description",
