@@ -12,8 +12,8 @@ from .services.tree_nodes import ObjectsTagsTree, GroupsTree, TasksTagsTree, Obj
 
 class ObjectFilter(django_filters.FilterSet):
     search = django_filters.CharFilter(method="search_filter")
-    not_count_params = ["page", "per_page"]
-    exclude_params = ["page"]
+
+
 
     class Meta:
         model = Object
@@ -28,9 +28,10 @@ class ObjectFilter(django_filters.FilterSet):
         Считаем только те параметры, которые не в списке `not_count_params` и имеют значение
         :return:  int
         """
+        not_count_params = ["page", "per_page"]
         return len([
             param for param, value in self.data.items()
-            if value and param not in self.not_count_params
+            if value and param not in not_count_params
         ])
 
     @property
@@ -38,7 +39,8 @@ class ObjectFilter(django_filters.FilterSet):
         """
         Формируем строку URL с параметрами, исключая параметры из `exclude_params`
         """
-        filter_data = {key: value for key, value in self.data.items() if key not in self.exclude_params}
+        exclude_params = ["page"]
+        filter_data = {key: value for key, value in self.data.items() if key not in exclude_params}
         return urlencode(filter_data, doseq=True)
 
 
@@ -47,8 +49,8 @@ def get_fields_for_filter(user, page):
     Возвращает древовидную структуру полей для отображения в фильтре
     """
 
-    cache_key = f'filter_fields:{page}:{user}'
-    version_cache_key = f"filter_fields_cache_{page}"
+    cache_key = f'filter_components:{page}:{user}'
+    version_cache_key = f"filter_components_cache_version_{page}"
     cache_version = CacheVersion(version_cache_key)
     cache_version_value = cache_version.get_cache_version()
     context = {"user": user}

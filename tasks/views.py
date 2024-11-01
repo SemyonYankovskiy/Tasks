@@ -5,19 +5,20 @@ from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from tasks.services.objects import get_objects_list, get_objects, get_single_object
+from tasks.services.objects import get_objects, get_single_object, get_child_objects
 from tasks.services.tasks_prepare import get_filtered_tasks, get_tasks
 from tasks.services.tree_nodes import GroupsTree
 from .filters import ObjectFilter, get_current_filter_params, get_fields_for_filter, TaskFilter
 from .forms import CKEditorEditForm, CKEditorCreateForm, CKEditorEditObjForm
 from .models import Object, Task, Engineer
+from .services.service import paginate_queryset
 from .services.tree_nodes.tree_nodes import AllTagsTree
 
 
 @login_required
 def get_home(request):
     page_number = request.GET.get("page", 1)
-    per_page = request.GET.get("per_page", 2)
+    per_page = request.GET.get("per_page", 8)
     filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page"]})
 
     objects = get_objects(request, filter_params, page_number, per_page)
@@ -26,7 +27,7 @@ def get_home(request):
 
     current_filter_params = get_current_filter_params(request, "objects")
 
-    obj_filter = ObjectFilter(request.GET, queryset=get_objects_list(request))
+    obj_filter = ObjectFilter(request.GET)
 
     context = {**objects,
                **current_filter_params,
@@ -43,19 +44,24 @@ def get_home(request):
 @login_required
 def get_object_page(request, object_slug):
     page_number = request.GET.get("page", 1)
-    per_page = request.GET.get("per_page", 1)
+    per_page = request.GET.get("per_page", 8)
     filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page", ]})
 
     obj = get_single_object(request.user, object_slug)
+    child_objects = get_child_objects(user=request.user, parent=obj["object"])
 
-    tasks = get_tasks(request, filter_params, page_number, per_page)
+    tasks = get_tasks(request, filter_params, page_number, per_page, obj=obj["object"])
+    # filtered_task = get_filtered_tasks(request, obj=obj["object"])
+    # pagination_data = paginate_queryset(filtered_task.tasks, page_number, per_page)
 
-    child_objects = get_objects_list(request).filter(parent=obj["object"])
     ckeditor = CKEditorCreateForm(request.POST)
-
     context = {
         **obj,
         **tasks,
+        # "tasks": pagination_data["page_obj"],
+        # "pagination_data": pagination_data,
+        # "task_count": filtered_task.tasks_counters,
+        # "filter_params": filtered_task.filter_params,
         "child_objects": child_objects,
         "ckeditor": ckeditor,
     }
@@ -66,12 +72,13 @@ def get_object_page(request, object_slug):
 @login_required
 def get_tasks_page(request):
     page_number = request.GET.get("page", 1)
-    per_page = request.GET.get("per_page", 1)
+    per_page = request.GET.get("per_page", 8)
     filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page", ]})
 
     tasks = get_tasks(request, filter_params, page_number, per_page)
-    fields = get_fields_for_filter(user=request.user, page="tasks")
 
+
+    fields = get_fields_for_filter(user=request.user, page="tasks")
     current_filter_params = get_current_filter_params(request=request, page="tasks")
 
     task_filter = TaskFilter(request.GET)

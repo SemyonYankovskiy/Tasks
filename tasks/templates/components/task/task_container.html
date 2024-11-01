@@ -1,35 +1,42 @@
 {% load static %}
 <div id="tasks" class=" mt-3 ms-1">
     <div class="container">
-    {% include "components/task/tasks_container_buttons.html" %}
+        {% include "components/task/tasks_container_buttons.html" %}
     </div>
 
 
     {% if tasks %}
         <div class="mt-4" id="myTabContent">
-        <!-- Вкладка активных задач -->
-        <div class="px-2 ">
-            {% for task in tasks %}
-                {% include "components/task/task.html" %}
-            {% endfor %}
-        </div>
-        <div class="mt-5">
-                {% include 'components/pagination.html' %}
-        </div>
-    {% else %}
-        <div class="d-flex justify-content-between mt-3 px-4">
-        <span class="mb-3">Задач для отображения нет</span>
-            {% if show_cat %}
-        <img class="m-0" src="{% static 'self/img/bongo-cat-cat-meme.gif' %}" alt="Задач нет" title="Задач нет">
-            {% endif %}
+
+            <div class="px-2 ">
+                {% for task in tasks %}
+                    {% include "components/task/task.html" %}
+                {% endfor %}
+            </div>
+
+
+            {% include 'components/pagination.html' %}
+
+
+
+
+            {% else %}
+            <div class="d-flex justify-content-between mt-3 px-4">
+                <span class="mb-3">Задач для отображения нет</span>
+                {% if show_cat %}
+                    <img class="m-0" src="{% static 'self/img/bongo-cat-cat-meme.gif' %}" alt="Задач нет"
+                         title="Задач нет">
+                {% endif %}
+            </div>
         </div>
     {% endif %}
-    
-    </div>
+
+
 
     {% include 'components/task/edit_task_modal.html' %}
     {% include 'components/task/confirm_task_modal.html' %}
 
 </div>
+
 
 <script src="{% static 'self/js/filters.js' %}"></script>

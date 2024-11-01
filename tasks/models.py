@@ -283,34 +283,33 @@ class Address(models.Model):
 
 @receiver(post_save, sender=Task)
 def update_cache_version(sender, created, **kwargs):
-    CacheVersion("tasks_version_cache").increment_cache_version()
+    CacheVersion("tasks_page_version_cache").increment_cache_version()
 
 
 @receiver(post_save, sender=Object)
 def update_cache_version(sender, created, **kwargs):
-    CacheVersion("object_cache").increment_cache_version()
-    CacheVersion("single_obj_version_cache").increment_cache_version()
-    CacheVersion("filter_fields_cache_tasks").increment_cache_version()
+    CacheVersion("objects_page_cache_version").increment_cache_version()
+    CacheVersion("filter_components_cache_version_tasks").increment_cache_version()
 
 
 @receiver(post_save, sender=Tag)
 def update_cache_version(sender, created, **kwargs):
-    CacheVersion("filter_fields_cache_objects").increment_cache_version()
-    CacheVersion("filter_fields_cache_tasks").increment_cache_version()
+    CacheVersion("filter_components_cache_version_objects").increment_cache_version()
+    CacheVersion("filter_components_cache_version_tasks").increment_cache_version()
 
 
 @receiver(post_save, sender=ObjectGroup)
 def update_cache_version(sender, created, **kwargs):
-    CacheVersion("filter_fields_cache_objects").increment_cache_version()
+    CacheVersion("filter_components_cache_version_objects").increment_cache_version()
 
 
 
 @receiver(post_save, sender=Engineer)
 def update_cache_version(sender, created, **kwargs):
-    CacheVersion("filter_fields_cache_tasks").increment_cache_version()
+    CacheVersion("filter_components_cache_version_tasks").increment_cache_version()
 
 
 @receiver(post_save, sender=Department)
 def update_cache_version(sender, created, **kwargs):
-    CacheVersion("filter_fields_cache_tasks").increment_cache_version()
+    CacheVersion("filter_components_cache_version_tasks").increment_cache_version()
 

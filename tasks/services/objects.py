@@ -1,18 +1,26 @@
 
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.db.models import Count, Q, F
 from django.db.models import OuterRef, Subquery, Case, When, Value, CharField, QuerySet
 from django.db.models.functions import Concat, Substr, Length
+from django.db.transaction import atomic
 from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 
+from tasks.forms import ObjectForm
 from tasks.models import Object, AttachedFile
 from .cache_version import CacheVersion
 from .service import paginate_queryset
+from .service import remove_unused_attached_files
+from .tasks_actions import create_tags
 from .tasks_prepare import permission_filter
 from ..filters import ObjectFilter
 
 
-def get_objects_list(request) -> QuerySet[Object]:
+def get_objects_list(user) -> QuerySet[Object]:
     """
     Создает запрос к базе данных для получения объектов и добавляет дополнительные поля
     через аннотации и подзапросы, такие как превью изображения, количество дочерних объектов и задач.
@@ -27,7 +35,7 @@ def get_objects_list(request) -> QuerySet[Object]:
 
     # Подзапрос для подсчета активных задач (не завершенных) для каждого объекта
     tasks_count_subquery = (
-        permission_filter(request.user)
+        permission_filter(user)
         .filter(objects_set=OuterRef("pk"), is_done=False)
         .values('objects_set')
         .annotate(tasks_count=Count("id"))
@@ -38,7 +46,7 @@ def get_objects_list(request) -> QuerySet[Object]:
     objects = (
         Object.objects.all()
         .prefetch_related("tags", "groups")
-        .filter(groups__users=request.user)
+        .filter(groups__users=user)
         .annotate(
             img_preview=Subquery(image_subquery),  # Добавляем превью изображения как подзапрос
             child_count=Count("children", distinct=True),  # Подсчет уникальных дочерних объектов
@@ -62,9 +70,9 @@ def get_objects(request, filter_params, page_number, per_page):
     """
     Возвращает список объектов. Если не применяются фильтры - возвращает объекты из кэша
     """
-    cache_key = f'objects-page:{page_number}:{request.user}'
+    cache_key = f'objects_page:{page_number}:{request.user}'
 
-    version_cache_key = "object_cache"
+    version_cache_key = "objects_page_cache_version"
     cache_version = CacheVersion(version_cache_key)
     cache_version_value = cache_version.get_cache_version()
 
@@ -73,10 +81,8 @@ def get_objects(request, filter_params, page_number, per_page):
     if cached_data:
         return cached_data
 
-    # ======= Фильтрация ======= #
-    filtered_objects = ObjectFilter(request.GET, queryset=get_objects_list(request)).qs
-
-    # ======= Пагинация ======= #
+    # Получение списка объектов и пагинирование
+    filtered_objects = ObjectFilter(request.GET, queryset=get_objects_list(request.user)).qs
     pagination_data = paginate_queryset(filtered_objects, page_number, per_page)
 
     result = {
@@ -93,7 +99,6 @@ def get_objects(request, filter_params, page_number, per_page):
 
 def get_obj(object_slug, user):
 
-    # Получаем основной объект
     obj = (
         Object.objects.filter(slug=object_slug)
             .prefetch_related("files", "tags", "groups")
@@ -134,23 +139,73 @@ def get_single_object(user, object_slug):
     """
     Возвращает список объектов. Если не применяются фильтры - возвращает объекты из кэша
     """
-    cache_key = f'obj-page:{user}'
-
-    version_cache_key = "single_obj_version_cache"
-    cache_version = CacheVersion(version_cache_key)
-    cache_version_value = cache_version.get_cache_version()
-
-    cached_data = cache.get(cache_key, version=cache_version_value)
+    cache_key = f'single_obj_{object_slug}'
+    cached_data = cache.get(cache_key)
 
     if cached_data:
         return cached_data
 
     obj = get_obj(object_slug, user)
-
     result = {**obj}
-
-    cache.set(cache_key, result, timeout=600, version=cache_version_value)
+    cache.set(cache_key, result, timeout=600)
 
     return result
 
 
+@login_required
+@atomic
+def edit_object(request, object_slug):
+    # Получаем объект по slug
+    obj = get_object_or_404(Object, slug=object_slug)
+
+    # Определяем путь для редиректа по умолчанию
+    redirect_to = reverse("home")
+
+    if request.method == "POST":
+
+        post_data = create_tags(request.POST, "obj_tags_edit")  # Сохраняем теги и возвращаем
+        form = ObjectForm(post_data, request.FILES, instance=obj)
+
+        if form.is_valid():
+
+            updated_object = form.save(commit=False)  # Сохраняем изменения в объекте
+
+            # Удаляем неиспользуемые прикрепленные файлы
+            remove_unused_attached_files(request.POST.get("fileuploader-list-files"), updated_object)
+
+            # Обработка прикрепленных файлов
+            for file in request.FILES.getlist("files[]"):
+                updated_object.files.add(AttachedFile.objects.create(file=file))
+            updated_object.save()
+            obj_cache_key = f'single_obj_{object_slug}'
+            childs_cache_key = f'obj_{object_slug}_childs'
+            cache.clear(obj_cache_key)
+            cache.clear(childs_cache_key)
+
+            messages.add_message(request, messages.SUCCESS, f"Объект '{updated_object.name}' отредактирован")
+
+            redirect_to = reverse("show-object", kwargs={"object_slug": updated_object.slug})
+
+        else:
+            messages.add_message(request, messages.WARNING, form.errors)
+
+    return redirect(redirect_to)
+
+
+def get_child_objects(user, parent):
+    """
+    Возвращает список объектов. Если не применяются фильтры - возвращает объекты из кэша
+    """
+
+    cache_key = f'obj_{parent.slug}_childs'
+    cached_data = cache.get(cache_key)
+    if cached_data is not None:
+
+        return cached_data
+
+    result = get_objects_list(user).filter(parent=parent)
+
+
+    cache.set(cache_key, result, timeout=600)
+
+    return result

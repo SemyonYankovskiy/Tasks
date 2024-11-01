@@ -9,9 +9,9 @@
 
         {% include "components/object/object-content.html" %}
 
-        <div class=" shadow rounded border-top border-3 ">
+        <div class=" shadow rounded border-top border-3 pb-1">
             <div class="fs-3 text-start  mt-4 ms-5">Задачи</div>
-            {% include "components/task/task_container.html" with hide_filter=True tasks=tasks not_done_count=counters.not_done_count done_count=counters.done_count show_my_tasks_only=filter_params.show_my_tasks_only sort_order=filter_params.sort_order show_active_task=filter_params.show_active_task show_done_task=filter_params.show_done_task %}
+            {% include "components/task/task_container.html" with hide_filter=True tasks=pagination_data.page_obj not_done_count=task_count.not_done_count done_count=task_count.done_count show_my_tasks_only=filter_params.show_my_tasks_only sort_order=filter_params.sort_order show_active_task=filter_params.show_active_task show_done_task=filter_params.show_done_task tasks_due_today_count=task_count.tasks_due_today_count %}
         </div>
     </div>
 {% endblock %}

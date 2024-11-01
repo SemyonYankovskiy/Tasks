@@ -5,13 +5,13 @@ from django.urls import include
 from django.urls import path
 
 from tasks import views
-from tasks.services import single_object, tasks_actions
+from tasks.services import tasks_actions, objects
 
 urlpatterns = [
     path("create-task/", tasks_actions.create_task, name="create_task"),
     path("take_task/<int:task_id>/", tasks_actions.take_task, name="take_task"),
     path("edit-task/<int:task_id>/", tasks_actions.edit_task, name="edit_task"),
-    path("edit-obj/<slug:slug>/", single_object.edit_object, name="edit_object"),
+    path("edit-obj/<slug:slug>/", objects.edit_object, name="edit_object"),
     path("close_task/<int:task_id>/", tasks_actions.close_task, name="close_task"),
     path("reopen_task/<int:task_id>/", tasks_actions.reopen_task, name="reopen_task"),
     path("tasks/", views.get_tasks_page, name="tasks"),  # Страница задач

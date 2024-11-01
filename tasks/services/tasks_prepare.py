@@ -139,13 +139,16 @@ def get_filtered_tasks(request, obj=None):
     )
 
 
-def get_tasks(request, filter_params, page_number, per_page):
+def get_tasks(request, filter_params, page_number, per_page, obj=None):
     """
     Возвращает список объектов. Если не применяются фильтры - возвращает объекты из кэша
     """
-    cache_key = f'tasks-page:{page_number}:{request.user}'
+    if obj:
+        cache_key = f'{obj.slug}_tasks_page:{page_number}:{request.user}'
+    else:
+        cache_key = f'tasks_page:{page_number}:{request.user}'
 
-    version_cache_key = "tasks_version_cache"
+    version_cache_key = "tasks_page_version_cache"
     cache_version = CacheVersion(version_cache_key)
     cache_version_value = cache_version.get_cache_version()
 
@@ -154,7 +157,7 @@ def get_tasks(request, filter_params, page_number, per_page):
     if cached_data:
         return cached_data
 
-    filtered_task = get_filtered_tasks(request)
+    filtered_task = get_filtered_tasks(request, obj=obj)
     pagination_data = paginate_queryset(filtered_task.tasks, page_number, per_page)
 
     result = {
