@@ -4,20 +4,21 @@
 <div class="accordion " id="accordionPanelsStayOpenExample">
     <div class="accordion-item bg-white border rounded {% if not expanded %}shadow{% else %}shadow-sm{% endif %} mx-3 my-3">
         <h2 class="accordion-header rounded"
-                            {% if task.time_left < 24 and task.time_left > 0 or task.completion_time.date == task.time_now.date %}
-                    style="border: 2px solid
-                            {% if task.priority == 'LOW' %} #1E90FF
-                            {% elif task.priority == 'MEDIUM' %}  #FFD700
-                            {% elif task.priority == 'HIGH' %}  #FF6347
-                            {% elif task.priority == 'CRITICAL' %}  #FF0000
-                            {% endif %}
-                            !important;"
-                    {% else %}
-                    style="border-bottom: 1px solid gainsboro;"
-                    style="border-bottom: 0;"
-                    {% endif %}>
+                {% if task.time_left < 24 and task.time_left > 0 or task.completion_time.date == task.time_now.date %}
+            style="border: 2px solid
+                    {% if task.priority == 'LOW' %} #1E90FF
+                    {% elif task.priority == 'MEDIUM' %}  #FFD700
+                    {% elif task.priority == 'HIGH' %}  #FF6347
+                    {% elif task.priority == 'CRITICAL' %}  #FF0000
+                    {% endif %}
+                    !important;"
+                {% else %}
+            style="border-bottom: 1px solid gainsboro;"
+            style="border-bottom: 0;"
+                {% endif %}>
 
-            <button class="accordion-button pb-1 ps-2 pt-3 ps-4{% if not expanded %}collapsed{% endif %} d-flex" type="button"
+            <button class="accordion-button pb-1 ps-2 pt-3 ps-4{% if not expanded %}collapsed{% endif %} d-flex"
+                    type="button"
                     data-bs-toggle="collapse"
                     data-bs-target="#collapse{{ task.id }}"
                     aria-expanded="{% if expanded %}true{% else %}false{% endif %}"
@@ -74,50 +75,53 @@
                     </div>
 
 
-
                 </div>
             </button>
             {# -- 2 Строка -- #}
-                    <div class="row pb-3 pt-2 mx-2 px-1 " style="font-size: medium">
-                        {# ============== OBJECTS ============== #}
-                        <div class="col d-flex justify-content-left">
-                            <div class="d-flex flex-wrap justify-content-left  align-items-center gap-2 mt-2">
-                                <i class="bi bi-grid pe-2" style="font-size: 1.2rem;"></i>
-                                {% if task.objects_set.all %}
-                                    {% for obj in task.objects_set.all %}
+            <div class="row pb-3 pt-2 mx-2 px-1 " style="font-size: medium">
+                {# ============== OBJECTS ============== #}
+                <div class="col d-flex justify-content-left">
+                    <div class="d-flex flex-wrap justify-content-left  align-items-center gap-2 mt-2">
+                        <i class="bi bi-grid pe-2" style="font-size: 1.2rem;"></i>
+                        {% if task.objects_set.all %}
+                            {% for obj in task.objects_set.all %}
 
-                                        <a href="{% url "tasks" %}?objects_set={{ obj.id }}" class="badge bg-dark-subtle text-black" style="text-decoration: none; ">{{ obj.name }}</a>
+                                <a href="{% url "tasks" %}?objects_set={{ obj.id }}"
+                                   class="badge bg-dark-subtle text-black"
+                                   style="text-decoration: none; ">{{ obj.name }}</a>
 
-                                    {% endfor %}
-                                {% else %}
-                                    <li class="list-group-item">Нет связанных объектов</li>
-                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item">Нет связанных объектов</li>
+                        {% endif %}
 
-                            </div>
-                        </div>
-
-                        {# ============== ENGINEERS ============== #}
-                        <div class="col d-flex justify-content-end px-3">
-                            <div class="col-md-10 d-flex flex-wrap justify-content-end  align-items-center gap-2 mt-2">
-                                {% if task.engineers.all %}
-                                    {% for engineer in task.engineers.all %}
-                                        <div>
-                                            <a href="{% url "tasks" %}?engineers=eng_{{ engineer.id }}" class="badge bg-secondary" style="text-decoration: none; ">{{ engineer.first_name }} {{ engineer.second_name }}</a>
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
-                                {% if task.departments.all %}
-                                    {% for departments in task.departments.all %}
-                                        <div>
-                                            <a href="{% url "tasks" %}?engineers=dep_{{ departments.id }}" class="badge bg-secondary" style="text-decoration: none; ">{{ departments }}</a>
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-                        </div>
                     </div>
-        </h2>
+                </div>
 
+                {# ============== ENGINEERS ============== #}
+                <div class="col d-flex justify-content-end px-3">
+                    <div class="col-md-10 d-flex flex-wrap justify-content-end  align-items-center gap-2 mt-2">
+                        {% if task.engineers.all %}
+                            {% for engineer in task.engineers.all %}
+                                <div>
+                                    <a href="{% url "tasks" %}?engineers=eng_{{ engineer.id }}"
+                                       class="badge bg-secondary"
+                                       style="text-decoration: none; ">{{ engineer.first_name }} {{ engineer.second_name }}</a>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        {% if task.departments.all %}
+                            {% for departments in task.departments.all %}
+                                <div>
+                                    <a href="{% url "tasks" %}?engineers=dep_{{ departments.id }}"
+                                       class="badge bg-secondary" style="text-decoration: none; ">{{ departments }}</a>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </h2>
 
 
         <div id="collapse{{ task.id }}" class="accordion-collapse  collapse {% if expanded %}show{% endif %}">
@@ -142,31 +146,31 @@
                                     {{ task.text|safe }}
                                 </span>
                         </div>
-{#                        <div class="row mx-1 my-2 py-3 d-flex align-items-center border-bottom">#}
-{#                            <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">#}
-{#                                <i class="bi bi-chat-left-dots" style="font-size: 1.2rem;"></i>#}
-{#                            </div>#}
-{#                            <div class="col d-flex flex-column align-items-start border-start"#}
-{#                                 style="font-size: 18px; white-space: pre-line; text-align: justify;">#}
-{#                                <span style="overflow: auto; width: 100%;">#}
-{#                                    {{ task.text|safe }}#}
-{#                                </span>#}
-{#                            </div>#}
-{#                        </div>#}
+                        {#                        <div class="row mx-1 my-2 py-3 d-flex align-items-center border-bottom">#}
+                        {#                            <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">#}
+                        {#                                <i class="bi bi-chat-left-dots" style="font-size: 1.2rem;"></i>#}
+                        {#                            </div>#}
+                        {#                            <div class="col d-flex flex-column align-items-start border-start"#}
+                        {#                                 style="font-size: 18px; white-space: pre-line; text-align: justify;">#}
+                        {#                                <span style="overflow: auto; width: 100%;">#}
+                        {#                                    {{ task.text|safe }}#}
+                        {#                                </span>#}
+                        {#                            </div>#}
+                        {#                        </div>#}
                     {% endif %}
                     {# ============== STATUS TEXT ============== #}
-{#                    {% if task.completion_text %}#}
-{#                        <div class="row mx-1 my-2 pt-3 d-flex align-items-center">#}
-{#                            <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">#}
-{#                                <i class="bi bi-activity" style="font-size: 1.2rem;"></i>#}
-{#                            </div>#}
-{#                            <div class="col d-flex flex-column align-items-start border-start"#}
-{#                                 style="font-size: 18px; white-space: pre-line; text-align: justify;">#}
-{#                                <span class="">{{ task.completion_text|safe }}</span>#}
-{##}
-{#                            </div>#}
-{#                        </div>#}
-{#                    {% endif %}#}
+                    {#                    {% if task.completion_text %}#}
+                    {#                        <div class="row mx-1 my-2 pt-3 d-flex align-items-center">#}
+                    {#                            <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">#}
+                    {#                                <i class="bi bi-activity" style="font-size: 1.2rem;"></i>#}
+                    {#                            </div>#}
+                    {#                            <div class="col d-flex flex-column align-items-start border-start"#}
+                    {#                                 style="font-size: 18px; white-space: pre-line; text-align: justify;">#}
+                    {#                                <span class="">{{ task.completion_text|safe }}</span>#}
+                    {##}
+                    {#                            </div>#}
+                    {#                        </div>#}
+                    {#                    {% endif %}#}
 
                     {# ============== TAGS ============== #}
                     {% if task.tags.all %}
@@ -174,11 +178,14 @@
                             <div class="col d-flex flex-wrap justify-content-start  align-items-center gap-2">
 
                                 {% for tag in task.tags.all %}
-                                    <a href="{% url "tasks" %}?tags={{ tag.id }}" class="badge bg-primary-subtle text-dark" style="text-decoration: none; ">    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                         class="bi bi-tag" viewBox="0 0 16 16">
-                      <path d="M6 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-1 0a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"></path>
-                      <path d="M2 1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 1 6.586V2a1 1 0 0 1 1-1zm0 5.586 7 7L13.586 9l-7-7H2v4.586z"></path>
-                    </svg>
+                                    <a href="{% url "tasks" %}?tags={{ tag.id }}"
+                                       class="badge bg-primary-subtle text-dark" style="text-decoration: none; ">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                             fill="currentColor"
+                                             class="bi bi-tag" viewBox="0 0 16 16">
+                                            <path d="M6 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-1 0a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"></path>
+                                            <path d="M2 1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 1 6.586V2a1 1 0 0 1 1-1zm0 5.586 7 7L13.586 9l-7-7H2v4.586z"></path>
+                                        </svg>
                                         {{ tag.tag_name }}</a>
                                 {% endfor %}
                             </div>
@@ -186,27 +193,23 @@
                     {% endif %}
 
                     {# ============== TASK BUTTONS ============== #}
-                    {% if not task.is_done %}
-                        {% if request.user.engineer in task.engineers.all or request.user.engineer.department in task.departments.all or request.user.is_superuser or request.user.is_staff %}
-                            <div class="row text-start pt-2 border-top px-1">
-                                <div class="col">
-                                    {% if request.user.engineer  %}
+
+                    {% if request.user.engineer in task.engineers.all or request.user.engineer.department in task.departments.all or request.user.is_superuser or request.user.is_staff %}
+                        <div class="row text-start pt-2 border-top px-1">
+                            <div class="col">
+                                {% if not task.is_done and request.user.engineer %}
                                     {% include "components/task/take_task_button.html" with task_id=task.id %}
-                                    {% endif %}
-                                </div>
-                                <div class="col text-end gap-2">
-                                    {% include "components/task/edit_task_button.html" with task_id=task.id %}
-                                    {% include "components/task/confirm_task_button.html" with task_id=task.id action_type="close" %}
-                                </div>
+                                {% endif %}
                             </div>
-                        {% endif %}
-                    {% else %}
-                        {% if request.user.engineer in task.engineers.all or request.user.is_superuser or request.user.is_staff %}
-                            <div class="text-end gap-2">
+                            <div class="col text-end gap-2">
                                 {% include "components/task/edit_task_button.html" with task_id=task.id %}
-                                {% include "components/task/confirm_task_button.html" with task_id=task.id action_type="reopen" %}
+                                {% if task.is_done %}
+                                    {% include "components/task/confirm_task_button.html" with task_id=task.id action_type="reopen" %}
+                                {% else %}
+                                    {% include "components/task/confirm_task_button.html" with task_id=task.id action_type="close" %}
+                                {% endif %}
                             </div>
-                        {% endif %}
+                        </div>
                     {% endif %}
 
                 </div>
@@ -232,7 +235,7 @@
         color: black;
     }
 
-    .accordion-body{
+    .accordion-body {
         padding: 0;
     }
 

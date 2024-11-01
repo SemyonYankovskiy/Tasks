@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load cache %}
 <div class="headerContainer">
     <div class="headerTop">
         <div class="container">
@@ -58,7 +58,7 @@
                                 </li>
                             {% endif %}
 
-
+                            {% cache 600 request.user %}
                             <li class="nav-item me-5 dropdown" id="dropdownMenu">
 
                                 <div style="color: inherit; text-decoration: none;" data-bs-toggle="dropdown"
@@ -124,6 +124,7 @@
                                 </ul>
 
                             </li>
+                        {% endcache %}
                         </ul>
                     </div>
                 {% else %}

@@ -1,7 +1,6 @@
 from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
@@ -10,7 +9,8 @@ from tasks.services.tasks_prepare import get_tasks
 from tasks.services.tree_nodes import GroupsTree
 from .filters import ObjectFilter, get_current_filter_params, get_fields_for_filter, TaskFilter
 from .forms import CKEditorEditForm, CKEditorCreateForm, CKEditorEditObjForm
-from .models import Object, Task, Engineer
+from .models import Object, Task
+from .services.statistics import get_stat
 from .services.tree_nodes.tree_nodes import AllTagsTree
 
 
@@ -205,29 +205,6 @@ def get_task_action_form(request, task_id, action_type):
 
 @login_required
 def get_stat_page(request):
-    # Выбираем всех инженеров с данными по активным и завершённым задачам
-    engineers = (Engineer.objects.all()
-        .prefetch_related("tasks")
-        .select_related("department")
-        .annotate(
-        active_task_count=Count('tasks', filter=Q(tasks__is_done=False)),  # Подсчёт активных задач
-        completed_task_count=Count('tasks', filter=Q(tasks__is_done=True))  # Подсчёт завершённых задач
-    ))
-
-    # Собираем данные для каждого инженера
-    engineer_stats = []
-    for engineer in engineers:
-        engineer_stats.append({
-            'first_name': engineer.first_name,
-            'second_name': engineer.second_name,
-            'department': engineer.department.name if engineer.department else 'Нет департамента',
-            'active_tasks_count': engineer.active_task_count,
-            'completed_tasks_count': engineer.completed_task_count,
-        })
-
-    context = {
-
-        'engineer_stats': engineer_stats,
-    }
-
+    stat = get_stat()
+    context = {**stat}
     return render(request, 'stat_page.html', context)
