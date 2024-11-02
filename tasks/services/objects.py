@@ -17,7 +17,6 @@ from .cache_version import CacheVersion
 from .service import paginate_queryset
 from .service import remove_unused_attached_files
 from .tasks_actions import create_tags
-from .tasks_prepare import permission_filter
 from ..filters import ObjectFilter
 
 
@@ -29,13 +28,13 @@ def get_objects_list(user) -> QuerySet[Object]:
         .values("image_file")
     )
 
-    tasks_count_subquery = (
-        permission_filter(user)
-        .filter(objects_set=OuterRef("pk"), is_done=False)
-        .values("objects_set")
-        .annotate(tasks_count=Count("id"))
-        .values("tasks_count")[:1]
-    )
+    # tasks_count_subquery = (
+    #     permission_filter(user)
+    #     .filter(objects_set=OuterRef("pk"), is_done=False)
+    #     .values("objects_set")
+    #     .annotate(tasks_count=Count("id"))
+    #     .values("tasks_count")[:1]
+    # )
 
     objects = (
         Object.objects.all()
@@ -45,7 +44,7 @@ def get_objects_list(user) -> QuerySet[Object]:
             img_preview=Subquery(image_subquery, output_field=CharField()),  # Используем подзапрос с одним значением
             child_count=Count("children", distinct=True),  # Подсчет уникальных дочерних объектов
             description_length=Length("description"),
-            tasks_count=Subquery(tasks_count_subquery, output_field=CharField()),  # Используем подзапрос с одним значением
+            # tasks_count=Subquery(tasks_count_subquery, output_field=CharField()),  # Используем подзапрос с одним значением
             short_description=Case(
                 When(description_length__gt=53, then=Concat(Substr("description", 1, 50), Value("..."))),
                 default="description",
@@ -171,10 +170,9 @@ def edit_object(request, object_slug):
             for file in request.FILES.getlist("files[]"):
                 updated_object.files.add(AttachedFile.objects.create(file=file))
             updated_object.save()
-            obj_cache_key = f'single_obj_{object_slug}'
-            childs_cache_key = f'obj_{object_slug}_childs'
-            cache.clear(obj_cache_key)
-            cache.clear(childs_cache_key)
+
+            cache.delete(f'single_obj_{object_slug}')
+            cache.delete(f'obj_{object_slug}_childs')
 
             messages.add_message(request, messages.SUCCESS, f"Объект '{updated_object.name}' отредактирован")
 
