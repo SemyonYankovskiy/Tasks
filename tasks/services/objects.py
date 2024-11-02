@@ -3,7 +3,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.db.models import Count, Q, F
-from django.db.models import Max
 from django.db.models import OuterRef, Subquery, Case, When, Value, CharField, QuerySet
 from django.db.models.functions import Concat, Substr, Length
 from django.db.transaction import atomic
@@ -17,24 +16,25 @@ from .cache_version import CacheVersion
 from .service import paginate_queryset
 from .service import remove_unused_attached_files
 from .tasks_actions import create_tags
+from .tasks_prepare import permission_filter
 from ..filters import ObjectFilter
 
 
 def get_objects_list(user) -> QuerySet[Object]:
+    # Подзапрос для получения первого файла изображения (jpeg, jpg, png) для каждого объекта
     image_subquery = (
         AttachedFile.objects.filter(objects_set=OuterRef("pk"), file__iregex=r"\.(jpeg|jpg|png)$")
-        .values("file")
-        .annotate(image_file=Max("file"))
-        .values("image_file")
+        .order_by("id")
+        .values("file")[:1]
     )
 
-    # tasks_count_subquery = (
-    #     permission_filter(user)
-    #     .filter(objects_set=OuterRef("pk"), is_done=False)
-    #     .values("objects_set")
-    #     .annotate(tasks_count=Count("id"))
-    #     .values("tasks_count")[:1]
-    # )
+    tasks_count_subquery = (
+        permission_filter(user)
+        .filter(objects_set=OuterRef("pk"), is_done=False)
+        .values("objects_set")
+        .annotate(tasks_count=Count("id"))
+        .values("tasks_count")[:1]
+    )
 
     objects = (
         Object.objects.all()
@@ -44,7 +44,7 @@ def get_objects_list(user) -> QuerySet[Object]:
             img_preview=Subquery(image_subquery, output_field=CharField()),  # Используем подзапрос с одним значением
             child_count=Count("children", distinct=True),  # Подсчет уникальных дочерних объектов
             description_length=Length("description"),
-            # tasks_count=Subquery(tasks_count_subquery, output_field=CharField()),  # Используем подзапрос с одним значением
+            tasks_count=Subquery(tasks_count_subquery, output_field=CharField()),  # Используем подзапрос с одним значением
             short_description=Case(
                 When(description_length__gt=53, then=Concat(Substr("description", 1, 50), Value("..."))),
                 default="description",
