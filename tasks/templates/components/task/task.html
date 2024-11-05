@@ -86,7 +86,7 @@
                         {% if task.objects_set.all %}
                             {% for obj in task.objects_set.all %}
 
-                                <a href="{% url "tasks" %}?objects_set={{ obj.id }}"
+                                <a href="{% url "show-object" obj.slug %}"
                                    class="badge bg-dark-subtle text-black"
                                    style="text-decoration: none; ">{{ obj.name }}</a>
 

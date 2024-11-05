@@ -1,7 +1,7 @@
 /*Стили для карточек object_preview*/
 .card {
     width: 300px; /* Ширина карточки */
-    height: 400px; /* Высота карточки */
+    min-height: 400px !important; /* Высота карточки */
     display: flex;
     flex-direction: column;
     overflow: hidden; /* Обрезать содержимое, выходящее за пределы карточки */

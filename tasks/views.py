@@ -37,9 +37,6 @@ def get_home(request):
     return render(request, "components/home/home.html", context=context)
 
 
-
-
-
 @login_required
 def get_object_page(request, object_slug):
     page_number = request.GET.get("page", 1)
@@ -50,17 +47,14 @@ def get_object_page(request, object_slug):
     child_objects = get_child_objects(user=request.user, parent=obj["object"])
 
     tasks = get_tasks(request, filter_params, page_number, per_page, obj=obj["object"])
-    # filtered_task = get_filtered_tasks(request, obj=obj["object"])
-    # pagination_data = paginate_queryset(filtered_task.tasks, page_number, per_page)
+
+    fields = get_fields_for_filter(user=request.user, page="tasks")
 
     ckeditor = CKEditorCreateForm(request.POST)
     context = {
         **obj,
         **tasks,
-        # "tasks": pagination_data["page_obj"],
-        # "pagination_data": pagination_data,
-        # "task_count": filtered_task.tasks_counters,
-        # "filter_params": filtered_task.filter_params,
+        **fields,
         "child_objects": child_objects,
         "ckeditor": ckeditor,
     }
@@ -85,7 +79,7 @@ def get_tasks_page(request):
     context = {
         **tasks,
         **fields,
-        "current_filter_params": current_filter_params,  # для TreeSelect
+        **current_filter_params,
         "filter_data": task_filter.filter_url,  # для сохранения фильтров при пагинации
         "params_count": task_filter.applied_filters_count,
         "ckeditor": ckeditor,
