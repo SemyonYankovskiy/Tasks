@@ -14,6 +14,7 @@ urlpatterns = [
     path("edit-obj/<slug:object_slug>/", objects.edit_object, name="edit_object"),
     path("close_task/<int:task_id>/", tasks_actions.close_task, name="close_task"),
     path("reopen_task/<int:task_id>/", tasks_actions.reopen_task, name="reopen_task"),
+    path("export_to_excel/", tasks_actions.export_to_excel, name="export-xls"),
     path("tasks/", views.get_tasks_page, name="tasks"),  # Страница задач
     path("calendar/", views.get_calendar_page, name="calendar"),  # Страница карты
     path("stat/", views.get_stat_page, name="stat"),  # Страница карты

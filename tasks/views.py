@@ -76,6 +76,10 @@ def get_tasks_page(request):
     task_filter = TaskFilter(request.GET)
     ckeditor = CKEditorCreateForm(request.POST)
 
+    # # Проверяем, если запрос на экспорт
+    # if request.GET.get("export") == "excel":
+    #     return export_to_excel(tasks["tasks"].object_list)
+
     context = {
         **tasks,
         **fields,

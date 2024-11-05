@@ -224,3 +224,40 @@ def close_task(request, task_id):
         messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' закрыта")
 
     return HttpResponseRedirect(redirect_to)
+
+
+def export_to_excel(qs):
+
+    print("enter", qs)
+    # # Создаем новый Excel файл
+    # workbook = openpyxl.Workbook()
+    # sheet = workbook.active
+    # sheet.title = "Задачи"
+    #
+    # # Определяем заголовки (например, если у вас есть поля `title`, `description`, `status`)
+    # headers = ["ID", "Название", "Описание", "Статус"]
+    # sheet.append(headers)
+    #
+    # # Заполняем данными из queryset (например, qs)
+    # for obj in qs:
+    #     row = [
+    #         obj.id,
+    #         obj.title,
+    #         obj.description,
+    #         obj.status,
+    #     ]
+    #     sheet.append(row)
+    #
+    # # Настройка ширины колонок (по желанию)
+    # for col_num, column_title in enumerate(headers, 1):
+    #     column_letter = get_column_letter(col_num)
+    #     sheet.column_dimensions[column_letter].width = 15
+    #
+    # # Создаем HTTP ответ с Excel файлом
+    # response = HttpResponse(
+    #     content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    # )
+    # response["Content-Disposition"] = 'attachment; filename="tasks.xlsx"'
+    # workbook.save(response)
+    #
+    # return response

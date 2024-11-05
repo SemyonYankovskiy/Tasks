@@ -48,6 +48,13 @@
             <!-- Кнопка для создания задачи -->
             {% include "components/task/create_task.html" %}
 
+            <!-- Кнопка "EXPORT" -->
+            <form method="get" action="{% url 'export-xls' %}">
+                <button type="submit" name="export" value="excel" class="btn btn-outline-success">
+                    <i class="bi bi-file-earmark-spreadsheet"></i>
+                </button>
+            </form>
+
         </div>
         <!-- Кнопка "Сегодня" -->
         {% if tasks_due_today_count %}
@@ -62,6 +69,8 @@
                 </button>
             </form>
         {% endif %}
+
+
         <!-- Дополнительные кнопки для фильтров -->
         <div class="d-flex flex-row gap-1">
             <div class="btn-group mb-2" role="group">
