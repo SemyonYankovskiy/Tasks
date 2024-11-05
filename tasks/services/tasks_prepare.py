@@ -62,6 +62,7 @@ class FilterParams:
 @dataclass
 class FilteredTasksResult:
     tasks: QuerySet[Task]
+    tasks_id_list: list
     tasks_counters: TasksCounter
     filter_params: FilterParams
     tasks_filter_by_done: TaskFilterByDone
@@ -108,8 +109,9 @@ def get_filtered_tasks(request, obj=None):
 
     # Задаём московский часовой пояс
     moscow_tz = ZoneInfo("Europe/Moscow")
-
+    tasks_id_list = []
     for task in tasks_qs:
+        tasks_id_list.append(task.id)
         if task.completion_time:
             completion_time_moscow = task.completion_time.astimezone(moscow_tz)
             now_moscow = datetime.datetime.now(moscow_tz)
@@ -128,6 +130,7 @@ def get_filtered_tasks(request, obj=None):
     # Возвращаем контекст с отфильтрованными задачами и параметрами отображения
     return FilteredTasksResult(
         tasks=tasks_qs,
+        tasks_id_list=tasks_id_list,
         tasks_counters=tasks_counters,
         filter_params=FilterParams(
             show_my_tasks_only=tasks_filter.data.get("show_my_tasks_only"),
@@ -165,6 +168,7 @@ def get_tasks(request, filter_params, page_number, per_page, obj=None):
         "pagination_data": pagination_data,
         "task_count": filtered_task.tasks_counters,
         "filter_params": filtered_task.filter_params,
+        "tasks_id_list": filtered_task.tasks_id_list
     }
 
     # Кэшируем результат, если отсутствуют фильтры

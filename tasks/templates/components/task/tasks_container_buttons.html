@@ -44,16 +44,19 @@
                     </button>
                 </div>
             {% endif %}
+            <!-- Кнопка "EXPORT" -->
+            <form method="get" action="{% url 'export-xls' %}">
+                <input type="hidden" name="task_ids" value="{{ tasks_id_list }}">
+                <button type="submit" class="btn btn-outline-success" data-bs-toggle="tooltip"
+                        data-bs-title="Экспорт задач в Excel">
+                    <i class="bi bi-file-earmark-spreadsheet"></i>
+                </button>
+            </form>
 
             <!-- Кнопка для создания задачи -->
             {% include "components/task/create_task.html" %}
 
-            <!-- Кнопка "EXPORT" -->
-            <form method="get" action="{% url 'export-xls' %}">
-                <button type="submit" name="export" value="excel" class="btn btn-outline-success">
-                    <i class="bi bi-file-earmark-spreadsheet"></i>
-                </button>
-            </form>
+
 
         </div>
         <!-- Кнопка "Сегодня" -->
@@ -73,6 +76,7 @@
 
         <!-- Дополнительные кнопки для фильтров -->
         <div class="d-flex flex-row gap-1">
+
             <div class="btn-group mb-2" role="group">
                 <!-- Кнопка Активные задачи -->
                 <button class="btn {% if show_active_task == "true" %}btn-primary{% else %}btn-outline-primary{% endif %} fs-6 text"

@@ -1,11 +1,13 @@
+import re
 from datetime import datetime
 from urllib.parse import unquote, urlparse, parse_qs
 
+import openpyxl
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.transaction import atomic
-from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, get_list_or_404
 from django.urls import reverse
 
 from tasks.forms import AddTaskForm, EditTaskForm
@@ -226,38 +228,29 @@ def close_task(request, task_id):
     return HttpResponseRedirect(redirect_to)
 
 
-def export_to_excel(qs):
+@login_required
+def export_to_excel(request):
+    tasks_str = request.GET.get("task_ids")
+    tasks_list = re.findall(r'\d+',tasks_str)
 
-    print("enter", qs)
-    # # Создаем новый Excel файл
-    # workbook = openpyxl.Workbook()
-    # sheet = workbook.active
-    # sheet.title = "Задачи"
-    #
-    # # Определяем заголовки (например, если у вас есть поля `title`, `description`, `status`)
-    # headers = ["ID", "Название", "Описание", "Статус"]
-    # sheet.append(headers)
-    #
-    # # Заполняем данными из queryset (например, qs)
-    # for obj in qs:
-    #     row = [
-    #         obj.id,
-    #         obj.title,
-    #         obj.description,
-    #         obj.status,
-    #     ]
-    #     sheet.append(row)
-    #
-    # # Настройка ширины колонок (по желанию)
-    # for col_num, column_title in enumerate(headers, 1):
-    #     column_letter = get_column_letter(col_num)
-    #     sheet.column_dimensions[column_letter].width = 15
-    #
-    # # Создаем HTTP ответ с Excel файлом
-    # response = HttpResponse(
-    #     content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    # )
-    # response["Content-Disposition"] = 'attachment; filename="tasks.xlsx"'
-    # workbook.save(response)
-    #
-    # return response
+    tasks_list = list(map(int, tasks_list))
+
+    # Получаем объекты из базы данных
+    tasks = get_list_or_404(Task, id__in=tasks_list)
+
+    # Создаем Excel файл (пример с openpyxl)
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Tasks"
+
+    # Добавляем заголовки в Excel файл
+    ws.append(['ID', 'Название задачи', 'Описание'])
+
+    for task in tasks:
+        ws.append([task.id, task.header, task.text])
+
+    # Возвращаем файл как ответ
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename=tasks_for_{request.user}_{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}.xlsx'
+    wb.save(response)
+    return response
