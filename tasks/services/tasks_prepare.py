@@ -62,7 +62,7 @@ class FilterParams:
 @dataclass
 class FilteredTasksResult:
     tasks: QuerySet[Task]
-    tasks_id_list: list
+    # tasks_id_list: list
     tasks_counters: TasksCounter
     filter_params: FilterParams
     tasks_filter_by_done: TaskFilterByDone
@@ -107,30 +107,9 @@ def get_filtered_tasks(request, obj=None):
 
     tasks_qs = tasks_filter_by_done.qs
 
-    # Задаём московский часовой пояс
-    moscow_tz = ZoneInfo("Europe/Moscow")
-    tasks_id_list = []
-    for task in tasks_qs:
-        tasks_id_list.append(task.id)
-        if task.completion_time:
-            completion_time_moscow = task.completion_time.astimezone(moscow_tz)
-            now_moscow = datetime.datetime.now(moscow_tz)
-
-            # Вычисляем оставшееся время
-            time_left = completion_time_moscow - now_moscow
-
-            # Переводим время в часы и преобразуем к int
-            hours_left = int(time_left.total_seconds() // 3600) if time_left.total_seconds() > 0 else 0
-            task.time_left = hours_left
-            task.time_now = now_moscow
-
-        else:
-            task.time_left = 0  # Если дедлайн не задан
-
     # Возвращаем контекст с отфильтрованными задачами и параметрами отображения
     return FilteredTasksResult(
         tasks=tasks_qs,
-        tasks_id_list=tasks_id_list,
         tasks_counters=tasks_counters,
         filter_params=FilterParams(
             show_my_tasks_only=tasks_filter.data.get("show_my_tasks_only"),
@@ -163,12 +142,29 @@ def get_tasks(request, filter_params, page_number, per_page, obj=None):
     filtered_task = get_filtered_tasks(request, obj=obj)
     pagination_data = paginate_queryset(filtered_task.tasks, page_number, per_page)
 
+    # Задаём московский часовой пояс
+    moscow_tz = ZoneInfo("Europe/Moscow")
+    for task in pagination_data["page_obj"]:
+        if task.completion_time:
+            completion_time_moscow = task.completion_time.astimezone(moscow_tz)
+            now_moscow = datetime.datetime.now(moscow_tz)
+
+            # Вычисляем оставшееся время
+            time_left = completion_time_moscow - now_moscow
+
+            # Переводим время в часы и преобразуем к int
+            hours_left = int(time_left.total_seconds() // 3600) if time_left.total_seconds() > 0 else 0
+            task.time_left = hours_left
+            task.time_now = now_moscow
+
+        else:
+            task.time_left = 0  # Если дедлайн не задан
+
     result = {
         "tasks": pagination_data["page_obj"],
         "pagination_data": pagination_data,
         "task_count": filtered_task.tasks_counters,
         "filter_params": filtered_task.filter_params,
-        "tasks_id_list": filtered_task.tasks_id_list
     }
 
     # Кэшируем результат, если отсутствуют фильтры

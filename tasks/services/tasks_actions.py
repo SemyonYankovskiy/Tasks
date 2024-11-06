@@ -1,20 +1,18 @@
-import re
 from datetime import datetime
 from urllib.parse import unquote, urlparse, parse_qs
 
-import openpyxl
-from bs4 import BeautifulSoup
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.transaction import atomic
-from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import get_object_or_404, redirect, get_list_or_404
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from openpyxl.styles import Alignment
 
 from tasks.forms import AddTaskForm, EditTaskForm
 from tasks.models import Task, AttachedFile, Engineer, Tag
+from tasks.services.export import TasksExcelExport
 from tasks.services.service import remove_unused_attached_files
+from tasks.services.tasks_prepare import get_tasks
 
 
 @atomic
@@ -231,74 +229,15 @@ def close_task(request, task_id):
 
 @login_required
 def export_to_excel(request):
-    tasks_str = request.GET.get("task_ids")
-    tasks_list = re.findall(r'\d+', tasks_str)
-    tasks_list = list(map(int, tasks_list))
+    tasks = get_tasks(request, "filter_params", page_number=1, per_page=100)
 
-    # Получаем объекты из базы данных
-    tasks = get_list_or_404(Task, id__in=tasks_list)
+    export = TasksExcelExport("Tasks")
 
-    # Создаем Excel файл
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = "Tasks"
+    paginator = tasks["pagination_data"]["paginator"]
 
-    # Установка ширины столбцов и высоты строк
-    column_widths = [5, 15, 35, 10, 40, 50, 15, 35, 40, 20, 20, 20, 20]  # Ширина для каждого столбца
-    for i, width in enumerate(column_widths, start=1):
-        ws.column_dimensions[openpyxl.utils.get_column_letter(i)].width = width
+    for page_num in range(paginator.num_pages):
+        page_data = paginator.get_page(page_num)
+        print(page_data.object_list)
+        export.add_tasks(page_data.object_list)
 
-    # Добавляем заголовки в Excel файл
-    headers = ['ID', 'Создатель', "Дата создания", 'Важность', 'Название задачи', 'Описание', 'Задача завершена?',
-               'Дата завершения', 'Текст завершения',
-               "Инженеры", 'Отделы', 'Теги']
-    ws.append(headers)
-
-    # Применение стиля для заголовков (разрешаем перенос строк)
-    for cell in ws[1]:
-        cell.alignment = Alignment(horizontal="center", vertical="top", wrap_text=True,)
-
-    for task in tasks:
-        # Получаем значения M2M полей
-        engineers = ", ".join([str(engineer) for engineer in task.engineers.all()])
-        departments = ", ".join([str(department) for department in task.departments.all()])
-        tags = ", ".join([str(tag) for tag in task.tags.all()])
-
-        # Используем BeautifulSoup для извлечения текста из HTML
-        soup = BeautifulSoup(task.text, "html.parser")
-        text = soup.get_text()
-
-        # Регулярное выражение для удаления изображений, если нужно
-        pattern = r'!.*?.*?'  # Находит все строки в формате ![...](...)
-        cleaned_text = re.sub(pattern, "", text)
-
-        # Убираем лишние пробелы
-        clean_text = re.sub(r'\s+', ' ', cleaned_text).strip()
-
-        # Добавляем строку в Excel и разрешаем перенос строк в ячейках
-        row = [
-            task.id,
-            str(task.creator),
-            BeautifulSoup(str(task.create_time), "html.parser").get_text(),
-            task.priority,
-            task.header,
-            clean_text,
-            task.is_done,
-            BeautifulSoup(str(task.completion_time), "html.parser").get_text(),
-            BeautifulSoup(str(task.completion_text), "html.parser").get_text(),
-            engineers,
-            departments,
-            tags,
-        ]
-        ws.append(row)
-
-        # Применение стиля для каждой ячейки новой строки (включаем перенос текста)
-        for cell in ws[ws.max_row]:
-            cell.alignment = Alignment(wrap_text=True, vertical="top")
-
-    # Возвращаем файл как ответ
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response[
-        'Content-Disposition'] = f'attachment; filename=tasks_for_{request.user}_{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}.xlsx'
-    wb.save(response)
-    return response
+    return export.make_response(filename=f"tasks_for_{request.user}_{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

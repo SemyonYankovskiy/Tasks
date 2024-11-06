@@ -4,21 +4,15 @@
         {% include "components/task/tasks_container_buttons.html" with not_done_count=task_count.not_done_count done_count=task_count.done_count show_my_tasks_only=filter_params.show_my_tasks_only sort_order=filter_params.sort_order show_active_task=filter_params.show_active_task show_done_task=filter_params.show_done_task tasks_due_today_count=task_count.tasks_due_today_count %}
     </div>
 
-
     {% if tasks %}
         <div class="mt-4" id="myTabContent">
-
             <div class="px-2 ">
                 {% for task in tasks %}
                     {% include "components/task/task.html" %}
                 {% endfor %}
             </div>
 
-
             {% include 'components/pagination.html' %}
-
-
-
 
             {% else %}
             <div class="d-flex justify-content-between mt-3 px-4">
@@ -31,12 +25,9 @@
         </div>
     {% endif %}
 
-
-
     {% include 'components/task/edit_task_modal.html' %}
     {% include 'components/task/confirm_task_modal.html' %}
 
 </div>
-
 
 <script src="{% static 'self/js/filters.js' %}"></script>

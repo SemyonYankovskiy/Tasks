@@ -55,6 +55,7 @@ def paginate_queryset(queryset, page_number, per_page):
 
     # Возвращаем объект страницы и параметры для отображения пагинации
     return {
+        "paginator": paginator,
         "page_obj": page_obj,
         "end_show_ellipsis": end_show_ellipsis,
         "end_show_last_page_link": end_show_last_page_link,
