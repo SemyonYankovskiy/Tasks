@@ -25,7 +25,7 @@ SECRET_KEY = os.getenv(
     "DJANGO_SECRET_KEY", "django-insecure-c@&8cjq7p*g*#!)3(nj(9n%hsd(&z^bnfr7vjpa-+%d+11l42s"
 )
 
-#CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DJANGO_DEBUG", "1").lower() in ("1", "yes", "true")  # По умолчанию True
