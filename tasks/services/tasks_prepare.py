@@ -14,34 +14,46 @@ from user.models import User
 
 def permission_filter(user: User) -> QuerySet[Task]:
     engineer: Engineer | None = user.get_engineer_or_none()
+
     # Если пользователь администратор, он видит все задачи
     if user.is_superuser:
         queryset = Task.objects.all()
+        queryset |= Task.objects.filter(creator=user)
+        return queryset.distinct()
 
     # Если пользователь head_of_department
     elif engineer and engineer.head_of_department:
-        # Пользователь head_of_department видит задачи, связанные с инженерами его департамента, включая подчиненных
+        # Получаем всех пользователей, связанных с инженерами департамента
+        department_users = User.objects.filter(engineer__department=engineer.department)
+
+        # Пользователь head_of_department видит задачи, связанные с его департаментом, подчиненными и задачи,
+        # которые подчиненные создали для других департаментов
         queryset = Task.objects.filter(
             Q(departments=engineer.department)  # Задачи департамента
             | Q(engineers__department=engineer.department)  # Задачи всех в департаменте
+            | Q(creator__in=department_users)  # Задачи, созданные подчиненными
         )
+        queryset |= Task.objects.filter(creator=user)
+        return queryset.distinct()
 
     # Если пользователь не администратор и не head_of_department
     elif engineer:
         if engineer.department:
             # Пользователь видит только свои задачи и задачи департамента
             queryset = Task.objects.filter(Q(engineers=engineer) | Q(departments=engineer.department))
+            queryset |= Task.objects.filter(creator=user)
+            return queryset.distinct()
         else:
             # Если у пользователя нет департамента, он видит только свои задачи
             queryset = Task.objects.filter(engineers=engineer)
+            queryset |= Task.objects.filter(creator=user)
+            return queryset.distinct()
 
     # Если нет инженера
     else:
         queryset = Task.objects.none()
-
-    queryset |= Task.objects.filter(creator=user)
-
-    return queryset.distinct()
+        queryset |= Task.objects.filter(creator=user)
+        return queryset.distinct()
 
 
 @dataclass
@@ -49,6 +61,8 @@ class TasksCounter:
     done_count: int
     not_done_count: int
     tasks_due_today_count: int
+    my_tasks_count: int
+    available_tasks_count: int
 
 
 @dataclass
@@ -68,21 +82,33 @@ class FilteredTasksResult:
     tasks_filter_by_done: TaskFilterByDone
 
 
-def get_tasks_count(queryset: QuerySet[Task]) -> TasksCounter:
-    # Используем aggregate для подсчёта завершённых и незавершённых задач за один запрос
-    tasks_status = queryset.aggregate(
+def get_tasks_count(queryset: QuerySet[Task], engineer: Engineer, available_queryset: QuerySet[Task]) -> TasksCounter:
+    # Счётчик всех задач
+    all_tasks_status = queryset.aggregate(
         done_tasks_count=Count(Case(When(is_done=True, then=1))),
         not_done_count=Count(Case(When(is_done=False, then=1))),
     )
 
+    # Счётчик задач, созданных текущим пользователем
+    my_tasks_status = queryset.filter(engineers=engineer).aggregate(
+        my_done_tasks_count=Count(Case(When(is_done=True, then=1))),
+        my_not_done_count=Count(Case(When(is_done=False, then=1))),
+    )
+
+    # Подсчет задач со сроком выполнения сегодня для всех задач и только моих
     tasks_due_today_count = queryset.filter(
-        completion_time__date=datetime.datetime.now(), is_done=False
+        completion_time__date=datetime.datetime.now().date(), is_done=False
     ).count()
 
+    # Счётчик доступных задач (включает задачи департамента, подчинённых и прочие)
+    available_tasks_count = available_queryset.count()
+
     return TasksCounter(
-        done_count=tasks_status["done_tasks_count"],
-        not_done_count=tasks_status["not_done_count"],
+        done_count=all_tasks_status["done_tasks_count"],
+        not_done_count=all_tasks_status["not_done_count"],
         tasks_due_today_count=tasks_due_today_count,
+        my_tasks_count=my_tasks_status["my_done_tasks_count"] + my_tasks_status["my_not_done_count"],
+        available_tasks_count=available_tasks_count
     )
 
 
@@ -91,7 +117,7 @@ def get_filtered_tasks(request, obj=None):
     Возвращает часть задач, которые отфильтрованы или включены/выключены в шаблоне
     """
     tasks_qs = permission_filter(user=request.user)
-
+    tasks_qs_old = tasks_qs
     tasks_qs = tasks_qs.prefetch_related("files", "tags", "engineers", "objects_set", "departments", "creator")
 
     tasks_filter = TaskFilter(request.GET, queryset=tasks_qs, request=request)
@@ -101,7 +127,7 @@ def get_filtered_tasks(request, obj=None):
     if obj:
         tasks_qs = tasks_qs.filter(objects_set=obj)
 
-    tasks_counters = get_tasks_count(tasks_qs)
+    tasks_counters = get_tasks_count(queryset=tasks_qs, available_queryset=tasks_qs_old, engineer=request.user.get_engineer_or_none())
 
     tasks_filter_by_done = TaskFilterByDone(request.GET, queryset=tasks_qs, request=request)
 

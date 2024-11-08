@@ -1,7 +1,7 @@
 {% load static %}
 <div id="tasks" class=" mt-3 ms-1">
     <div class="container">
-        {% include "components/task/tasks_container_buttons.html" with not_done_count=task_count.not_done_count done_count=task_count.done_count show_my_tasks_only=filter_params.show_my_tasks_only sort_order=filter_params.sort_order show_active_task=filter_params.show_active_task show_done_task=filter_params.show_done_task tasks_due_today_count=task_count.tasks_due_today_count %}
+        {% include "components/task/tasks_container_buttons.html" with my_tasks_count=task_count.my_tasks_count available_tasks_count=task_count.available_tasks_count not_done_count=task_count.not_done_count done_count=task_count.done_count show_my_tasks_only=filter_params.show_my_tasks_only sort_order=filter_params.sort_order show_active_task=filter_params.show_active_task show_done_task=filter_params.show_done_task tasks_due_today_count=task_count.tasks_due_today_count %}
     </div>
 
     {% if tasks %}
