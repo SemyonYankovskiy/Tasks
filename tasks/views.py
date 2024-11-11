@@ -183,6 +183,9 @@ def get_task_action_form(request, task_id, action_type):
     if action_type == 'close':
         action_url = reverse('close_task', args=[task_id])
         form_action = 'close'
+    elif action_type == 'delete':
+        action_url = reverse('delete_task', args=[task_id])
+        form_action = 'delete'
     else:
         action_url = reverse('reopen_task', args=[task_id])
         form_action = 'reopen'
@@ -194,7 +197,7 @@ def get_task_action_form(request, task_id, action_type):
         'from_url': request.GET.get('from_url', ''),
     }
 
-    return render(request, 'components/task/confirm_task_form.html', context)
+    return render(request, 'components/task/action_task_form.html', context)
 
 
 @login_required

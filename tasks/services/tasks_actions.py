@@ -1,5 +1,4 @@
 from datetime import datetime
-from urllib.parse import unquote, urlparse, parse_qs
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -230,16 +229,16 @@ def close_task(request, task_id):
         # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
 
-        if "?referrer=" in redirect_to:
-            # Извлекаем параметры из URL
-            parsed_url = urlparse(redirect_to)
-            query_params = parse_qs(parsed_url.query)
-
-            # Получаем параметр referrer
-            encoded_referrer = query_params.get("referrer", [""])[0]
-            decoded_referrer = unquote(encoded_referrer)
-
-            redirect_to = decoded_referrer
+        # if "?referrer=" in redirect_to:
+        #     # Извлекаем параметры из URL
+        #     parsed_url = urlparse(redirect_to)
+        #     query_params = parse_qs(parsed_url.query)
+        #
+        #     # Получаем параметр referrer
+        #     encoded_referrer = query_params.get("referrer", [""])[0]
+        #     decoded_referrer = unquote(encoded_referrer)
+        #
+        #     redirect_to = decoded_referrer
 
         # Обновление задачи
         task.is_done = True

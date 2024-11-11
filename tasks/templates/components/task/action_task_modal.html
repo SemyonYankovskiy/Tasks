@@ -18,14 +18,17 @@
 
     function loadTaskModal(taskID, formAction) {
         const currentUrlWithFilters = window.location.pathname + location.search;  // Capture the current URL with filters
-
+        console.log(formAction)
         // Условие для задания текста в зависимости от formAction
         let modalTitle;
         if (formAction === "close") {
             modalTitle = "Закрыть задачу";
         } else if (formAction === "reopen") {
             modalTitle = "Вернуть задачу в работу";
-        } else {
+        } else if (formAction === "delete") {
+            modalTitle = "Удалить задачу";
+        }
+        else {
             modalTitle = "Действие с задачей";  // Заголовок по умолчанию
         }
 

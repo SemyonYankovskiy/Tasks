@@ -197,12 +197,13 @@
                     {% if request.user.engineer in task.engineers.all or request.user.engineer.department in task.departments.all or request.user.is_superuser or request.user.is_staff %}
                         <div class="row text-start pt-2 border-top px-1">
                             <div class="col">
-                                {% include "components/task/delete_task_button.html" with task_id=task.id %}
+
                                 {% if not task.is_done and request.user.engineer %}
                                     {% include "components/task/take_task_button.html" with task_id=task.id %}
                                 {% endif %}
                             </div>
                             <div class="col text-end gap-2">
+                                {% include "components/task/delete_task_button.html" with task_id=task.id action_type="delete" %}
                                 {% include "components/task/edit_task_button.html" with task_id=task.id %}
                                 {% if task.is_done %}
                                     {% include "components/task/confirm_task_button.html" with task_id=task.id action_type="reopen" %}
