@@ -10,6 +10,7 @@ from tasks.services import tasks_actions, objects
 urlpatterns = [
     path("create-task/", tasks_actions.create_task, name="create_task"),
     path("take_task/<int:task_id>/", tasks_actions.take_task, name="take_task"),
+    path("delete_task/<int:task_id>/", tasks_actions.delete_task, name="delete_task"),
     path("edit-task/<int:task_id>/", tasks_actions.edit_task, name="edit_task"),
     path("edit-obj/<slug:object_slug>/", objects.edit_object, name="edit_object"),
     path("close_task/<int:task_id>/", tasks_actions.close_task, name="close_task"),

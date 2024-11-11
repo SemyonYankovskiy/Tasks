@@ -52,6 +52,18 @@ def create_tags(request, tags_list):
     return post_data  # Возвращаем обновленные данные POST-запроса
 
 
+def add_event_log(user, task, text):
+    try:
+        name = f"{user.engineer.first_name} {user.engineer.second_name}"
+    except AttributeError:
+        # Если у пользователя нет engineer, использовать имя пользователя
+        name =user.username
+
+    pattern = f"{text}: [{name} / {datetime.now().strftime('%d.%m.%Y %H:%M')}]\n"
+    task.completion_text += pattern
+    task.save()
+
+
 @login_required
 @atomic
 def create_task(request):
@@ -77,6 +89,7 @@ def create_task(request):
             messages.add_message(
                 request, messages.SUCCESS, f"Задача '{form.cleaned_data['header']}' успешно создана"
             )
+            add_event_log(user=request.user, task=task, text="➕ Задача создана")
             return redirect(redirect_to)
         else:
             messages.add_message(request, messages.WARNING, form.errors)
@@ -112,6 +125,8 @@ def edit_task(request, task_id):
                 updated_task.files.add(AttachedFile.objects.create(file=file))
             updated_task.save()
 
+            add_event_log(user=request.user, task=updated_task, text="✏️Задача отредактирована")
+
             messages.add_message(
                 request, messages.SUCCESS, f"Задача '{form.cleaned_data['header']}' отредактирована"
             )
@@ -138,6 +153,7 @@ def take_task(request, task_id):
             print(request.user.engineer)
             task.engineers.add(request.user.engineer)
             task.save()
+            add_event_log(user=request.user, task=task, text="🙋‍♂️Пользователь взял задачу")
             messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' добавлена в Мои задачи")
         except Engineer.DoesNotExist:
             print(f"у {request.user} нет инженера")
@@ -146,6 +162,32 @@ def take_task(request, task_id):
 
     # Редирект на исходную страницу
     return redirect(redirect_to)
+
+
+@login_required
+def delete_task(request, task_id):
+
+    redirect_to: str = reverse("tasks")
+
+    if request.method == "POST":
+
+        # Получаем URL с параметрами фильтров
+        redirect_to = request.POST.get("from_url", redirect_to).strip()
+
+        task = get_object_or_404(Task, pk=task_id)
+
+        if request.user.is_staff or request.user == task.creator:
+
+            # Обновление задачи
+            task.deleted = True
+
+            add_event_log(user=request.user, task=task, text="🗑️Задача удалена")
+
+            messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' удалена")
+        else:
+            messages.add_message(request, messages.ERROR, f"Недостаточно прав для удаления задачи")
+
+    return HttpResponseRedirect(redirect_to)
 
 
 @login_required
@@ -165,18 +207,9 @@ def reopen_task(request, task_id):
 
         # Обновление задачи
         task.is_done = False
-        # task.completion_time = None
 
-        try:
-            name = f"{request.user.engineer.first_name} {request.user.engineer.second_name}"
-        except AttributeError:
-            # Если у пользователя нет engineer, использовать имя пользователя
-            name = request.user.username
-
-        pattern = f"\n\nПереоткрыто: [{name} / {datetime.now().strftime('%d.%m.%Y %H:%M')}]\n"
-
-        task.completion_text += pattern + comment
         task.save()
+        add_event_log(user=request.user, task=task, text="↩️ Задача переоткрыта: "+comment)
         messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' возвращена в работу")
 
     return HttpResponseRedirect(redirect_to)
@@ -211,17 +244,8 @@ def close_task(request, task_id):
         # Обновление задачи
         task.is_done = True
         # task.completion_time = datetime.now()
-
-        try:
-            name = f"{request.user.engineer.first_name} {request.user.engineer.second_name}"
-        except AttributeError:
-            # Если у пользователя нет engineer, использовать имя пользователя
-            name = request.user.username
-
-        pattern = f"\n\nЗакрыто: [{name} / {datetime.now().strftime('%d.%m.%Y %H:%M')}]\n"
-
-        task.completion_text += pattern + comment
         task.save()
+        add_event_log(user=request.user, task=task, text="✅ Задача закрыта: "+comment)
         messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' закрыта")
 
     return HttpResponseRedirect(redirect_to)

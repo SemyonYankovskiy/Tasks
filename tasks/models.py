@@ -99,21 +99,16 @@ class Task(models.Model):
 
     priority = models.CharField(choices=Priority.choices, max_length=10)
     is_done = models.BooleanField()
+    deleted = models.BooleanField()
     completion_time = models.DateTimeField()
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     header = models.CharField(max_length=128)
     text = RichTextUploadingField(blank=True)
     completion_text = RichTextUploadingField(blank=True)
-    engineers = models.ManyToManyField(
-        "Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True
-    )
-    departments = models.ManyToManyField(
-        "Department", related_name="tasks", db_table="tasks_departments_m2m", blank=True
-    )
+    engineers = models.ManyToManyField("Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True)
+    departments = models.ManyToManyField("Department", related_name="tasks", db_table="tasks_departments_m2m", blank=True)
     tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m", blank=True)
-    files = models.ManyToManyField(
-        "AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True
-    )
+    files = models.ManyToManyField("AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True)
     creator = models.ForeignKey(get_user_model(), related_name="created_tasks", on_delete=models.PROTECT)
 
     # slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")

@@ -2,7 +2,6 @@ from datetime import datetime
 
 from ckeditor.widgets import CKEditorWidget
 from django import forms
-from django.core.exceptions import ValidationError
 
 from .models import Task, Engineer, Tag, Object, Department
 
@@ -58,6 +57,7 @@ class AddTaskForm(forms.ModelForm):
             f"{completion_date_only} {completion_time_only}", "%Y-%m-%d %H:%M:%S"
         )
         instance.completion_time = completion_time
+        instance.deleted = False
 
         if commit:
             instance.save()
@@ -147,6 +147,7 @@ class EditTaskForm(forms.ModelForm):
         )
         instance.completion_time = completion_time
         instance.text = self.cleaned_data["text_edit"]
+        instance.deleted = False
 
         if commit:
             instance.save()

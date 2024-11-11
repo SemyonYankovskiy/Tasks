@@ -17,8 +17,8 @@ def permission_filter(user: User) -> QuerySet[Task]:
 
     # Если пользователь администратор, он видит все задачи
     if user.is_superuser:
-        queryset = Task.objects.all()
-        queryset |= Task.objects.filter(creator=user)
+        queryset = Task.objects.filter(deleted=False)
+        queryset |= Task.objects.filter(creator=user, deleted=False)
         return queryset.distinct()
 
     # Если пользователь head_of_department
@@ -29,30 +29,34 @@ def permission_filter(user: User) -> QuerySet[Task]:
         # Пользователь head_of_department видит задачи, связанные с его департаментом, подчиненными и задачи,
         # которые подчиненные создали для других департаментов
         queryset = Task.objects.filter(
-            Q(departments=engineer.department)  # Задачи департамента
-            | Q(engineers__department=engineer.department)  # Задачи всех в департаменте
-            | Q(creator__in=department_users)  # Задачи, созданные подчиненными
+            (Q(departments=engineer.department)  # Задачи департамента
+             | Q(engineers__department=engineer.department)  # Задачи всех в департаменте
+             | Q(creator__in=department_users)),  # Задачи, созданные подчиненными
+            deleted=False
         )
-        queryset |= Task.objects.filter(creator=user)
+        queryset |= Task.objects.filter(creator=user, deleted=False)
         return queryset.distinct()
 
     # Если пользователь не администратор и не head_of_department
     elif engineer:
         if engineer.department:
             # Пользователь видит только свои задачи и задачи департамента
-            queryset = Task.objects.filter(Q(engineers=engineer) | Q(departments=engineer.department))
-            queryset |= Task.objects.filter(creator=user)
+            queryset = Task.objects.filter(
+                (Q(engineers=engineer) | Q(departments=engineer.department)),
+                deleted=False
+            )
+            queryset |= Task.objects.filter(creator=user, deleted=False)
             return queryset.distinct()
         else:
             # Если у пользователя нет департамента, он видит только свои задачи
-            queryset = Task.objects.filter(engineers=engineer)
-            queryset |= Task.objects.filter(creator=user)
+            queryset = Task.objects.filter(engineers=engineer, deleted=False)
+            queryset |= Task.objects.filter(creator=user, deleted=False)
             return queryset.distinct()
 
     # Если нет инженера
     else:
         queryset = Task.objects.none()
-        queryset |= Task.objects.filter(creator=user)
+        queryset |= Task.objects.filter(creator=user, deleted=False)
         return queryset.distinct()
 
 
