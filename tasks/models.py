@@ -52,7 +52,7 @@ class Object(models.Model):
     priority = models.CharField(choices=Priority.choices, max_length=10)
     parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, related_name="children")
     name = models.CharField(max_length=64)
-    address = models.ForeignKey("Address", on_delete=models.CASCADE)
+    address = models.ForeignKey("Address", on_delete=models.CASCADE, blank=True)
     description = RichTextUploadingField(blank=True)
     zabbix_link = models.CharField(max_length=256, blank=True)
     ecstasy_link = models.CharField(max_length=256, blank=True)

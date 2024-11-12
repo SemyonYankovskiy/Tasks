@@ -124,7 +124,7 @@ def edit_task(request, task_id):
                 updated_task.files.add(AttachedFile.objects.create(file=file))
             updated_task.save()
 
-            add_event_log(user=request.user, task=updated_task, text="✏️Задача отредактирована")
+            add_event_log(user=request.user, task=updated_task, text="✏️ Задача отредактирована")
 
             messages.add_message(
                 request, messages.SUCCESS, f"Задача '{form.cleaned_data['header']}' отредактирована"
@@ -180,7 +180,7 @@ def delete_task(request, task_id):
             # Обновление задачи
             task.deleted = True
 
-            add_event_log(user=request.user, task=task, text="🗑️Задача удалена")
+            add_event_log(user=request.user, task=task, text="🗑️ Задача удалена")
 
             messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' удалена")
         else:
