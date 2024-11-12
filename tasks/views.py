@@ -127,7 +127,6 @@ def get_calendar_page(request):
 def get_task_edit_form(request, task_id: int):
     task = get_object_or_404(Task, pk=task_id)
     fields = get_fields_for_filter(request.user, "tasks")
-    print(fields)
     from_url = request.GET.get("from_url", reverse("tasks"))
 
     current_engineers_with_type = list(task.engineers.all().values_list("id", flat=True))

@@ -7,7 +7,8 @@ from django.db.models import Q
 from .models import Object, Task, Engineer
 from .services.cache_version import CacheVersion
 from .services.service import default_date
-from .services.tree_nodes import ObjectsTagsTree, GroupsTree, TasksTagsTree, ObjectsTree, EngineersTree
+from .services.tree_nodes import GroupsTree, ObjectsTree, EngineersTree
+from .services.tree_nodes.tree_nodes import AllTagsTree
 
 
 class ObjectFilter(django_filters.FilterSet):
@@ -59,16 +60,16 @@ def get_fields_for_filter(user, page):
     cached_data = cache.get(cache_key, version=cache_version_value)
     if cached_data:
         return cached_data
-
+    # context = {"user": user}
     # Заполняем filter_fields_content в зависимости от страницы
     if page == "objects":
         filter_fields_content = {
-            "tags_json": ObjectsTagsTree(context).get_nodes(),
+            "tags_json": AllTagsTree(context).get_nodes(),
             "groups_json": GroupsTree(context).get_nodes()
         }
     elif page == "tasks":
         filter_fields_content = {
-            "tags_json": TasksTagsTree(context).get_nodes(),
+            "tags_json": AllTagsTree(context).get_nodes(),
             "engineers_json": EngineersTree(context).get_nodes(),
             "objects_json": ObjectsTree(context).get_nodes(),
             "default_date": default_date(),
@@ -78,7 +79,7 @@ def get_fields_for_filter(user, page):
         # Обработка неизвестного значения page
         raise ValueError(f"Неизвестное значение параметра 'page': {page}")
 
-    # Устанавливаем данные в кеш
+    # # Устанавливаем данные в кеш
     cache.set(cache_key, filter_fields_content, timeout=600, version=cache_version_value)
     return filter_fields_content
 
