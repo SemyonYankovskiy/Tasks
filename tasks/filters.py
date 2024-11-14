@@ -23,27 +23,6 @@ class ObjectFilter(django_filters.FilterSet):
     def search_filter(self, queryset, name: str, value: str):
         return queryset.filter(Q(name__icontains=value) | Q(description__icontains=value))
 
-    @property
-    def applied_filters_count(self):
-        """
-        Считаем только те параметры, которые не в списке `not_count_params` и имеют значение
-        :return:  int
-        """
-        not_count_params = ["page", "per_page"]
-        return len([
-            param for param, value in self.data.items()
-            if value and param not in not_count_params
-        ])
-
-    @property
-    def filter_url(self):
-        """
-        Формируем строку URL с параметрами, исключая параметры из `exclude_params`
-        """
-        exclude_params = ["page"]
-        filter_data = {key: value for key, value in self.data.items() if key not in exclude_params}
-        return urlencode(filter_data, doseq=True)
-
 
 def get_fields_for_filter(user, page):
     """
@@ -65,7 +44,8 @@ def get_fields_for_filter(user, page):
     if page == "objects":
         filter_fields_content = {
             "tags_json": AllTagsTree(context).get_nodes(),
-            "groups_json": GroupsTree(context).get_nodes()
+            "groups_json": GroupsTree(context).get_nodes(),
+            "objects_json": ObjectsTree(context).get_nodes()
         }
     elif page == "tasks":
         filter_fields_content = {
@@ -136,8 +116,10 @@ class TaskFilter(django_filters.FilterSet):
         if self.data.get("show_my_tasks_only") is None:
             # Check if request exists and user is staff
             if hasattr(self, 'request') and self.request and hasattr(self.request,'user') and self.request.user.is_staff:
+                print("не сука")
                 self.data["show_my_tasks_only"] = "false"
             else:
+                print("Сука")
                 self.data["show_my_tasks_only"] = "true"
 
         if self.data.get("sort_order") is None:
@@ -181,7 +163,7 @@ class TaskFilter(django_filters.FilterSet):
         return queryset.filter(Q(header__icontains=value) | Q(text__icontains=value))
 
     @property
-    def applied_filters_count(self):
+    def applied_filters_count_taks(self):
         """
         Считаем только те параметры, которые не в списке `not_count_params` и имеют значение
         :return:  int
@@ -200,14 +182,25 @@ class TaskFilter(django_filters.FilterSet):
 
         return params_count
 
-    @property
-    def filter_url(self):
-        """
-        Формируем строку URL с параметрами, исключая параметры из `exclude_params`
-        """
-        filter_data = {key: value for key, value in self.data.items() if key not in ["page"]}
-        return urlencode(filter_data, doseq=True)
 
+def applied_filters_count(request):
+    """
+    Считаем только те параметры, которые не в списке `not_count_params` и имеют значение
+    :return:  int
+    """
+    not_count_params = ["page", "per_page"]
+    return len([
+        param for param, value in request.GET.items()
+        if value and param not in not_count_params
+    ])
+
+
+def filter_url(request):
+    """
+    Формируем строку URL с параметрами, исключая параметры из `exclude_params`
+    """
+    filter_data = {key: value for key, value in request.GET.items() if key not in ["page"]}
+    return urlencode(filter_data, doseq=True)
 
 
 class TaskFilterByDone(django_filters.FilterSet):

@@ -7,8 +7,9 @@ from django.urls import reverse
 from tasks.services.objects import get_objects, get_single_object, get_child_objects
 from tasks.services.tasks_prepare import get_tasks
 from tasks.services.tree_nodes import GroupsTree
-from .filters import ObjectFilter, get_current_filter_params, get_fields_for_filter, TaskFilter
-from .forms import CKEditorEditForm, CKEditorCreateForm, CKEditorEditObjForm
+from .filters import ObjectFilter, get_current_filter_params, get_fields_for_filter, TaskFilter, filter_url, \
+    applied_filters_count
+from .forms import CKEditorEditForm, CKEditorCreateForm, CKEditorEditObjForm, CKEditorCreateObjForm
 from .models import Object, Task
 from .services.statistics import get_stat
 from .services.tree_nodes.tree_nodes import AllTagsTree
@@ -18,7 +19,7 @@ from .services.tree_nodes.tree_nodes import AllTagsTree
 def get_home(request):
     page_number = request.GET.get("page", 1)
     per_page = request.GET.get("per_page", 8)
-    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page"]})
+    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page"]})
 
     objects = get_objects(request, filter_params, page_number, per_page)
 
@@ -28,11 +29,14 @@ def get_home(request):
 
     obj_filter = ObjectFilter(request.GET)
 
+    ckeditor__obj_form = CKEditorCreateObjForm()
+
     context = {**objects,
                **current_filter_params,
                **filter_fields_items,
-               "filter_data": obj_filter.filter_url,  # для сохранения фильтров при пагинации
-               "params_count": obj_filter.applied_filters_count,
+               "ckeditor__obj_form": ckeditor__obj_form,
+               "filter_data": filter_url(request),  # для сохранения фильтров при пагинации
+               "params_count": applied_filters_count(request),
                }
     return render(request, "components/home/home.html", context=context)
 
@@ -41,7 +45,8 @@ def get_home(request):
 def get_object_page(request, object_slug):
     page_number = request.GET.get("page", 1)
     per_page = request.GET.get("per_page", 8)
-    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page", ]})
+
+    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page"]})
 
     obj = get_single_object(request.user, object_slug)
     child_objects = get_child_objects(user=request.user, parent=obj["object"])
@@ -49,7 +54,6 @@ def get_object_page(request, object_slug):
     tasks = get_tasks(request, filter_params, page_number, per_page, obj=obj["object"])
 
     fields = get_fields_for_filter(user=request.user, page="tasks")
-
     ckeditor = CKEditorCreateForm(request.POST)
     context = {
         **obj,
@@ -57,6 +61,7 @@ def get_object_page(request, object_slug):
         **fields,
         "child_objects": child_objects,
         "ckeditor": ckeditor,
+        "filter_data": filter_url(request),  # для сохранения фильтров при пагинации
     }
 
     return render(request, "components/object/object-page.html", context=context)
@@ -66,7 +71,8 @@ def get_object_page(request, object_slug):
 def get_tasks_page(request):
     page_number = request.GET.get("page", 1)
     per_page = request.GET.get("per_page", 8)
-    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page", ]})
+    print("Гнида", per_page)
+    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page"]})
 
     tasks = get_tasks(request, filter_params, page_number, per_page)
 
@@ -80,8 +86,8 @@ def get_tasks_page(request):
         **tasks,
         **fields,
         **current_filter_params,
-        "filter_data": task_filter.filter_url,  # для сохранения фильтров при пагинации
-        "params_count": task_filter.applied_filters_count,
+        "filter_data": filter_url(request),  # для сохранения фильтров при пагинации
+        "params_count": task_filter.applied_filters_count_taks,
         "ckeditor": ckeditor,
     }
 
@@ -106,7 +112,7 @@ def get_task_view(request, task_id: int):
 def get_calendar_page(request):
     page_number = request.GET.get("page", 1)
     per_page = request.GET.get("per_page", 1000)
-    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page", "per_page", ]})
+    filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page"]})
 
     tasks = get_tasks(request, filter_params, page_number, per_page)
     fields = get_fields_for_filter(user=request.user, page="tasks")
@@ -117,7 +123,7 @@ def get_calendar_page(request):
         **tasks,
         **fields,
         "current_filter_params": current_filter_params,  # для TreeSelect
-        "params_count": task_filter.applied_filters_count,
+        "params_count": task_filter.applied_filters_count_taks,
     }
 
     return render(request, "components/calendar/calendar.html", context=context)

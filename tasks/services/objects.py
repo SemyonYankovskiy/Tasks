@@ -12,6 +12,7 @@ from django.urls import reverse
 
 from tasks.forms import ObjectForm
 from tasks.models import Object, AttachedFile
+from user.models import User
 from .cache_version import CacheVersion
 from .service import paginate_queryset
 from .service import remove_unused_attached_files
@@ -28,14 +29,6 @@ def get_objects_list(user) -> QuerySet[Object]:
         .values("file")[:1]
     )
 
-    tasks_count_subquery = (
-        permission_filter(user)
-        .filter(objects_set=OuterRef("pk"), is_done=False)
-        .values("objects_set")
-        .annotate(tasks_count=Count("id"))
-        .values("tasks_count")[:1]
-    )
-
     objects = (
         Object.objects.all()
         .prefetch_related("tags", "groups")
@@ -44,7 +37,6 @@ def get_objects_list(user) -> QuerySet[Object]:
             img_preview=Subquery(image_subquery, output_field=CharField()),  # Используем подзапрос с одним значением
             child_count=Count("children", distinct=True),  # Подсчет уникальных дочерних объектов
             description_length=Length("description"),
-            tasks_count=Subquery(tasks_count_subquery, output_field=CharField()),  # Используем подзапрос с одним значением
             short_description=Case(
                 When(description_length__gt=53, then=Concat(Substr("description", 1, 50), Value("..."))),
                 default="description",
@@ -57,6 +49,14 @@ def get_objects_list(user) -> QuerySet[Object]:
     )
 
     return objects
+
+
+def add_tasks_count_to_objects(queryset: QuerySet[Object], user: User, field_name: str) -> QuerySet[Object]:
+    for obj in queryset:
+        count: int = permission_filter(user).filter(objects_set=obj, is_done=False).count()
+        setattr(obj, field_name, count)
+
+    return queryset
 
 
 def get_objects(request, filter_params, page_number, per_page):
@@ -77,6 +77,7 @@ def get_objects(request, filter_params, page_number, per_page):
     # Получение списка объектов и пагинирование
     filtered_objects = ObjectFilter(request.GET, queryset=get_objects_list(request.user)).qs
     pagination_data = paginate_queryset(filtered_objects, page_number, per_page)
+    add_tasks_count_to_objects(pagination_data["page_obj"], user=request.user, field_name="tasks_count")
 
     result = {
         "objects_qs": pagination_data["page_obj"],
@@ -201,3 +202,9 @@ def get_child_objects(user, parent):
     cache.set(cache_key, result, timeout=600)
 
     return result
+
+
+@login_required
+@atomic
+def create_object(request, object_slug):
+    print("хухуху")

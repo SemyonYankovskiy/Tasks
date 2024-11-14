@@ -248,3 +248,44 @@ class ObjectForm(forms.ModelForm):
     #         current_parent = current_parent.parent
     #
     #     return cleaned_data
+
+
+class CKEditorCreateObjForm(forms.Form):
+    description_create = forms.CharField(widget=CKEditorWidget, label='', required=False)
+
+
+class ObjectCreateForm(forms.ModelForm):
+    obj_tags_edit = forms.ModelMultipleChoiceField(queryset=Tag.objects.all(), required=False)
+
+    class Meta:
+        model = Object
+        fields = [
+            'name', 'priority', 'description',
+            'zabbix_link', 'ecstasy_link', 'notes_link', 'another_link',
+            'obj_tags_edit', 'files', 'groups'
+        ]
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
+            'tasks': forms.CheckboxSelectMultiple(),
+
+        }
+
+    def save(self, commit=True):
+        instance: Object = super().save(commit=False)
+
+        if commit:
+            instance.save()
+
+        # Обновление групп
+        if 'groups' in self.cleaned_data and self.cleaned_data['groups']:
+            instance.groups.set(self.cleaned_data['groups'])  # Здесь вы должны передавать список ID групп
+        else:
+            instance.groups.clear()  # Если ничего не передано, удаляем все группы
+
+        # Обновление тегов
+        if 'obj_tags_edit' in self.cleaned_data:
+            instance.tags.set(self.cleaned_data["obj_tags_edit"])  # Установите теги
+        else:
+            instance.tags.clear()  # Удалите все теги, если нет переданных данных
+
+        return instance

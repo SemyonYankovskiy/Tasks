@@ -25,7 +25,6 @@ def permission_filter(user: User) -> QuerySet[Task]:
     elif engineer and engineer.head_of_department:
         # Получаем всех пользователей, связанных с инженерами департамента
         department_users = User.objects.filter(engineer__department=engineer.department)
-
         # Пользователь head_of_department видит задачи, связанные с его департаментом, подчиненными и задачи,
         # которые подчиненные создали для других департаментов
         queryset = Task.objects.filter(

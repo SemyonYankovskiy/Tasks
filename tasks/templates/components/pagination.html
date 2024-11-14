@@ -4,14 +4,14 @@
 <div class="pagination container d-flex justify-content-center align-self-center align-items-center mt-5 mb-3">
 
         <a href="{% if pagination_data.page_obj.has_previous %}?page={{ pagination_data.page_obj.previous_page_number }}
-            &per_page={{ pagination_data.per_page }}&{{ filter_data }}{% else %}#{% endif %}"
+            &{{ filter_data }}{% else %}#{% endif %}"
            class="mx-3 next_prev px-2 py-1 btn {% if not pagination_data.page_obj.has_previous %}disabled{% endif %}">
             <i class="bi bi-caret-left" style="font-size: 1.2rem;"></i>
         </a>
 
 
         {% if pagination_data.start_show_first_page_link %}
-            <a href="?page=1&per_page={{ pagination_data.per_page }}&{{ filter_data }}">1</a>
+            <a href="?page=1&{{ filter_data }}">1</a>
             {% if pagination_data.start_show_ellipsis %}
                 <span>...</span>
             {% endif %}
@@ -22,7 +22,7 @@
             {% if pagination_data.page_obj.number == p %}
                 <a class="active">{{ p }}</a>
             {% elif p >= pagination_data.page_obj.number|add:-2 and p <= pagination_data.page_obj.number|add:2 %}
-                <a href="?page={{ p }}&per_page={{ pagination_data.per_page }}&{{ filter_data }}">{{ p }}</a>
+                <a href="?page={{ p }}&{{ filter_data }}">{{ p }}</a>
             {% endif %}
         {% endfor %}
 
@@ -31,11 +31,11 @@
             {% if pagination_data.end_show_ellipsis %}
                 <span>...</span>
             {% endif %}
-            <a href="?page={{ pagination_data.last_page_number }}&per_page={{ pagination_data.per_page }}&{{ filter_data }}">{{ pagination_data.last_page_number }}</a>
+            <a href="?page={{ pagination_data.last_page_number }}&{{ filter_data }}">{{ pagination_data.last_page_number }}</a>
         {% endif %}
 
 
-        <a href="{% if pagination_data.page_obj.has_next %}?page={{ pagination_data.page_obj.next_page_number }}&per_page={{ pagination_data.per_page }}&
+        <a href="{% if pagination_data.page_obj.has_next %}?page={{ pagination_data.page_obj.next_page_number }}&
             {{ filter_data }}{% else %}#{% endif %}"
            class="mx-3 next_prev px-2 py-1 btn {% if not pagination_data.page_obj.has_next %}disabled{% endif %}">
             <i class="bi bi-caret-right" style="font-size: 1.2rem;"></i>
@@ -43,20 +43,23 @@
 
 
     <form method="GET" class="per-page-form h-100">
-        <!-- Сохраняем текущие фильтры и страницу -->
-        <input type="hidden" name="page" value="{{ pagination_data.page_obj.number }}">
-        {% for key, value in request.GET.items %}
-            {% if key != 'page' and key != 'per_page' %}
-                <input type="hidden" name="{{ key }}" value="{{ value }}">
-            {% endif %}
-        {% endfor %}
+    <!-- Сохраняем текущую страницу -->
+    <input type="hidden" name="page" value="{{ pagination_data.page_obj.number }}">
 
-        <select name="per_page" class="h-100" id="per_page" onchange="this.form.submit()">
-            <option value="8" {% if pagination_data.per_page == '8' %}selected{% endif %}>8</option>
-            <option value="12" {% if pagination_data.per_page == '12' %}selected{% endif %}>12</option>
-            <option value="16" {% if pagination_data.per_page == '16' %}selected{% endif %}>16</option>
-        </select>
-    </form>
+    <!-- Сохраняем другие параметры фильтра -->
+    {% for key, value in request.GET.items %}
+        {% if key != 'page' and key != 'per_page' %}
+            <input type="hidden" name="{{ key }}" value="{{ value }}">
+        {% endif %}
+    {% endfor %}
+
+    <!-- Поле выбора количества элементов на странице -->
+    <select name="per_page" class="h-100" id="per_page" onchange="this.form.submit()">
+        <option value="8" {% if pagination_data.per_page == '8' %}selected{% endif %}>8</option>
+        <option value="12" {% if pagination_data.per_page == '12' %}selected{% endif %}>12</option>
+        <option value="16" {% if pagination_data.per_page == '16' %}selected{% endif %}>16</option>
+    </select>
+</form>
 
 
 </div>

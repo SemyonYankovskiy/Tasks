@@ -4,7 +4,7 @@
         <div id="div_id_name__icontains" class="text-field__group mb-3">
             {#                <i class="bi bi-card-heading"></i>#}
             {% include "components/filter_button.html" %}
-
+            {% include "components/object/create_object.html" %}
             <label for="id_name__icontains" class="text-field__label form-label"></label>
             <input type="text" name="search" class="text-field__input textinput form-control ms-2 border-black"
                    value="{{ request.GET.search }}"
