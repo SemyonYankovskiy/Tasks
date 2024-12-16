@@ -1,8 +1,12 @@
+{% load static %}
 <div class="card m-2"
      style="text-decoration: none; color: inherit; position: relative;">
     <a href="{% url 'show-object' slug %}" style="text-decoration: none; color: black">
-        <img src="/media/{{ img_preview }}" class="card-img-top" alt="...">
-
+        {% if img_preview %}
+        <img src="/media/{{ img_preview }}" class="card-img-top" alt="image loading">
+        {% else %}
+        <img src="{% static 'self/img/noimage.jpg' %}" class="card-img-top" alt="no image">
+        {% endif %}
         {% if tasks_count %}
         <!-- Иконка с цифрой -->
         <div class="badge"
