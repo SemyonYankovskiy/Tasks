@@ -8,10 +8,14 @@
 <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
 <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 
-<button type="button" class="ms-2 btn btn-outline-primary " style="align-self: baseline;" data-bs-toggle="modal"
+<div  class="m-0" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="Добавить объект" style="width: auto; display: inline-block;">
+    <button type="button" class="mx-4 mb-0 mt-0 btn btn-outline-primary " style="align-self: baseline;" data-bs-toggle="modal"
         data-bs-target="#staticBackdrop_create_object">
     <i class="bi bi-plus-square"></i>
 </button>
+</div>
+
+
 
 <!-- Модальное окно создания задачи -->
 <div class="modal fade" id="staticBackdrop_create_object" data-bs-backdrop="static" data-bs-keyboard="false"
@@ -119,7 +123,7 @@
                         </div>
                     </div>
 
-                      <!-- Текст задачи -->
+                    <!-- Текст задачи -->
                     <div class="mb-3">
                         <label for="objText_create" class="form-label">
                             <i class="bi bi-card-text" style="font-size: 1.2rem;"></i>

@@ -71,7 +71,6 @@ def get_object_page(request, object_slug):
 def get_tasks_page(request):
     page_number = request.GET.get("page", 1)
     per_page = request.GET.get("per_page", 8)
-    print("Гнида", per_page)
     filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page"]})
 
     tasks = get_tasks(request, filter_params, page_number, per_page)

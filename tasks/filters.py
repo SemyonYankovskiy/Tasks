@@ -119,7 +119,6 @@ class TaskFilter(django_filters.FilterSet):
                 print("не сука")
                 self.data["show_my_tasks_only"] = "false"
             else:
-                print("Сука")
                 self.data["show_my_tasks_only"] = "true"
 
         if self.data.get("sort_order") is None:
