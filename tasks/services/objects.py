@@ -1,4 +1,3 @@
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
@@ -10,7 +9,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 
-from tasks.forms import ObjectForm
+from tasks.forms import ObjectForm, ObjectCreateForm
 from tasks.models import Object, AttachedFile
 from user.models import User
 from .cache_version import CacheVersion
@@ -25,15 +24,15 @@ def get_objects_list(user) -> QuerySet[Object]:
     # Подзапрос для получения первого файла изображения (jpeg, jpg, png) для каждого объекта
     image_subquery = (
         AttachedFile.objects.filter(objects_set=OuterRef("pk"), file__iregex=r"\.(jpeg|jpg|png)$")
-        .order_by("id")
-        .values("file")[:1]
+            .order_by("id")
+            .values("file")[:1]
     )
 
     objects = (
         Object.objects.all()
-        .prefetch_related("tags", "groups")
-        .filter(groups__users=user)
-        .annotate(
+            .prefetch_related("tags", "groups")
+            .filter(groups__users=user)
+            .annotate(
             img_preview=Subquery(image_subquery, output_field=CharField()),  # Используем подзапрос с одним значением
             child_count=Count("children", distinct=True),  # Подсчет уникальных дочерних объектов
             description_length=Length("description"),
@@ -43,9 +42,9 @@ def get_objects_list(user) -> QuerySet[Object]:
                 output_field=CharField(),
             ),
         )
-        .only("id", "name", "priority", "slug", "zabbix_link", "notes_link", "ecstasy_link", "another_link")
-        .distinct()
-        .order_by("parent_id", "-id")
+            .only("id", "name", "priority", "slug", "zabbix_link", "notes_link", "ecstasy_link", "another_link")
+            .distinct()
+            .order_by("-id")
     )
 
     return objects
@@ -92,7 +91,6 @@ def get_objects(request, filter_params, page_number, per_page):
 
 
 def get_obj(object_slug, user):
-
     obj = (
         Object.objects.filter(slug=object_slug)
             .prefetch_related("files", "tags", "groups")
@@ -193,11 +191,9 @@ def get_child_objects(user, parent):
     cache_key = f'obj_{parent.slug}_childs'
     cached_data = cache.get(cache_key)
     if cached_data is not None:
-
         return cached_data
 
     result = get_objects_list(user).filter(parent=parent)
-
 
     cache.set(cache_key, result, timeout=600)
 
@@ -206,5 +202,37 @@ def get_child_objects(user, parent):
 
 @login_required
 @atomic
-def create_object(request, object_slug):
-    print("хухуху")
+def create_object(request):
+    # redirect_to = reverse("home")
+    # obj_name = request.POST.get("name")
+    # messages.add_message(request, messages.SUCCESS, f"Объект '{obj_name}' мог быть добавлен, но я не доделал фичу")
+    #
+    # return redirect(redirect_to)
+    redirect_to = reverse("home")
+
+    if request.method == "POST":
+        print(request.POST)
+        post_data = create_tags(request.POST, "tags_create")  # Сохраняем теги и возвращаем
+
+        # Теперь создаем форму с обновлёнными данными (содержит ID всех тегов)
+        form = ObjectCreateForm(post_data, request.FILES)
+
+        # Получаем URL с параметрами фильтров
+        redirect_to = request.POST.get("from_url", redirect_to).strip()
+        print(redirect_to)
+        if form.is_valid():
+            task = form.save()
+
+            # Сохраняем прикреплённые файлы (если они есть)
+            for file in request.FILES.getlist("files[]"):
+                task.files.add(AttachedFile.objects.create(file=file))
+
+            messages.add_message(
+                request, messages.SUCCESS, f"Объект '{form.cleaned_data['name']}' успешно создан"
+            )
+
+            return redirect(redirect_to)
+        else:
+            messages.add_message(request, messages.WARNING, form.errors)
+
+    return redirect("home")

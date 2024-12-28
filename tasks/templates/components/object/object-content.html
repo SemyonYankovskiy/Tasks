@@ -2,26 +2,28 @@
 <div class="container text-center  mt-2 shadow rounded border-top border-3">
     {# ============== NAV BUTTON & EDIT ============== #}
     <div class="row mb-2 d-flex p-3">
-        <div class="col d-flex justify-content-left px-3 pt-3">
+        <div class="col d-flex justify-content-left px-3 pt-3 gap-2">
             {% if object.parent_slug %}
 
-                <a href="{% url 'show-object' object.parent_slug %}" class="btn btn-outline-primary X">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                         class="bi bi-arrow-left-square-fill" viewBox="0 0 16 16">
-                        <path d="M16 14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12zm-4.5-6.5H5.707l2.147-2.146a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708-.708L5.707 8.5H11.5a.5.5 0 0 0 0-1z"/>
-                    </svg>
-                    {{ object.parent_name }}
+                <a href="{% url 'show-object' object.parent_slug %}"
+                   class="btn btn-outline-primary d-flex  align-items-center">
+                    <i class="bi bi-arrow-left-square-fill" style="font-size: 1.3rem"></i>
+                    <span class="mx-2">{{ object.parent_name }}</span>
                 </a>
-            {% else %}
-                <a href="{% url 'home' %}" class="btn btn-outline-primary ">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                         class="bi bi-arrow-left-square-fill" viewBox="0 0 16 16">
-                        <path d="M16 14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12zm-4.5-6.5H5.707l2.147-2.146a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708-.708L5.707 8.5H11.5a.5.5 0 0 0 0-1z"/>
-                    </svg>
+
+                <a href="{% url 'home' %}" class="btn btn-outline-primary d-flex  align-items-center">
+                    <i class="bi bi-house-door-fill" style="font-size: 1.3rem"></i>
                     <span class="mx-2">На главную</span>
 
+                </a>
+
+            {% else %}
+                <a href="{% url 'home' %}" class="btn btn-outline-primary d-flex align-items-center">
+                    <i class="bi bi-house-door-fill" style="font-size: 1.3rem"></i>
+                    <span class="mx-2">На главную</span>
 
                 </a>
+
             {% endif %}
         </div>
         <div class="col  d-flex justify-content-end align-items-center">

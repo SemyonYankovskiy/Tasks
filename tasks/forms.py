@@ -2,8 +2,10 @@ from datetime import datetime
 
 from ckeditor.widgets import CKEditorWidget
 from django import forms
+from django.utils.text import slugify
 
-from .models import Task, Engineer, Tag, Object, Department
+from .models import Task, Engineer, Tag, Object, Department, ObjectGroup, AttachedFile
+from .services.service import transliterate
 
 
 class CKEditorCreateForm(forms.Form):
@@ -255,37 +257,82 @@ class CKEditorCreateObjForm(forms.Form):
 
 
 class ObjectCreateForm(forms.ModelForm):
-    obj_tags_edit = forms.ModelMultipleChoiceField(queryset=Tag.objects.all(), required=False)
+    tags_create = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(),
+        label="Теги"
+    )
+    groups_create = forms.ModelMultipleChoiceField(
+        queryset=ObjectGroup.objects.all(),
+        required=True,
+        widget=forms.CheckboxSelectMultiple(),
+        label="Группы"
+    )
+    files = forms.ModelMultipleChoiceField(
+        queryset=AttachedFile.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(),
+        label="Файлы"
+    )
+    description = forms.CharField(
+        widget=CKEditorWidget(),
+        required=False,
+        label="Описание"
+    )
 
     class Meta:
         model = Object
         fields = [
-            'name', 'priority', 'description',
+            'name', 'priority', 'parent', 'description',
             'zabbix_link', 'ecstasy_link', 'notes_link', 'another_link',
-            'obj_tags_edit', 'files', 'groups'
+            'tags_create', 'files', 'groups_create'
         ]
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
-            'tasks': forms.CheckboxSelectMultiple(),
-
+            'name': forms.TextInput(attrs={'placeholder': 'Название объекта'}),
+            'priority': forms.Select(),
+            'parent': forms.Select(),
+            'zabbix_link': forms.TextInput(attrs={'placeholder': 'Ссылка на Zabbix'}),
+            'ecstasy_link': forms.TextInput(attrs={'placeholder': 'Ссылка на Ecstasy'}),
+            'notes_link': forms.TextInput(attrs={'placeholder': 'Ссылка на заметки'}),
+            'another_link': forms.TextInput(attrs={'placeholder': 'Другая ссылка'}),
         }
 
     def save(self, commit=True):
         instance: Object = super().save(commit=False)
 
+        # Генерация slug на основе name
+        if not instance.slug:  # Генерируем slug только если он еще не задан
+            base_slug = slugify(transliterate(instance.name))  # Преобразуем кириллицу и генерируем slug
+            slug = base_slug
+            counter = 1
+
+            # Проверяем уникальность slug
+            while Object.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            instance.slug = slug
+
         if commit:
             instance.save()
 
         # Обновление групп
-        if 'groups' in self.cleaned_data and self.cleaned_data['groups']:
-            instance.groups.set(self.cleaned_data['groups'])  # Здесь вы должны передавать список ID групп
+        if 'groups_create' in self.cleaned_data and self.cleaned_data['groups_create']:
+            instance.groups.set(self.cleaned_data['groups_create'])
         else:
-            instance.groups.clear()  # Если ничего не передано, удаляем все группы
+            instance.groups.clear()
 
         # Обновление тегов
-        if 'obj_tags_edit' in self.cleaned_data:
-            instance.tags.set(self.cleaned_data["obj_tags_edit"])  # Установите теги
+        if 'tags_create' in self.cleaned_data:
+            instance.tags.set(self.cleaned_data["tags_create"])
         else:
-            instance.tags.clear()  # Удалите все теги, если нет переданных данных
+            instance.tags.clear()
+
+        # Обновление файлов
+        if 'files' in self.cleaned_data:
+            instance.files.set(self.cleaned_data["files"])
+        else:
+            instance.files.clear()
 
         return instance

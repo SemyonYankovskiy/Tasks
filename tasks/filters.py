@@ -116,7 +116,7 @@ class TaskFilter(django_filters.FilterSet):
         if self.data.get("show_my_tasks_only") is None:
             # Check if request exists and user is staff
             if hasattr(self, 'request') and self.request and hasattr(self.request,'user') and self.request.user.is_staff:
-                print("не сука")
+
                 self.data["show_my_tasks_only"] = "false"
             else:
                 self.data["show_my_tasks_only"] = "true"

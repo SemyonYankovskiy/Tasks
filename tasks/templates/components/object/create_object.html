@@ -32,7 +32,7 @@
                 {% csrf_token %}
 
                 <!-- Поле для передачи URL с фильтрами (опционально) -->
-                <input type="hidden" name="from_url" value="{{ from_url }}">
+                <input type="hidden" name="from_url" value="{{ request.get_full_path }}">
 
                 <div class="modal-body p-4">
 
@@ -55,11 +55,11 @@
                                 <span>Приоритет<span style="color: red;">*</span></span>
                             </label>
                             <select name="priority" class="select form-select" id="objPriority_create" required>
-                                <option value="" selected>-</option>
-                                <option value="CRITICAL">Критический</option>
-                                <option value="HIGH">Высокий</option>
-                                <option value="MEDIUM">Средний</option>
-                                <option value="LOW">Низкий</option>
+                                <option disabled selected value> - Приоритет -</option>
+                                <option value="CRITICAL" style="color: #FF0000">Критический</option>
+                                <option value="HIGH" style="color: #FF6347">Высокий</option>
+                                <option value="MEDIUM" style="color: #FFD700">Средний</option>
+                                <option value="LOW" style="color: #1E90FF">Низкий</option>
                             </select>
                         </div>
 
@@ -87,7 +87,7 @@
                             <i class="bi bi-sitemap" style="font-size: 1.2rem;"></i>
                             <span>Родительский объект</span>
                         </label>
-                        {% include 'tree-select.html' with select_name='obj_parent' objects_structure_json=objects_json %}
+                        {% include 'tree-select.html' with select_name='parent' objects_structure_json=objects_json %}
                     </div>
                     <!-- Ссылки -->
                     <div class="row ps-2">
