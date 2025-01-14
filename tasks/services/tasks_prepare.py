@@ -120,20 +120,28 @@ def get_filtered_tasks(request, obj=None):
     Возвращает часть задач, которые отфильтрованы или включены/выключены в шаблоне
     """
     tasks_qs = permission_filter(user=request.user)
-    tasks_qs_old = tasks_qs
     tasks_qs = tasks_qs.prefetch_related("files", "tags", "engineers", "objects_set", "departments", "creator")
 
-    tasks_filter = TaskFilter(request.GET, queryset=tasks_qs, request=request)
+    # Сохраняем исходный QuerySet для подсчета доступных задач
+    tasks_qs_all = tasks_qs
 
+    tasks_filter = TaskFilter(request.GET, queryset=tasks_qs, request=request)
     tasks_qs = tasks_filter.qs
 
+    # Если передан объект, фильтруем задачи по нему
     if obj:
         tasks_qs = tasks_qs.filter(objects_set=obj)
+        available_queryset = tasks_qs_all.filter(objects_set=obj)
+    else:
+        available_queryset = tasks_qs_all
 
-    tasks_counters = get_tasks_count(queryset=tasks_qs, available_queryset=tasks_qs_old, engineer=request.user.get_engineer_or_none())
+    tasks_counters = get_tasks_count(
+        queryset=tasks_qs,
+        available_queryset=available_queryset,
+        engineer=request.user.get_engineer_or_none()
+    )
 
     tasks_filter_by_done = TaskFilterByDone(request.GET, queryset=tasks_qs, request=request)
-
     tasks_qs = tasks_filter_by_done.qs
 
     # Возвращаем контекст с отфильтрованными задачами и параметрами отображения

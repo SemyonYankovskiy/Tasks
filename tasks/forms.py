@@ -205,15 +205,17 @@ class ObjectForm(forms.ModelForm):
     class Meta:
         model = Object
         fields = [
-            'name', 'priority', 'description',
-            'zabbix_link', 'ecstasy_link', 'notes_link', 'another_link',
-            'obj_tags_edit', 'files', 'groups'
+            'name',
+            'priority',
+            'description',
+            'zabbix_link',
+            'ecstasy_link',
+            'notes_link',
+            'another_link',
+            'obj_tags_edit',
+            'files',
+            'groups'
         ]
-        # widgets = {
-        #     'description': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
-        #     'tasks': forms.CheckboxSelectMultiple(),
-        #
-        # }
 
     def save(self, commit=True):
         instance: Object = super().save(commit=False)
@@ -234,22 +236,6 @@ class ObjectForm(forms.ModelForm):
             instance.tags.clear()  # Удалите все теги, если нет переданных данных
 
         return instance
-
-    # def clean(self):
-    #     cleaned_data = super().clean()
-    #     parent = cleaned_data.get('parent')
-    #
-    #     if parent == self.instance:
-    #         raise ValidationError("Рекурсия")
-    #
-    #     # Проверка на циклическую ссылку
-    #     current_parent = parent
-    #     while current_parent:
-    #         if current_parent == self.instance:
-    #             raise ValidationError("Твой выбранный родитель это твой же потомок, осуждаем")
-    #         current_parent = current_parent.parent
-    #
-    #     return cleaned_data
 
 
 class CKEditorCreateObjForm(forms.Form):
@@ -275,32 +261,25 @@ class ObjectCreateForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple(),
         label="Файлы"
     )
-    # description_create = forms.CharField(
-    #     widget=CKEditorWidget(),
-    #     required=False,
-    #     label="Описание"
-    # )
 
     class Meta:
         model = Object
         fields = [
-            'name', 'priority', 'parent', 'description',
-            'zabbix_link', 'ecstasy_link', 'notes_link', 'another_link',
-            'tags_create', 'files', 'groups_create'
+            'name',
+            'priority',
+            'parent',
+            'description',
+            'zabbix_link',
+            'ecstasy_link',
+            'notes_link',
+            'another_link',
+            'tags_create',
+            'files',
+            'groups_create'
         ]
-        # widgets = {
-        #     'name': forms.TextInput(attrs={'placeholder': 'Название объекта'}),
-        #     'priority': forms.Select(),
-        #     'parent': forms.Select(),
-        #     'zabbix_link': forms.TextInput(attrs={'placeholder': 'Ссылка на Zabbix'}),
-        #     'ecstasy_link': forms.TextInput(attrs={'placeholder': 'Ссылка на Ecstasy'}),
-        #     'notes_link': forms.TextInput(attrs={'placeholder': 'Ссылка на заметки'}),
-        #     'another_link': forms.TextInput(attrs={'placeholder': 'Другая ссылка'}),
-        # }
 
     def save(self, commit=True):
         instance: Object = super().save(commit=False)
-
 
         # Генерация slug на основе name
         if not instance.slug:  # Генерируем slug только если он еще не задан

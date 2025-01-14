@@ -203,23 +203,16 @@ def get_child_objects(user, parent):
 @login_required
 @atomic
 def create_object(request):
-    # redirect_to = reverse("home")
-    # obj_name = request.POST.get("name")
-    # messages.add_message(request, messages.SUCCESS, f"Объект '{obj_name}' мог быть добавлен, но я не доделал фичу")
-    #
-    # return redirect(redirect_to)
+
     redirect_to = reverse("home")
 
     if request.method == "POST":
-        print(request.POST)
         post_data = create_tags(request.POST, "tags_create")  # Сохраняем теги и возвращаем
-
         # Теперь создаем форму с обновлёнными данными (содержит ID всех тегов)
         form = ObjectCreateForm(post_data, request.FILES)
 
         # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
-        print(redirect_to)
         if form.is_valid():
             task = form.save()
 
