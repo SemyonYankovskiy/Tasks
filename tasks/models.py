@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, MinValueValidator
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 from tasks.services.cache_version import CacheVersion
@@ -276,34 +276,72 @@ class Address(models.Model):
         return f"Address: ({self.__str__()})"
 
 
+# --- Task ---
 @receiver(post_save, sender=Task)
-def update_cache_version1(sender, created, **kwargs):
+def update_cache_version1_save(sender, created, **kwargs):
     CacheVersion("tasks_page_version_cache").increment_cache_version()
 
 
+@receiver(post_delete, sender=Task)
+def update_cache_version1_delete(sender, instance, **kwargs):
+    CacheVersion("tasks_page_version_cache").increment_cache_version()
+
+
+# --- Object ---
 @receiver(post_save, sender=Object)
-def update_cache_version2(sender, created, **kwargs):
+def update_cache_version2_save(sender, created, **kwargs):
     CacheVersion("objects_page_cache_version").increment_cache_version()
     CacheVersion("filter_components_cache_version_tasks").increment_cache_version()
 
 
+@receiver(post_delete, sender=Object)
+def update_cache_version2_delete(sender, instance, **kwargs):
+    CacheVersion("objects_page_cache_version").increment_cache_version()
+    CacheVersion("filter_components_cache_version_tasks").increment_cache_version()
+
+
+# --- Tag ---
 @receiver(post_save, sender=Tag)
-def update_cache_version3(sender, created, **kwargs):
+def update_cache_version3_save(sender, created, **kwargs):
     CacheVersion("filter_components_cache_version_objects").increment_cache_version()
     CacheVersion("filter_components_cache_version_tasks").increment_cache_version()
 
 
+@receiver(post_delete, sender=Tag)
+def update_cache_version3_delete(sender, instance, **kwargs):
+    CacheVersion("filter_components_cache_version_objects").increment_cache_version()
+    CacheVersion("filter_components_cache_version_tasks").increment_cache_version()
+
+
+# --- ObjectGroup ---
 @receiver(post_save, sender=ObjectGroup)
-def update_cache_version4(sender, created, **kwargs):
+def update_cache_version4_save(sender, created, **kwargs):
     CacheVersion("filter_components_cache_version_objects").increment_cache_version()
 
 
+@receiver(post_delete, sender=ObjectGroup)
+def update_cache_version4_delete(sender, instance, **kwargs):
+    CacheVersion("filter_components_cache_version_objects").increment_cache_version()
+
+
+# --- Engineer ---
 @receiver(post_save, sender=Engineer)
-def update_cache_version5(sender, created, **kwargs):
+def update_cache_version5_save(sender, created, **kwargs):
     CacheVersion("filter_components_cache_version_tasks").increment_cache_version()
 
 
+@receiver(post_delete, sender=Engineer)
+def update_cache_version5_delete(sender, instance, **kwargs):
+    CacheVersion("filter_components_cache_version_tasks").increment_cache_version()
+
+
+# --- Department ---
 @receiver(post_save, sender=Department)
-def update_cache_version6(sender, created, **kwargs):
+def update_cache_version6_save(sender, created, **kwargs):
+    CacheVersion("filter_components_cache_version_tasks").increment_cache_version()
+
+
+@receiver(post_delete, sender=Department)
+def update_cache_version6_delete(sender, instance, **kwargs):
     CacheVersion("filter_components_cache_version_tasks").increment_cache_version()
 
