@@ -20,7 +20,7 @@
 
             {% for object in objects_qs %}
 
-                {% include "components/object/object-preview.html" with tasks_count=object.tasks_count img_preview=object.img_preview title=object.name desc=object.short_description priority=object.priority groups=object.groups child_count=object.child_count slug=object.slug tags=object.tags %}
+                {% include "components/object/object-preview.html" with tasks_count=object.tasks_count img_preview=object.img_preview title=object.name desc_full=object.description desc=object.short_description priority=object.priority groups=object.groups child_count=object.child_count slug=object.slug tags=object.tags %}
 
             {% endfor %}
 

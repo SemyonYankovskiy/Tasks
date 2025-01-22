@@ -42,7 +42,7 @@ def get_objects_list(user) -> QuerySet[Object]:
                 output_field=CharField(),
             ),
         )
-            .only("id", "name", "priority", "slug", "zabbix_link", "notes_link", "ecstasy_link", "another_link")
+            .only("id", "name", "priority", "description", "slug", "zabbix_link", "notes_link", "ecstasy_link", "another_link")
             .distinct()
             .order_by("-id")
     )

@@ -31,11 +31,15 @@ urlpatterns = [
 
     # CKEDITOR
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    # path('ckeditor/upload/', ckeditor_views.upload, name='ckeditor_upload'),
+    # path('ckeditor/browse/', ckeditor_views.browse, name='ckeditor_browse'),
 ]
+
 
 if settings.DEBUG:
     from debug_toolbar.toolbar import debug_toolbar_urls
 
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
     urlpatterns += debug_toolbar_urls()

@@ -172,6 +172,10 @@ else:
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -227,6 +231,8 @@ CKEDITOR_CONFIGS = {
         # 'toolbarCanCollapse': True,
         # 'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
         'tabSpaces': 4,
+        # 'filebrowserUploadUrl': '/ckeditor/upload/',
+        # 'filebrowserBrowseUrl': '/ckeditor/browse/',
         'extraPlugins': ','.join([
             'uploadimage',  # the upload image feature
             # your extra plugins here
@@ -243,5 +249,8 @@ CKEDITOR_CONFIGS = {
             # 'dialogui',
             # 'elementspath'
         ]),
+        'filebrowserUploadUrl': '/ckeditor/upload/',
+        'filebrowserBrowseUrl': '/ckeditor/browse/',
+        'imageUploadUrl': '/ckeditor/upload/',
     }
 }
