@@ -13,15 +13,26 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed; /* Устанавливаем фиксированную ширину столбцов */
         }
         th, td {
             border: 1px solid black !important;
             padding: 5px;
             text-align: left;
             font-size: 10px;
+            word-wrap: break-word; /* Перенос текста в ячейках */
         }
         th {
             background-color: #f2f2f2;
+        }
+        th:nth-child(1), td:nth-child(1) {
+            width: 10%; /* Ширина для первого столбца */
+        }
+        th:nth-child(2), td:nth-child(2) {
+            width: 75%; /* Ширина для второго столбца */
+        }
+        th:nth-child(3), td:nth-child(3) {
+            width: 15%; /* Ширина для третьего столбца */
         }
         .done {
             text-decoration: line-through; /* Зачеркивание выполненных задач */
@@ -44,7 +55,6 @@
     </style>
 </head>
 <body>
-    <h2>Список задач</h2>
     <table>
         <thead>
             <tr>
