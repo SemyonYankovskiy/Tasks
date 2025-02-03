@@ -269,23 +269,26 @@ def export_to_excel(request):
 
 @login_required
 def print_tasks(request):
-    filter_params = request.GET.urlencode()
-    tasks = get_tasks(request, filter_params, page_number=1, per_page=100)
+    filter_params = request.GET.urlencode()  # Сохраняем все фильтры из запроса
+    tasks = get_tasks(request, filter_params, page_number=1, per_page=100)  # Передаем фильтры
 
     tasks_data = []
     paginator = tasks["pagination_data"]["paginator"]
 
     for page_num in range(paginator.num_pages):
         page_data = paginator.get_page(page_num)
-        for task in page_data.object_list:
+        # Сортируем задачи по дате
+        sorted_tasks = sorted(page_data.object_list, key=lambda task: task.completion_time)
+
+        for task in sorted_tasks:
             engineers = ", ".join([str(engineer) for engineer in task.engineers.all()])
-            formatted_date = format(task.create_time, "d.m.Y")
+            formatted_date = format(task.completion_time, "d.m.Y")
 
             task_info = {
                 "date": formatted_date,
                 "header": task.header,
                 "engineers": engineers,
-                "is_done": task.is_done
+                "is_done": task.is_done,
             }
             tasks_data.append(task_info)
 
