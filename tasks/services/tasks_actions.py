@@ -275,10 +275,13 @@ def print_tasks(request):
     tasks_data = []
     paginator = tasks["pagination_data"]["paginator"]
 
+    # Получаем все задачи, сортируем их
+    sorted_tasks = sorted(paginator.object_list,
+                          key=lambda task: (task.completion_time or task.create_time, task.create_time))
+
+    # Применяем пагинацию
     for page_num in range(paginator.num_pages):
         page_data = paginator.get_page(page_num)
-        # Сортируем задачи по дате
-        sorted_tasks = sorted(page_data.object_list, key=lambda task: task.completion_time)
 
         for task in sorted_tasks:
             engineers = ", ".join([str(engineer) for engineer in task.engineers.all()])
@@ -293,3 +296,4 @@ def print_tasks(request):
             tasks_data.append(task_info)
 
     return render(request, "components/task/print.html", {"tasks": tasks_data})
+
