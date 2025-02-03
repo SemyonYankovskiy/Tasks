@@ -20,19 +20,18 @@ class TasksExcelExport:
 
     def _create_header(self):
         # Установка ширины столбцов и высоты строк
-        column_widths = [5, 15, 35, 10, 40, 50, 15, 35, 40, 20, 20, 20, 20]  # Ширина для каждого столбца
+        column_widths = [5, 15, 35, 10, 40, 50, 15, 35, 40, 20, 20, 20, 20, 40]  # Добавлен новый столбец для объектов
         for i, width in enumerate(column_widths, start=1):
             self.ws.column_dimensions[openpyxl.utils.get_column_letter(i)].width = width
 
         # Добавляем заголовки в Excel файл
         headers = ['ID', 'Создатель', "Дата создания", 'Важность', 'Название задачи', 'Описание', 'Задача завершена?',
-                   'Дата завершения', 'Текст завершения',
-                   "Инженеры", 'Отделы', 'Теги']
+                   'Дата завершения', 'Текст завершения', "Инженеры", 'Отделы', 'Теги', 'Объекты']  # Новый столбец
         self.ws.append(headers)
 
         # Применение стиля для заголовков (разрешаем перенос строк)
         for cell in self.ws[1]:
-            cell.alignment = Alignment(horizontal="center", vertical="top", wrap_text=True, )
+            cell.alignment = Alignment(horizontal="center", vertical="top", wrap_text=True)
 
     def add_tasks(self, tasks: QuerySet[Task]):
         for task in tasks:
@@ -40,6 +39,9 @@ class TasksExcelExport:
             engineers = ", ".join([str(engineer) for engineer in task.engineers.all()])
             departments = ", ".join([str(department) for department in task.departments.all()])
             tags = ", ".join([str(tag) for tag in task.tags.all()])
+
+            # Получаем объекты, к которым относится задача
+            objects = ", ".join([str(obj) for obj in task.objects_set.all()])
 
             # Используем BeautifulSoup для извлечения текста из HTML
             soup = BeautifulSoup(task.text, "html.parser")
@@ -66,6 +68,7 @@ class TasksExcelExport:
                 engineers,
                 departments,
                 tags,
+                objects  # Добавляем информацию о связанных объектах
             ]
             self.ws.append(row)
 
