@@ -48,20 +48,21 @@ def get_object_page(request, object_slug):
 
     filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page"]})
 
-    obj = get_single_object(request.user, object_slug)
+    obj = get_single_object(request.user, object_slug)  # Получаем объект
     child_objects = get_child_objects(user=request.user, parent=obj["object"])
 
     tasks = get_tasks(request, filter_params, page_number, per_page, obj=obj["object"])
 
     fields = get_fields_for_filter(user=request.user, page="tasks")
     ckeditor = CKEditorCreateForm(request.POST)
+
     context = {
         **obj,
         **tasks,
         **fields,
         "child_objects": child_objects,
         "ckeditor": ckeditor,
-        "filter_data": filter_url(request),  # для сохранения фильтров при пагинации
+        "filter_data": filter_url(request, obj=obj["object"]),  # Передаем объект в filter_url
     }
 
     return render(request, "components/object/object-page.html", context=context)
@@ -71,9 +72,15 @@ def get_object_page(request, object_slug):
 def get_tasks_page(request):
     page_number = request.GET.get("page", 1)
     per_page = request.GET.get("per_page", 8)
+    obj_id = request.GET.get("object_id")  # Получаем объект из запроса, если есть
+    obj = None
+
+    if obj_id:
+        obj = get_object_or_404(Object, id=obj_id)  # Получаем объект по ID
+
     filter_params = urlencode({key: value for key, value in request.GET.items() if key not in ["page"]})
 
-    tasks = get_tasks(request, filter_params, page_number, per_page)
+    tasks = get_tasks(request, filter_params, page_number, per_page, obj=obj)
 
     fields = get_fields_for_filter(user=request.user, page="tasks")
     current_filter_params = get_current_filter_params(request=request, page="tasks")
@@ -85,7 +92,7 @@ def get_tasks_page(request):
         **tasks,
         **fields,
         **current_filter_params,
-        "filter_data": filter_url(request),  # для сохранения фильтров при пагинации
+        "filter_data": filter_url(request, obj=obj),  # Передаем объект в filter_url
         "params_count": task_filter.applied_filters_count_taks,
         "ckeditor": ckeditor,
     }

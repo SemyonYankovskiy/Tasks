@@ -194,11 +194,18 @@ def applied_filters_count(request):
     ])
 
 
-def filter_url(request):
+def filter_url(request, obj=None):
     """
-    Формируем строку URL с параметрами, исключая параметры из `exclude_params`
+    Формируем строку URL с параметрами, исключая параметры из exclude_params.
+    Если передан объект, добавляем его в фильтр.
     """
+
     filter_data = {key: value for key, value in request.GET.items() if key not in ["page"]}
+
+    # Если объект передан, добавляем его ID в параметры
+    if obj:
+        filter_data["objects_set"] = obj.id  # Предполагаем, что у объекта есть поле id
+
     return urlencode(filter_data, doseq=True)
 
 
