@@ -51,15 +51,14 @@
                     <i class="bi bi-file-earmark-spreadsheet"></i>
                 </button>
             </a>
-            {% if request.user.username == "cus" %}
-                      <!-- Кнопка "Печать" -->
+
+            <!-- Кнопка "Печать" -->
             <a id="print-tasks-link" href="{% url 'print' %}?{{ filter_data }}">
                 <button id="print-tasks-button" type="button" class="btn btn-outline-dark" data-bs-toggle="tooltip"
                         data-bs-title="Печать задач">
                     <i class="bi bi-printer"></i>
                 </button>
             </a>
-            {% endif %}
 
 
             <!-- Кнопка для создания задачи -->
