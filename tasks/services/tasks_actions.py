@@ -5,7 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.db.transaction import atomic
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import render
 from django.urls import reverse
+from django.utils.dateformat import format
 
 from tasks.forms import AddTaskForm, EditTaskForm
 from tasks.models import Task, AttachedFile, Engineer, Tag
@@ -56,7 +58,7 @@ def add_event_log(user, task, text):
         name = f"{user.engineer.first_name} {user.engineer.second_name}"
     except AttributeError:
         # Если у пользователя нет engineer, использовать имя пользователя
-        name =user.username
+        name = user.username
 
     pattern = f"{text}: [{name} / {datetime.now().strftime('%d.%m.%Y %H:%M')}]\n"
     task.completion_text += pattern
@@ -165,7 +167,6 @@ def take_task(request, task_id):
 
 @login_required
 def delete_task(request, task_id):
-
     redirect_to: str = reverse("tasks")
 
     if request.method == "POST":
@@ -208,7 +209,7 @@ def reopen_task(request, task_id):
         task.is_done = False
 
         task.save()
-        add_event_log(user=request.user, task=task, text="↩️ Задача переоткрыта: "+comment)
+        add_event_log(user=request.user, task=task, text="↩️ Задача переоткрыта: " + comment)
         messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' возвращена в работу")
 
     return HttpResponseRedirect(redirect_to)
@@ -244,7 +245,7 @@ def close_task(request, task_id):
         task.is_done = True
         # task.completion_time = datetime.now()
         task.save()
-        add_event_log(user=request.user, task=task, text="✅ Задача закрыта: "+comment)
+        add_event_log(user=request.user, task=task, text="✅ Задача закрыта: " + comment)
         messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' закрыта")
 
     return HttpResponseRedirect(redirect_to)
@@ -264,3 +265,28 @@ def export_to_excel(request):
         export.add_tasks(page_data.object_list)
 
     return export.make_response(filename=f"tasks_for_{request.user}_{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+
+@login_required
+def print_tasks(request):
+    filter_params = request.GET.urlencode()
+    tasks = get_tasks(request, filter_params, page_number=1, per_page=100)
+
+    tasks_data = []
+    paginator = tasks["pagination_data"]["paginator"]
+
+    for page_num in range(paginator.num_pages):
+        page_data = paginator.get_page(page_num)
+        for task in page_data.object_list:
+            engineers = ", ".join([str(engineer) for engineer in task.engineers.all()])
+            formatted_date = format(task.create_time, "d.m.Y")
+
+            task_info = {
+                "date": formatted_date,
+                "header": task.header,
+                "engineers": engineers,
+                "is_done": task.is_done
+            }
+            tasks_data.append(task_info)
+
+    return render(request, "components/task/print.html", {"tasks": tasks_data})

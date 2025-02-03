@@ -46,15 +46,24 @@
             {% endif %}
             <!-- Кнопка "EXPORT" -->
             <a href="{% url 'export-xls' %}?{{ filter_data }}">
-                <button type="submit" class="btn btn-outline-success" data-bs-toggle="tooltip"
+                <button type="submit" class="btn btn-outline-success ms-3" data-bs-toggle="tooltip"
                         data-bs-title="Экспорт задач в Excel">
                     <i class="bi bi-file-earmark-spreadsheet"></i>
                 </button>
             </a>
+            {% if request.user.username == "cus" %}
+                      <!-- Кнопка "Печать" -->
+            <a id="print-tasks-link" href="{% url 'print' %}?{{ filter_data }}">
+                <button id="print-tasks-button" type="button" class="btn btn-outline-dark" data-bs-toggle="tooltip"
+                        data-bs-title="Печать задач">
+                    <i class="bi bi-printer"></i>
+                </button>
+            </a>
+            {% endif %}
+
 
             <!-- Кнопка для создания задачи -->
             {% include "components/task/create_task.html" %}
-
 
 
         </div>

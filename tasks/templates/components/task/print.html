@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Печать задач</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            font-size: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black !important;
+            padding: 5px;
+            text-align: left;
+            font-size: 10px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .done {
+            text-decoration: line-through; /* Зачеркивание выполненных задач */
+            color: gray; /* Делаем текст светлее */
+        }
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            button { display: none; }
+            table {
+                width: 100%;
+                page-break-inside: avoid;
+            }
+            th, td {
+                border: 1px solid black !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2>Список задач</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Заголовок</th>
+                <th>Инженеры</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr class="{% if task.is_done %}done{% endif %}">
+                <td>{{ task.date }}</td>
+                <td>{{ task.header }}</td>
+                <td>{{ task.engineers }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <button onclick="window.print()">Печать</button>
+
+    <script>
+        window.onload = function() {
+            window.print();
+        };
+    </script>
+</body>
+</html>
