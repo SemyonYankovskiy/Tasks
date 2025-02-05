@@ -5,7 +5,7 @@
     <div class="accordion-item bg-white border rounded {% if not expanded %}shadow{% else %}shadow-sm{% endif %} mx-3 my-3">
         <h2 class="accordion-header rounded"
                 {% if task.time_left < 24 and task.time_left > 0 or task.completion_time.date == task.time_now.date %}
-            style="border: 2px solid
+            style="border-left: 6px solid
                     {% if task.priority == 'LOW' %} #1E90FF
                     {% elif task.priority == 'MEDIUM' %}  #FFD700
                     {% elif task.priority == 'HIGH' %}  #FF6347
