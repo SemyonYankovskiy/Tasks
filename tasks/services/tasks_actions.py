@@ -284,7 +284,7 @@ def print_tasks(request):
         page_data = paginator.get_page(page_num)
 
         for task in sorted_tasks:
-            engineers = ", ".join([str(engineer) for engineer in task.engineers.all()])
+            engineers = ", ".join([str(engineer.second_name) for engineer in task.engineers.all()])
             formatted_date = format(task.completion_time, "d.m.Y")
 
             task_info = {
