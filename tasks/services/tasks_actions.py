@@ -269,31 +269,30 @@ def export_to_excel(request):
 
 @login_required
 def print_tasks(request):
-    filter_params = request.GET.urlencode()  # Сохраняем все фильтры из запроса
-    tasks = get_tasks(request, filter_params, page_number=1, per_page=100)  # Передаем фильтры
+    filter_params = request.GET.urlencode()
+    tasks = get_tasks(request, filter_params, page_number=1, per_page=100)
 
     tasks_data = []
-    paginator = tasks["pagination_data"]["paginator"]
+    page_obj = tasks["pagination_data"]["page_obj"]
 
-    # Получаем все задачи, сортируем их
-    sorted_tasks = sorted(paginator.object_list,
-                          key=lambda task: (task.completion_time or task.create_time, task.create_time))
+    sorted_tasks = sorted(page_obj, key=lambda task: (task.completion_time or datetime.min, task.create_time))
 
-    # Применяем пагинацию
-    for page_num in range(paginator.num_pages):
-        page_data = paginator.get_page(page_num)
+    for task in sorted_tasks:
+        engineers = [str(engineer.second_name) for engineer in task.engineers.all()]
+        departments = [str(department) for department in task.departments.all()]
 
-        for task in sorted_tasks:
-            engineers = ", ".join([str(engineer.second_name) for engineer in task.engineers.all()])
-            formatted_date = format(task.completion_time, "d.m.Y")
+        # Собираем всех в один список
+        responsible_list = departments + engineers
+        responsible = ", ".join(responsible_list) if responsible_list else "Не назначен"
 
-            task_info = {
-                "date": formatted_date,
-                "header": task.header,
-                "engineers": engineers,
-                "is_done": task.is_done,
-            }
-            tasks_data.append(task_info)
+        formatted_date = format(task.completion_time, "d.m.Y") if task.completion_time else "—"
+
+        task_info = {
+            "date": formatted_date,
+            "header": task.header,
+            "engineers": responsible,  # Вместо "engineers"
+            "is_done": task.is_done,
+        }
+        tasks_data.append(task_info)
 
     return render(request, "components/task/print.html", {"tasks": tasks_data})
-
