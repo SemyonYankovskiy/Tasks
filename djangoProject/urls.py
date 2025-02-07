@@ -18,11 +18,11 @@ urlpatterns = [
     path("reopen_task/<int:task_id>/", tasks_actions.reopen_task, name="reopen_task"),
     path("export_to_excel/", tasks_actions.export_to_excel, name="export-xls"),
     path("print_tasks/", tasks_actions.print_tasks, name="print"),
-    path("tasks/", views.get_tasks_page, name="tasks"),  # Страница задач
+    path("", views.get_tasks_page, name="tasks"),  # Страница задач
     path("calendar/", views.get_calendar_page, name="calendar"),  # Страница карты
     path("stat/", views.get_stat_page, name="stat"),  # Страница карты
     path("object/<slug:object_slug>/", views.get_object_page, name="show-object"),
-    path("", views.get_home, name="home"),
+    path("objects/", views.get_home, name="home"),
     path("admin/",admin.site.urls),
     path("user/", include("user.urls", namespace="user")),
     path("ajax/tasks/<int:task_id>/", views.get_task_view, name="ajax-show-task"),

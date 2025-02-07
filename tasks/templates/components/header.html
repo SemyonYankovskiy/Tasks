@@ -6,7 +6,7 @@
             <header class="d-flex flex-wrap align-items-center justify-content-between mb-4">
                 {% if user.is_authenticated %}
                     <div class="col-md-2 d-flex align-items-center">
-                        <a href="{% url 'home' %}" class="mx-3 mt-2 icon-container">
+                        <a href="{% url 'tasks' %}" class="mx-3 mt-2 icon-container">
                             {% if header_icon %}
                                 <img src="{% static header_icon %}" alt="Random Icon" class="icon"/>
                             {% else %}
@@ -18,7 +18,7 @@
 
                     <div class="col-md-10 d-flex justify-content-end">
                         <ul class="nav nav-pills mx-5">
-                            <li class="nav-item {% if current_page == '/' or objects_page %}active{% endif %}">
+                            <li class="nav-item {% if current_page == '/objects/' or objects_page %}active{% endif %}">
                                 <a href="{% url 'home' %}" class="nav-link p-0 ">
                                     <img width="32" height="32" src="{% static 'self/img/grid.svg' %}"
                                          class="bi d-block mx-auto mb-3" alt="objects"/>
@@ -27,7 +27,7 @@
 
                             </li>
 
-                            <li class="nav-item {% if current_page == '/tasks/' %}active{% endif %}">
+                            <li class="nav-item {% if current_page == '/' %}active{% endif %}">
                                 <a href="{% url 'tasks' %}" class="nav-link p-0 ">
                                     <img width="32" height="32" src="{% static 'self/img/list-task.svg' %}"
                                          class="bi d-block mx-auto mb-3" alt="tasks"/>
