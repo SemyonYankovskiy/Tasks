@@ -269,28 +269,30 @@ def export_to_excel(request):
 
 @login_required
 def print_tasks(request):
-    filter_params = request.GET.urlencode()
-    tasks = get_tasks(request, filter_params, page_number=1, per_page=100)
+    filter_params = request.GET.urlencode()  # Сохраняем все фильтры из запроса
+
+    # Указываем большое значение per_page, чтобы получить все задачи
+    tasks = get_tasks(request, filter_params, page_number=1, per_page=100000)
+
+    # Получаем список всех задач
+    all_tasks = tasks["pagination_data"]["paginator"].object_list
+
+    # Сортируем задачи
+    sorted_tasks = sorted(all_tasks, key=lambda task: (task.completion_time or task.create_time, task.create_time))
 
     tasks_data = []
-    page_obj = tasks["pagination_data"]["page_obj"]
-
-    sorted_tasks = sorted(page_obj, key=lambda task: (task.completion_time or datetime.min, task.create_time))
-
     for task in sorted_tasks:
         engineers = [str(engineer.second_name) for engineer in task.engineers.all()]
         departments = [str(department) for department in task.departments.all()]
-
-        # Собираем всех в один список
         responsible_list = departments + engineers
-        responsible = ", ".join(responsible_list) if responsible_list else "Не назначен"
+        responsible = ", ".join(responsible_list) if responsible_list else ""
 
         formatted_date = format(task.completion_time, "d.m.Y") if task.completion_time else "—"
 
         task_info = {
             "date": formatted_date,
             "header": task.header,
-            "engineers": responsible,  # Вместо "engineers"
+            "engineers": responsible,
             "is_done": task.is_done,
         }
         tasks_data.append(task_info)
