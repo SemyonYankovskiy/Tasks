@@ -280,11 +280,13 @@ class Address(models.Model):
 @receiver(post_save, sender=Task)
 def update_cache_version1_save(sender, created, **kwargs):
     CacheVersion("tasks_page_version_cache").increment_cache_version()
+    CacheVersion("objects_page_cache_version").increment_cache_version()
 
 
 @receiver(post_delete, sender=Task)
 def update_cache_version1_delete(sender, instance, **kwargs):
     CacheVersion("tasks_page_version_cache").increment_cache_version()
+    CacheVersion("objects_page_cache_version").increment_cache_version()
 
 
 # --- Object ---

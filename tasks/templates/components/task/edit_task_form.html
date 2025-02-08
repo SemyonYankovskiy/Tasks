@@ -20,7 +20,7 @@
             <div class="mb-3 w-100">
                 <label for="taskHeader_edit_{{ task.id }}" class="form-label"> <i class="bi bi-card-heading"
                                                                                   style="font-size: 1.2rem;"></i>
-                    <span>Заголовок</span></label>
+                    <span>Заголовок<span style="color: red;"> *</span></span></label>
                 <input type="text" class="form-control" id="taskHeader_edit_{{ task.id }}" name="header"
                        value="{{ task.header }}" required>
             </div>
@@ -78,7 +78,7 @@
             <div class="mb-3 col-6">
                 <label for="taskEngineers_edit_{{ task.id }}" class="form-label">
                     <i class="bi bi-people-fill" style="font-size: 1.2rem;"></i>
-                    <span>Инженеры<span style="color: red;"> *</span></span>
+                    <span>Инженеры</span>
                 </label>
                 {% include 'tree-select.html' with select_name='engineers_edit' current_options=current_engineers task_id=task.id objects_structure_json=engineers_json %}
             </div>

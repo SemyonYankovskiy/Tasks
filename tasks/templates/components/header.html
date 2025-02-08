@@ -14,49 +14,60 @@
                                 <div class="icon-placeholder">No icon available</div>
                             {% endif %}
                         </a>
+
                     </div>
 
-                    <div class="col-md-10 d-flex justify-content-end">
-                        <ul class="nav nav-pills mx-5">
-                            <li class="nav-item {% if current_page == '/objects/' or objects_page %}active{% endif %}">
-                                <a href="{% url 'home' %}" class="nav-link p-0 ">
-                                    <img width="32" height="32" src="{% static 'self/img/grid.svg' %}"
-                                         class="bi d-block mx-auto mb-3" alt="objects"/>
-                                    <span class="m-0 p-0 text-black" style="font-size: 1rem">Объекты</span>
-                                </a>
 
-                            </li>
+                    <div class="col-md-10 d-flex justify-content-between">
+                        <div class="d-flex justify-content-start">
+                            <span style="   font-family: Century Gothic, fantasy;
+                            color: #000000;
+                            font-size: 2rem; ">
 
-                            <li class="nav-item {% if current_page == '/' %}active{% endif %}">
-                                <a href="{% url 'tasks' %}" class="nav-link p-0 ">
-                                    <img width="32" height="32" src="{% static 'self/img/list-task.svg' %}"
-                                         class="bi d-block mx-auto mb-3" alt="tasks"/>
-                                    <span class="m-0 p-0 text-black" style="font-size: 1rem">Задачи</span>
-                                </a>
-                            </li>
-                            <li class="nav-item {% if current_page == '/calendar/' %}active{% endif %}">
-                                <a href="{% url 'calendar' %}" class="nav-link p-0 ">
-                                    <img width="32" height="32" src="{% static 'self/img/calendar-week.svg' %}"
-                                         class="bi d-block mx-auto mb-3" alt="calendar"/>
-                                    <span class="m-0 p-0 text-black" style="font-size: 1rem">Календарь</span>
-                                </a>
-                            </li>
-                            <li class="nav-item {% if current_page == '/stat/' %}active{% endif %}">
-                                <a href="{% url 'stat' %}" class="nav-link p-0">
-                                    <img width="32" height="32" src="{% static 'self/img/graph-up.svg' %}"
-                                         class="bi d-block mx-auto mb-3" alt="stat"/>
-                                    <span class="m-0 p-0 text-black" style="font-size: 1rem">Статистика</span>
-                                </a>
-                            </li>
-                            {% if user.is_superuser %}
-                                <li class="nav-item {% if current_page == 'admin/' %}active{% endif %}">
-                                    <a href="/admin" class="nav-link p-0">
-                                        <img width="32" height="32" src="{% static 'self/img/gear.svg' %}"
-                                             class="bi d-block mx-auto mb-3" alt="stat"/>
-                                        <span class="m-0 p-0 text-black" style="font-size: 1rem">Админ панель</span>
+                            Tasker</span>
+
+                        </div>
+                        <div class="col-md-10 d-flex justify-content-end">
+                            <ul class="nav nav-pills mx-5">
+                                <li class="nav-item {% if current_page == '/objects/' or objects_page %}active{% endif %}">
+                                    <a href="{% url 'home' %}" class="nav-link p-0 ">
+                                        <img width="32" height="32" src="{% static 'self/img/grid.svg' %}"
+                                             class="bi d-block mx-auto mb-3" alt="objects"/>
+                                        <span class="m-0 p-0 text-black" style="font-size: 1rem">Объекты</span>
+                                    </a>
+
+                                </li>
+
+                                <li class="nav-item {% if current_page == '/' %}active{% endif %}">
+                                    <a href="{% url 'tasks' %}" class="nav-link p-0 ">
+                                        <img width="32" height="32" src="{% static 'self/img/list-task.svg' %}"
+                                             class="bi d-block mx-auto mb-3" alt="tasks"/>
+                                        <span class="m-0 p-0 text-black" style="font-size: 1rem">Задачи</span>
                                     </a>
                                 </li>
-                            {% endif %}
+                                <li class="nav-item {% if current_page == '/calendar/' %}active{% endif %}">
+                                    <a href="{% url 'calendar' %}" class="nav-link p-0 ">
+                                        <img width="32" height="32" src="{% static 'self/img/calendar-week.svg' %}"
+                                             class="bi d-block mx-auto mb-3" alt="calendar"/>
+                                        <span class="m-0 p-0 text-black" style="font-size: 1rem">Календарь</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item {% if current_page == '/stat/' %}active{% endif %}">
+                                    <a href="{% url 'stat' %}" class="nav-link p-0">
+                                        <img width="32" height="32" src="{% static 'self/img/graph-up.svg' %}"
+                                             class="bi d-block mx-auto mb-3" alt="stat"/>
+                                        <span class="m-0 p-0 text-black" style="font-size: 1rem">Статистика</span>
+                                    </a>
+                                </li>
+                                {% if user.is_superuser %}
+                                    <li class="nav-item {% if current_page == 'admin/' %}active{% endif %}">
+                                        <a href="/admin" class="nav-link p-0">
+                                            <img width="32" height="32" src="{% static 'self/img/gear.svg' %}"
+                                                 class="bi d-block mx-auto mb-3" alt="stat"/>
+                                            <span class="m-0 p-0 text-black" style="font-size: 1rem">Админ панель</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
 
 
                                 <li class="nav-item me-5 dropdown" id="dropdownMenu">
@@ -125,7 +136,9 @@
 
                                 </li>
 
-                        </ul>
+                            </ul>
+                        </div>
+
                     </div>
                 {% else %}
                     <div class="col-md-1"></div>
