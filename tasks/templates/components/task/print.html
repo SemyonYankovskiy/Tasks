@@ -26,10 +26,10 @@
             background-color: #f2f2f2;
         }
         th:nth-child(1), td:nth-child(1) {
-            width: 10%; /* Ширина для первого столбца */
+            width: 15%; /* Ширина для первого столбца */
         }
         th:nth-child(2), td:nth-child(2) {
-            width: 75%; /* Ширина для второго столбца */
+            width: 70%; /* Ширина для второго столбца */
         }
         th:nth-child(3), td:nth-child(3) {
             width: 15%; /* Ширина для третьего столбца */
@@ -37,6 +37,10 @@
         .done {
             text-decoration: line-through; /* Зачеркивание выполненных задач */
             color: gray; /* Делаем текст светлее */
+        }
+        .critical {
+            text-decoration: underline; /* Подчеркивание для критических задач */
+            font-weight: bold; /* Жирный шрифт для выделения */
         }
         @media print {
             body {
@@ -65,7 +69,7 @@
         </thead>
         <tbody>
             {% for task in tasks %}
-            <tr class="{% if task.is_done %}done{% endif %}">
+            <tr class="{% if task.is_done %}done{% endif %} {% if task.priority == 'CRITICAL' %}critical{% endif %}">
                 <td>{{ task.date }}</td>
                 <td>{{ task.header }}</td>
                 <td>{{ task.engineers }}</td>

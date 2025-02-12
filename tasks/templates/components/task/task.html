@@ -11,7 +11,8 @@
                     {% elif task.priority == 'HIGH' %}  #FF6347
                     {% elif task.priority == 'CRITICAL' %}  #FF0000
                     {% endif %}
-                    !important;"
+                    !important;
+                    border-bottom: 1px solid gainsboro;"
                 {% else %}
             style="border-bottom: 1px solid gainsboro;"
             style="border-bottom: 0;"
@@ -140,34 +141,32 @@
 
                     {# ============== TEXT ============== #}
                     {% if task.text %}
-                        {#                        <div class="d-flex flex-column align-items-start mt-2"#}
-                        {#                             style="font-size: 16px;  text-align: justify;">#}
-                        {#                        <span class="px-4" style="overflow: auto; width: 100%;">#}
-                        {#                                    {{ task.text|safe }}#}
-                        {#                                </span>#}
-                        {#                        </div>#}
-                        <div class="row mx-1 my-2 py-3 d-flex align-items-center border-bottom">
-                            <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">
-                                <i class="bi bi-chat-left-dots" style="font-size: 1.2rem;"></i>
-                            </div>
-                            <div class="col d-flex flex-column align-items-start border-start"
-                                 style="font-size: 18px; white-space: pre-line; text-align: justify;">
+
+                        <div class=" ms-3 me-3 mt-4 d-flex flex-column align-items-start"
+                                 style="font-size: 14px; white-space: normal; text-align: justify;">
                                 <span>{{ task.text|safe }}</span>
                             </div>
-                        </div>
+
+
                     {% endif %}
                     {# ============== STATUS TEXT ============== #}
                     {% if task.completion_text %}
-                        <div class="row mx-1 my-2 pt-3 d-flex align-items-center">
-                            <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">
-                                <i class="bi bi-activity" style="font-size: 1.2rem;"></i>
-                            </div>
-                            <div class="col d-flex flex-column align-items-start border-start"
+
+                        <div class="m-3 pt-3 d-flex flex-column align-items-start border-top"
                                  style="font-size: 12px; white-space: pre-line; text-align: justify;">
                                 <span>{{ task.completion_text|safe }}</span>
 
                             </div>
-                        </div>
+{#                        <div class="row mx-1 my-2 pt-3 d-flex align-items-center">#}
+{#                            <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">#}
+{#                                <i class="bi bi-activity" style="font-size: 1.2rem;"></i>#}
+{#                            </div>#}
+{#                            <div class="col d-flex flex-column align-items-start border-start"#}
+{#                                 style="font-size: 12px; white-space: pre-line; text-align: justify;">#}
+{#                                <span>{{ task.completion_text|safe }}</span>#}
+{##}
+{#                            </div>#}
+{#                        </div>#}
                     {% endif %}
 
                     {# ============== TAGS ============== #}
@@ -192,7 +191,7 @@
 
                     {# ============== TASK BUTTONS ============== #}
 
-                    {% if request.user.engineer in task.engineers.all or request.user.engineer.department in task.departments.all or request.user.is_superuser or request.user.is_staff %}
+                    {% if request.user.engineer in task.engineers.all or request.user.engineer.department in task.departments.all or request.user.is_superuser or request.user.is_staff or request.user == task.creator %}
                         <div class="row text-start pt-2 border-top px-1">
                             <div class="col">
 

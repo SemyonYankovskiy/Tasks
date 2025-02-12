@@ -294,6 +294,7 @@ def print_tasks(request):
             "header": task.header,
             "engineers": responsible,
             "is_done": task.is_done,
+            "priority": task.priority,
         }
         tasks_data.append(task_info)
 
