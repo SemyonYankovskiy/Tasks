@@ -10,6 +10,7 @@ from .models import (
     AttachedFile,
     Engineer,
     Department,
+    Comment,
 )
 
 admin.site.register(UserObjectGroup)
@@ -20,6 +21,7 @@ admin.site.register(Address)
 admin.site.register(AttachedFile)
 admin.site.register(Department)
 admin.site.register(Engineer)
+admin.site.register(Comment)
 
 
 @admin.register(Object)

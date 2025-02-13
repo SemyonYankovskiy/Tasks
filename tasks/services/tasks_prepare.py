@@ -120,7 +120,7 @@ def get_filtered_tasks(request, obj=None):
     Возвращает часть задач, которые отфильтрованы или включены/выключены в шаблоне
     """
     tasks_qs = permission_filter(user=request.user)
-    tasks_qs = tasks_qs.prefetch_related("files", "tags", "engineers", "objects_set", "departments", "creator")
+    tasks_qs = tasks_qs.prefetch_related("files", "tags", "engineers", "objects_set", "departments", "creator", "comments")
 
     # Сохраняем исходный QuerySet для подсчета доступных задач
     tasks_qs_all = tasks_qs

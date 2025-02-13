@@ -3,71 +3,117 @@
     <div class="attached-files">
         <div class="files-grid">
             {% for file in files %}
-                {% if not file.is_image %}
+                {#                {% if not file.is_image %}#}
                 <div class="file-item">
                     <div class="file-content d-flex align-items-center p-2">
                         <a href="{{ file.file.url }}" download="{{ file.clear_file_name }}"
                            class="d-flex align-items-center text-decoration-none">
                             {% if file.extension == ".pdf" %}
-                                <i class="bi bi-filetype-pdf"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-filetype-pdf" style="font-size: 2rem;"></i>
                             {% elif file.extension == ".doc" %}
-                                <i class="bi bi-filetype-doc"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-filetype-doc" style="font-size: 2rem;"></i>
                             {% elif file.extension == ".docx" %}
-                                <i class="bi bi-filetype-docx"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-filetype-docx" style="font-size: 2rem;"></i>
                             {% elif file.extension == ".txt" %}
-                                <i class="bi bi-filetype-txt"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-filetype-txt" style="font-size: 2rem;"></i>
                             {% elif file.extension == ".exe" %}
-                                <i class="bi bi-filetype-exe"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-filetype-exe" style="font-size: 2rem;"></i>
                             {% elif file.extension == ".gif" %}
-                                <i class="bi bi-filetype-gif"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-filetype-gif" style="font-size: 2rem;"></i>
                             {% elif file.extension == ".html" %}
-                                <i class="bi bi-filetype-html"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-filetype-html" style="font-size: 2rem;"></i>
                             {% elif file.extension == ".js" %}
-                                <i class="bi bi-filetype-js"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-filetype-js" style="font-size: 2rem;"></i>
                             {% elif file.extension == ".css" %}
-                                <i class="bi bi-filetype-js"
-                                   style="font-size: 1em;"></i>
+                                <i class="bi bi-filetype-css" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".png" %}
+                                <i class="bi bi-filetype-png" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".jpg" %}
+                                <i class="bi bi-filetype-jpg" style="font-size: 2rem;"></i>
                             {% elif file.extension == ".py" %}
-                                <i class="bi bi-filetype-py"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-filetype-py" style="font-size: 2rem;"></i>
                             {% elif file.extension == ".json" or file.extension == ".geojson" %}
-                                <i class="bi bi-filetype-json"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-filetype-json" style="font-size: 2rem;"></i>
                             {% elif file.extension == ".xls" %}
-                                <i class="bi bi-filetype-xls"
-                                   style="font-size: 2rem;"></i>
-                            {% elif  file.extension == ".xlsx" %}
-                                <i class="bi bi-filetype-xlsx"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-filetype-xls" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".xlsx" %}
+                                <i class="bi bi-filetype-xlsx" style="font-size: 2rem;"></i>
                             {% elif file.extension == ".ppt" %}
-                                <i class="bi bi-filetype-ppt"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-filetype-ppt" style="font-size: 2rem;"></i>
                             {% elif file.extension == ".pptx" %}
-                                <i class="bi bi-filetype-pptx"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-filetype-pptx" style="font-size: 2rem;"></i>
                             {% elif file.extension == ".zip" or file.extension == ".rar" %}
-                                <i class="bi bi-file-earmark-zip"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-file-earmark-zip" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".aac" %}
+                                <i class="bi bi-filetype-aac" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".ai" %}
+                                <i class="bi bi-filetype-ai" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".bmp" %}
+                                <i class="bi bi-filetype-bmp" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".cs" %}
+                                <i class="bi bi-filetype-cs" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".csv" %}
+                                <i class="bi bi-filetype-csv" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".heic" %}
+                                <i class="bi bi-filetype-heic" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".java" %}
+                                <i class="bi bi-filetype-java" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".jsx" %}
+                                <i class="bi bi-filetype-jsx" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".key" %}
+                                <i class="bi bi-filetype-key" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".m4p" %}
+                                <i class="bi bi-filetype-m4p" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".md" %}
+                                <i class="bi bi-filetype-md" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".mdx" %}
+                                <i class="bi bi-filetype-mdx" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".mov" %}
+                                <i class="bi bi-filetype-mov" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".mp3" %}
+                                <i class="bi bi-filetype-mp3" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".mp4" %}
+                                <i class="bi bi-filetype-mp4" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".otf" %}
+                                <i class="bi bi-filetype-otf" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".psd" %}
+                                <i class="bi bi-filetype-psd" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".raw" %}
+                                <i class="bi bi-filetype-raw" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".rb" %}
+                                <i class="bi bi-filetype-rb" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".sass" %}
+                                <i class="bi bi-filetype-sass" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".scss" %}
+                                <i class="bi bi-filetype-scss" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".sh" %}
+                                <i class="bi bi-filetype-sh" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".sql" %}
+                                <i class="bi bi-filetype-sql" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".svg" %}
+                                <i class="bi bi-filetype-svg" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".tiff" %}
+                                <i class="bi bi-filetype-tiff" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".tsx" %}
+                                <i class="bi bi-filetype-tsx" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".ttf" %}
+                                <i class="bi bi-filetype-ttf" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".wav" %}
+                                <i class="bi bi-filetype-wav" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".woff" %}
+                                <i class="bi bi-filetype-woff" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".xml" %}
+                                <i class="bi bi-filetype-xml" style="font-size: 2rem;"></i>
+                            {% elif file.extension == ".yml" %}
+                                <i class="bi bi-filetype-yml" style="font-size: 2rem;"></i>
                             {% else %}
-                                <i class="bi bi-file-earmark"
-                                   style="font-size: 2rem;"></i>
+                                <i class="bi bi-file-earmark" style="font-size: 2rem;"></i>
                             {% endif %}
-                            <span class="ms-2">
-
-                                        {{ file.clear_file_name|truncatechars:12 }}{{ file.extension }}
-                                    </span>
+                            <span class="ms-2">{{ file.clear_file_name|truncatechars:8 }}{{ file.extension }}</span>
                         </a>
                     </div>
                 </div>
-                {% endif %}
+                {#                {% endif %}#}
             {% endfor %}
         </div>
     </div>

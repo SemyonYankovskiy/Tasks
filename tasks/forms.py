@@ -12,6 +12,11 @@ class CKEditorCreateForm(forms.Form):
     text = forms.CharField(widget=CKEditorWidget, label='', required=False)
 
 
+class CKEditorAnswerForm(forms.Form):
+    answer = forms.CharField(widget=CKEditorWidget, label='', required=False)
+
+
+
 class CKEditorEditForm(forms.Form):
     text_edit = forms.CharField(widget=CKEditorWidget, label='', required=False)
 

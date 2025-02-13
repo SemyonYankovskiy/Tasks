@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.utils.dateformat import format
 
 from tasks.forms import AddTaskForm, EditTaskForm
-from tasks.models import Task, AttachedFile, Engineer, Tag
+from tasks.models import Task, AttachedFile, Engineer, Tag, Comment
 from tasks.services.export import TasksExcelExport
 from tasks.services.service import remove_unused_attached_files
 from tasks.services.tasks_prepare import get_tasks
@@ -60,7 +60,7 @@ def add_event_log(user, task, text):
         # Если у пользователя нет engineer, использовать имя пользователя
         name = user.username
 
-    pattern = f"{text}: [{name} / {datetime.now().strftime('%d.%m.%Y %H:%M')}]\n"
+    pattern = f"{text} [{name} / {datetime.now().strftime('%d.%m.%Y %H:%M')}]\n"
     task.completion_text += pattern
     task.save()
 
@@ -216,11 +216,51 @@ def reopen_task(request, task_id):
 
 
 @login_required
+def comment_task(request, task_id):
+    redirect_to: str = reverse("tasks")
+
+    if request.method == "POST":
+
+        task = get_object_or_404(Task, pk=task_id)
+        is_done = "is_done" in request.POST
+        answer = request.POST.get("answer", "").strip()  # Убираем лишние пробелы
+
+
+        # Получаем URL с параметрами фильтров (если нужно)
+        redirect_to = request.POST.get("from_url", redirect_to).strip()
+
+
+        if answer:
+            comment = Comment.objects.create(
+                task=task,
+                author=request.user,
+                text=answer,
+            )
+            comment.save()
+            print("Comment created!")
+
+        if is_done:
+            # Обновление задачи
+            task.is_done = True
+            task.completion_time = datetime.now()  # Устанавливаем текущее время как время завершения
+            task.save()
+
+            # Логируем событие о закрытии задачи
+            add_event_log(user=request.user, task=task, text="✅ Задача закрыта: " + answer)
+            messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' закрыта")
+        else:
+            # Логируем событие о новом комментарии
+            add_event_log(user=request.user, task=task, text="⤴️ Ответ на задачу: " + answer)
+            messages.add_message(request, messages.SUCCESS, f"Добавлен ответ к задаче '{task.header}'")
+
+    return HttpResponseRedirect(redirect_to)
+
+
+
+
+@login_required
 def close_task(request, task_id):
-    """
-    Устанавливает в поле task.is_done = True и добавляет комментарий к полю task.completion_text
-    При успешном изменении полей - редирект на страницу откуда была вызвана
-    """
+
     redirect_to: str = reverse("tasks")
 
     if request.method == "POST":
@@ -229,17 +269,6 @@ def close_task(request, task_id):
 
         # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
-
-        # if "?referrer=" in redirect_to:
-        #     # Извлекаем параметры из URL
-        #     parsed_url = urlparse(redirect_to)
-        #     query_params = parse_qs(parsed_url.query)
-        #
-        #     # Получаем параметр referrer
-        #     encoded_referrer = query_params.get("referrer", [""])[0]
-        #     decoded_referrer = unquote(encoded_referrer)
-        #
-        #     redirect_to = decoded_referrer
 
         # Обновление задачи
         task.is_done = True

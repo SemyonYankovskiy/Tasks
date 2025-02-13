@@ -131,6 +131,16 @@ class Tag(models.Model):
         return self.tag_name
 
 
+class Comment(models.Model):
+    task = models.ForeignKey(Task, related_name="comments", on_delete=models.CASCADE)
+    author = models.ForeignKey(get_user_model(), related_name="comments", on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Comment by {self.author} on {self.created_at}"
+
+
 class Engineer(models.Model):
     first_name = models.CharField(max_length=128)
     second_name = models.CharField(max_length=128)
@@ -172,17 +182,42 @@ class AttachedFile(models.Model):
     class Meta:
         db_table = "attached_files"
 
-    def __str__(self):
+    def str(self):
         return self.file.name
 
     def clear_file_name(self):
-        return re.search(r".+\/\S{8}-\S{4}-\S{4}-\S{4}-\S{12}_\._(.+)", self.file.name).group(1)
+        """
+        Возвращает оригинальное имя файла без UUID, '._' и расширения.
+        """
+        # Получаем базовое имя файла (без пути)
+        base_name = os.path.basename(self.file.name)
+
+        # Удаляем UUID и "._" из имени файла
+        parts = base_name.split("_._")
+
+        # Если есть хотя бы один элемент после split, берём последний
+        if parts:
+            original_name = parts[-1]
+
+            # Если у файла есть расширение, убираем его
+            if "." in original_name:
+                original_name = os.path.splitext(original_name)[0]
+
+            return original_name  # Возвращаем только имя без расширения
+        return ""  # Если split не сработал
 
     def save(self, *args, **kwargs):
         if self.file:
-            # Определение расширения файла
-            _, file_extension = os.path.splitext(self.file.name)
-            self.extension = file_extension.lower()  # Приведение расширения к нижнему регистру
+            # Получаем базовое имя файла
+            base_name = os.path.basename(self.file.name)
+
+            # Проверяем, является ли файл скрытым (например, .env)
+            if base_name.startswith(".") and base_name.count(".") == 1:
+                self.extension = base_name  # Для .env расширение будет .env
+            else:
+                # Используем splitext() для корректного извлечения расширения
+                _, file_extension = os.path.splitext(base_name)
+                self.extension = file_extension.lower() if file_extension else ""
 
             # Установка поля is_image на основе расширения
             self.is_image = self.extension in [".jpeg", ".jpg", ".png"]
@@ -347,3 +382,15 @@ def update_cache_version6_save(sender, created, **kwargs):
 def update_cache_version6_delete(sender, instance, **kwargs):
     CacheVersion("filter_components_cache_version_tasks").increment_cache_version()
 
+
+# --- Comments ---
+@receiver(post_save, sender=Comment)
+def update_cache_version7_save(sender, created, **kwargs):
+    CacheVersion("tasks_page_version_cache").increment_cache_version()
+    CacheVersion("objects_page_cache_version").increment_cache_version()
+
+
+@receiver(post_delete, sender=Comment)
+def update_cache_version7_delete(sender, instance, **kwargs):
+    CacheVersion("tasks_page_version_cache").increment_cache_version()
+    CacheVersion("objects_page_cache_version").increment_cache_version()

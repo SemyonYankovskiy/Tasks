@@ -2,7 +2,18 @@
 {% load humanize %}
 
 <div class="accordion " id="accordionPanelsStayOpenExample">
-    <div class="accordion-item bg-white border rounded {% if not expanded %}shadow{% else %}shadow-sm{% endif %} mx-3 my-3">
+
+
+    <div class="position-relative accordion-item bg-white border rounded {% if not expanded %}shadow{% else %}shadow-sm{% endif %} mx-3 my-3">
+        <!-- Индикатор новых комментариев -->
+
+
+        {% if task.comments.all %}
+            <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle"
+                  style="z-index: 100">
+                <span class="visually-hidden">Новые комментарии</span>
+            </span>
+        {% endif %}
         <h2 class="accordion-header rounded"
                 {% if task.time_left < 24 and task.time_left > 0 or task.completion_time.date == task.time_now.date %}
             style="border-left: 6px solid
@@ -132,7 +143,7 @@
 
                     <div class="row d-flex justify-content-between">
                         {% if task.files.all %}
-                            {% include "components/files/gallery.html" with images=task.files.all id=task.id type="task" %}
+                            {#                            {% include "components/files/gallery.html" with images=task.files.all id=task.id type="task" %}#}
 
                             {% include "components/files/attached_files.html" with files=task.files.all %}
                         {% endif %}
@@ -143,31 +154,46 @@
                     {% if task.text %}
 
                         <div class=" ms-3 me-3 mt-4 d-flex flex-column align-items-start"
-                                 style="font-size: 14px; white-space: normal; text-align: justify;">
-                                <span>{{ task.text|safe }}</span>
-                            </div>
+                             style="font-size: 14px; white-space: normal; text-align: justify;">
+                            <span>{{ task.text|safe }}</span>
+                        </div>
 
 
                     {% endif %}
+                    {# ==============COMMENT TEXT ============== #}
+
+                    {% if task.comments.all %}
+                        {% for comment in task.comments.all %}
+                            <div class="ms-3 me-3 pt-3 pb-3 border-top" style="text-align: left !important;">
+                            <span style="font-size: 14px">
+                                <i class="bi bi-chat-left-dots" style="font-size: 1rem"></i>
+                                <strong>
+                                    {% if comment.author.engineer %}
+                                        {{ comment.author.engineer.first_name }} {{ comment.author.engineer.second_name }}
+                                    {% else %}
+                                        {{ comment.author.username }}
+                                    {% endif %}
+                               </strong>
+                            </span>
+                                <span>: {{ comment.text|safe }}</span>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
                     {# ============== STATUS TEXT ============== #}
                     {% if task.completion_text %}
-
-                        <div class="m-3 pt-3 d-flex flex-column align-items-start border-top"
-                                 style="font-size: 12px; white-space: pre-line; text-align: justify;">
+                        <div class="ps-3 pt-2 pe-3 pb-2 d-flex flex-column align-items-start"
+                             style="font-size: 12px; white-space: pre-line; text-align: justify;">
+                            <button class="btn btn-outline-secondary showHistoryButton" onclick="toggleHistory(this)"
+                                    style="font-size: 12px">📃 Показать историю
+                            </button>
+                            <div class="historyContent" style="display: none;">
                                 <span>{{ task.completion_text|safe }}</span>
-
                             </div>
-{#                        <div class="row mx-1 my-2 pt-3 d-flex align-items-center">#}
-{#                            <div class="col d-flex align-items-center justify-content-start" style="max-width: 48px">#}
-{#                                <i class="bi bi-activity" style="font-size: 1.2rem;"></i>#}
-{#                            </div>#}
-{#                            <div class="col d-flex flex-column align-items-start border-start"#}
-{#                                 style="font-size: 12px; white-space: pre-line; text-align: justify;">#}
-{#                                <span>{{ task.completion_text|safe }}</span>#}
-{##}
-{#                            </div>#}
-{#                        </div>#}
+                        </div>
                     {% endif %}
+
+
 
                     {# ============== TAGS ============== #}
                     {% if task.tags.all %}
@@ -191,25 +217,36 @@
 
                     {# ============== TASK BUTTONS ============== #}
 
-                    {% if request.user.engineer in task.engineers.all or request.user.engineer.department in task.departments.all or request.user.is_superuser or request.user.is_staff or request.user == task.creator %}
-                        <div class="row text-start pt-2 border-top px-1">
-                            <div class="col">
+                    <div class="row text-start pt-2 border-top px-1">
+                        <div class="col">
+                            {# Кнопка "Взять задачу" #}
+                            {% if not task.is_done and request.user.engineer and request.user.engineer.department in task.departments.all %}
+                                {% include "components/task/take_task_button.html" with task_id=task.id %}
+                            {% endif %}
+                        </div>
 
-                                {% if not task.is_done and request.user.engineer %}
-                                    {% include "components/task/take_task_button.html" with task_id=task.id %}
-                                {% endif %}
-                            </div>
-                            <div class="col text-end gap-2">
+                        <div class="col text-end gap-2">
+                            {# Кнопки редактирования и удаления (создатель, суперюзер, стаф) #}
+                            {% if request.user == task.creator or request.user.is_superuser or request.user.is_staff %}
                                 {% include "components/task/delete_task_button.html" with task_id=task.id action_type="delete" %}
                                 {% include "components/task/edit_task_button.html" with task_id=task.id %}
-                                {% if task.is_done %}
+                            {% endif %}
+
+                            {# Кнопка "Комментировать задачу" (исполнитель, департамент, создатель, суперюзер, стаф) #}
+                            {% if request.user.engineer in task.engineers.all or request.user.engineer.department in task.departments.all or request.user == task.creator or request.user.is_superuser or request.user.is_staff %}
+                                {% include "components/task/comment_task_button.html" with task_id=task.id %}
+                            {% endif %}
+
+                            {# Кнопка "Закрыть" или "Вернуть в работу" #}
+                            {% if task.is_done %}
+                                {% if request.user.engineer in task.engineers.all or request.user.is_superuser or request.user.is_staff %}
                                     {% include "components/task/confirm_task_button.html" with task_id=task.id action_type="reopen" %}
-                                {% else %}
-                                    {% include "components/task/confirm_task_button.html" with task_id=task.id action_type="close" %}
                                 {% endif %}
-                            </div>
+                                {#                            {% else %}#}
+                                {#                                {% include "components/task/confirm_task_button.html" with task_id=task.id action_type="close" %}#}
+                            {% endif %}
                         </div>
-                    {% endif %}
+                    </div>
 
                 </div>
             </div>
@@ -218,6 +255,20 @@
 </div>
 
 
+<script>
+    function toggleHistory(button) {
+        // Находим ближайший контейнер с контентом
+        var content = button.nextElementSibling;
+
+        if (content.style.display === "none") {
+            content.style.display = "block";
+            button.textContent = "📃 Скрыть историю";
+        } else {
+            content.style.display = "none";
+            button.textContent = "📃 Показать историю";
+        }
+    }
+</script>
 <style>
     /* Убираем синюю рамку на активной кнопке */
     .accordion-button:focus {
