@@ -139,21 +139,30 @@ class TaskFilter(django_filters.FilterSet):
         return queryset
 
     def dep_to_engineers(self, queryset, name: str, value: str):
-        values = self.data.getlist("engineers")
+        values = self.data.get("engineers", "").split(",")
 
-        if not values:
+        if not values or all(not v for v in values):
             return queryset
 
         q_objects = Q()
         for val in values:
             type_id = val.split("_")
-            type = type_id[0]
-            id = int(type_id[1])
+            if len(type_id) != 2:
+                continue
 
-            if type == "eng":
-                q_objects |= Q(engineers__id=id)
-            elif type == "dep":
-                q_objects |= Q(engineers__department__id=id)
+            type_, id_ = type_id[0], type_id[1]
+            if not id_.isdigit():
+                continue
+            id_ = int(id_)
+
+            if type_ == "eng":
+                # Фильтруем по конкретному инженеру
+                q_objects |= Q(engineers__id=id_)
+            elif type_ == "dep":
+                # Фильтруем по:
+                # 1. Инженерам, которые состоят в этом департаменте
+                # 2. Самим задачам, где в исполнителях указан департамент
+                q_objects |= Q(engineers__department__id=id_) | Q(departments__id=id_)
 
         return queryset.filter(q_objects)
 
