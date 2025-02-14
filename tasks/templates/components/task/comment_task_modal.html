@@ -1,0 +1,39 @@
+
+
+<!-- Модальное окно -->
+<div class="modal fade" id="taskСommentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title" id="commentModalLabel">Добавить результат к задаче</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            {# Здесь будет загружена форма редактирования #}
+            <div id="task-edit-form-comment"></div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const taskСommentModal = new bootstrap.Modal('#taskСommentModal', {});
+
+    function loadTaskСommentModal(taskID) {
+        const currentUrlWithFilters = window.location.pathname + location.search;  // Capture the current URL with filters
+
+
+
+        // Show modal and load content
+        taskСommentModal.show();
+
+        // Load the appropriate form (close/reopen) dynamically into the modal's body
+
+        $("#task-edit-form-comment").load("/ajax/tasks/" + taskID + "/comment?from_url=" + encodeURIComponent(currentUrlWithFilters));
+        {#$("#task-edit-form-comment").load(`/ajax/tasks/${taskID}/comment?from_url=` + encodeURIComponent(currentUrlWithFilters));#}
+    }
+</script>
+
+

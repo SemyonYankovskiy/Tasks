@@ -29,38 +29,3 @@
     </div>
 </form>
 {% endif %}
-
-
-{#<script>#}
-{#    // Инициализируем CKEditor для каждого комментария с task_id#}
-{#    CKEDITOR.replace('comment_{{ task_id }}', {#}
-{#        toolbar: [#}
-{#            {name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike']},#}
-{#            {name: 'paragraph', items: ['NumberedList', 'BulletedList']},#}
-{#            {name: 'clipboard', items: ['Undo', 'Redo']},#}
-{#            {name: 'insert', items: ['Image', 'Table', 'HorizontalRule']},#}
-{#        ],#}
-{#        height: 150,#}
-{#        filebrowserUploadUrl: '/ckeditor/upload/',#}
-{#        filebrowserBrowseUrl: '/ckeditor/browse/',#}
-{##}
-{#        // Disable version warning notification#}
-{#        removePlugins: 'notification',#}
-{#    });#}
-{##}
-{#    // Обработка отправки формы#}
-{#    document.getElementById('submit-button{{ task_id }}').addEventListener('click', function (event) {#}
-{#        event.preventDefault();  // Останавливаем стандартное поведение формы#}
-{##}
-{#        // Получаем текущее значение из скрытого поля с URL#}
-{#        var form = document.getElementById('task-form_{{ form_action }}_{{ task_id }}');#}
-{#        var fromUrlField = form.querySelector('input[name="from_url"]');#}
-{#        var currentUrl = new URL(fromUrlField.value, window.location.origin);#}
-{##}
-{#        // Устанавливаем модифицированный URL обратно в скрытое поле#}
-{#        fromUrlField.value = currentUrl.href;#}
-{##}
-{#        // Теперь отправляем форму#}
-{#        form.submit();#}
-{#    });#}
-{#</script>#}

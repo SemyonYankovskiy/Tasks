@@ -1,0 +1,46 @@
+{% load static %}
+
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+
+
+<form method="POST" action="{% url 'comment_task' task_id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="from_url" value="{{ from_url }}">
+
+                    <div class="mb-3">
+                        <label for="answer" class="form-label d-flex">Комментарий</label>
+                        <textarea class="form-control" id="answer" name="answer"></textarea>
+                        <div>
+                            {{ ckeditor_answer.answer }}
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+
+                    <!-- Статус выполнения -->
+                    <div class="mb-3 form-check form-switch">
+                        <input type="checkbox" class="form-check-input" id="IsDone"
+                               role="switch"
+                               name="is_done"
+                               onchange="updateTaskStatus(this)">
+                        <label class="form-check-label" for="IsDone"
+                               id="StatusLabel">Задача завершена
+
+                        </label>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                    </div>
+                </div>
+            </form>
+<style>
+
+    .django-ckeditor-widget {
+        width: 100% !important;
+    }
+
+</style>

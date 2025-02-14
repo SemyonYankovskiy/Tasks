@@ -1,63 +1,60 @@
 {% load static %}
 
 <!-- Кнопка для открытия модального окна -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#commentModal">
-    <i class="bi bi-caret-right-square"></i>
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#commentModal"
+        onclick="loadTaskСommentModal('{{ task_id }}')">
+                <i class=" bi bi-caret-right-square"></i>
 </button>
-<!-- ckeditor -->
-<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
-<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 
-<!-- Модальное окно -->
-<div class="modal fade" id="commentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-     aria-labelledby="commentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span class="modal-title" id="commentModalLabel">Добавить результат к задаче</span>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="POST" action="{% url 'comment_task' task.id %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <input type="hidden" name="from_url" value="{{ request.get_full_path }}">
-
-
-                    <div class="mb-3">
-                        <label for="answer" class="form-label d-flex">Комментарий</label>
-                        {#                        <textarea class="form-control" id="answer" name="answer"></textarea>#}
-                        <div>
-                            {{ ckeditor_answer.answer }}
-                        </div>
-                    </div>
-
-                </div>
-                <div class="modal-footer d-flex justify-content-between">
-
-                    <!-- Статус выполнения -->
-                    <div class="mb-3 form-check form-switch">
-                        <input type="checkbox" class="form-check-input" id="IsDone"
-                               role="switch"
-                               name="is_done"
-                               onchange="updateTaskStatus(this)">
-                        <label class="form-check-label" for="IsDone"
-                               id="StatusLabel">Задача завершена
-
-                        </label>
-                    </div>
-
-                    <div>
-                        <button type="submit" class="btn btn-primary">Сохранить</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-<style>
-
-    .django-ckeditor-widget {
-        width: 100% !important;
-    }
-
-</style>
+{##}
+{##}
+{#<!-- ckeditor -->#}
+{#<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>#}
+{#<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>#}
+{##}
+{#<!-- Модальное окно -->#}
+{#<div class="modal fade" id="commentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"#}
+{#     aria-labelledby="commentModalLabel" aria-hidden="true">#}
+{#    <div class="modal-dialog modal-lg modal-dialog-centered">#}
+{#        <div class="modal-content">#}
+{#            <div class="modal-header">#}
+{#                <span class="modal-title" id="commentModalLabel">Добавить результат к задаче</span>#}
+{#                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>#}
+{#            </div>#}
+{#            <form method="POST" action="{% url 'comment_task' task.id %}">#}
+{#                {% csrf_token %}#}
+{#                <div class="modal-body">#}
+{#                    <input type="hidden" name="from_url" value="{{ request.get_full_path }}">#}
+{##}
+{##}
+{#                    <div class="mb-3">#}
+{#                        <label for="answer" class="form-label d-flex">Комментарий</label>#}
+{#                        <textarea class="form-control" id="answer" name="answer"></textarea>#}
+{#                        <div>#}
+{#                            {{ ckeditor_answer.answer }}#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                </div>#}
+{#                <div class="modal-footer d-flex justify-content-between">#}
+{##}
+{#                    <!-- Статус выполнения -->#}
+{#                    <div class="mb-3 form-check form-switch">#}
+{#                        <input type="checkbox" class="form-check-input" id="IsDone"#}
+{#                               role="switch"#}
+{#                               name="is_done"#}
+{#                               onchange="updateTaskStatus(this)">#}
+{#                        <label class="form-check-label" for="IsDone"#}
+{#                               id="StatusLabel">Задача завершена#}
+{##}
+{#                        </label>#}
+{#                    </div>#}
+{##}
+{#                    <div>#}
+{#                        <button type="submit" class="btn btn-primary">Сохранить</button>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </form>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}

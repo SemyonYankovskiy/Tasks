@@ -30,6 +30,7 @@ urlpatterns = [
     path("ajax/tasks/<int:task_id>/edit", views.get_task_edit_form, name="ajax-task-edit-form"),
     path("ajax/objects/<slug:slug>/edit", views.get_obj_edit_form, name="ajax-obj-edit-form"),
     path('ajax/tasks/<int:task_id>/action/<str:action_type>', views.get_task_action_form, name='ajax-task-action-form'),
+    path('ajax/tasks/<int:task_id>/comment', views.get_task_comment_form, name='ajax-task-action-form-comment'),
 
     # CKEDITOR
     path('ckeditor/', include('ckeditor_uploader.urls')),

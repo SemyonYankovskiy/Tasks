@@ -214,6 +214,19 @@ def get_task_action_form(request, task_id, action_type):
 
 
 @login_required
+def get_task_comment_form(request, task_id):
+
+    context = {
+        'task_id': task_id,
+        'action_url': reverse('reopen_task', args=[task_id]),
+        'from_url': request.GET.get('from_url', ''),
+    }
+
+    return render(request, 'components/task/comment_task_form.html', context)
+
+
+
+@login_required
 def get_stat_page(request):
     stat = get_stat()
     context = {**stat}

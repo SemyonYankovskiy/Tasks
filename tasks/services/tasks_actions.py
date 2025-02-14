@@ -228,7 +228,7 @@ def comment_task(request, task_id):
 
         # Получаем URL с параметрами фильтров (если нужно)
         redirect_to = request.POST.get("from_url", redirect_to).strip()
-
+        print(redirect_to)
 
         if answer:
             comment = Comment.objects.create(
