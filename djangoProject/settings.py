@@ -25,7 +25,7 @@ SECRET_KEY = os.getenv(
     "DJANGO_SECRET_KEY", "django-insecure-c@&8cjq7p*g*#!)3(nj(9n%hsd(&z^bnfr7vjpa-+%d+11l42s"
 )
 
-#CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+# CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DJANGO_DEBUG", "1").lower() in ("1", "yes", "true")  # По умолчанию True
@@ -126,7 +126,7 @@ if os.getenv("DJANGO_REDIS_CACHE_URL"):
             "BACKEND": "django.core.cache.backends.redis.RedisCache",
             "LOCATION": os.getenv("DJANGO_REDIS_CACHE_URL"),
 
-         }
+        }
 
     }
 
@@ -134,19 +134,19 @@ if os.getenv("DJANGO_REDIS_CACHE_URL"):
     # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
     AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
-]
+        {
+            "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        },
+        {
+            "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        },
+        {
+            "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        },
+        {
+            "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        },
+    ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -176,7 +176,6 @@ MEDIA_ROOT = BASE_DIR / "media"
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -185,6 +184,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 LOGIN_URL = "user/login/"
+
 
 # ==============================  CKEDITOR ==================================
 
@@ -219,6 +219,58 @@ CKEDITOR_CONFIGS = {
              'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', ]},
             {'name': 'basicstyles',
              'items': ['RemoveFormat', ]},
+            '/',
+
+        ],
+        'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
+        # 'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] }],
+        # 'height': 291,
+        # 'width': '100%',
+        # 'filebrowserWindowHeight': 725,
+        # 'filebrowserWindowWidth': 940,
+        # 'toolbarCanCollapse': True,
+        # 'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
+        'tabSpaces': 4,
+        # 'filebrowserUploadUrl': '/ckeditor/upload/',
+        # 'filebrowserBrowseUrl': '/ckeditor/browse/',
+        'extraPlugins': ','.join([
+            'uploadimage',  # the upload image feature
+            # your extra plugins here
+            # 'div',
+            'autolink',
+            # 'autoembed',
+            # 'embedsemantic',
+            # 'autogrow',
+            # 'devtools',
+            # 'widget',
+            # 'lineutils',
+            # 'clipboard',
+            # 'dialog',
+            # 'dialogui',
+            # 'elementspath'
+        ]),
+        'filebrowserUploadUrl': '/ckeditor/upload/',
+        'filebrowserBrowseUrl': '/ckeditor/browse/',
+        'imageUploadUrl': '/ckeditor/upload/',
+    },
+    'minimal': {
+        'height': 150,
+        # 'skin': 'office2013',
+        'toolbar_Basic': [
+            ['Source', '-', 'Bold', 'Italic']
+        ],
+        'toolbar_YourCustomToolbarConfig': [
+            {'name': 'styles', 'items': ['Font', 'FontSize', 'Styles', 'Format', ]},
+
+            {'name': 'basicstyles',
+             'items': ['Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor', 'Subscript', 'Superscript',
+                       '-', ]},
+
+            {'name': 'basicstyles','items': ['RemoveFormat', ]},
+            {'name': 'links', 'items': ['Link', 'Unlink']},
+
+            # '/',  # put this to force next toolbar on new line
+
             '/',
 
         ],

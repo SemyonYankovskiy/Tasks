@@ -13,8 +13,26 @@ class CKEditorCreateForm(forms.Form):
 
 
 class CKEditorAnswerForm(forms.Form):
-    answer = forms.CharField(widget=CKEditorWidget, label='', required=False)
+    answer = forms.CharField(widget=CKEditorWidget(config_name='minimal'), label='',  required=False)
 
+
+class ObjectForm(forms.ModelForm):
+    answer = forms.CharField(required=False)
+
+    class Meta:
+        model = Task
+        fields = [
+            'answer'
+        ]
+
+    def save(self, commit=True):
+        instance: Task = super().save(commit=False)
+        instance.text = self.cleaned_data["answer"]
+
+        if commit:
+            instance.save()
+
+        return instance
 
 
 class CKEditorEditForm(forms.Form):

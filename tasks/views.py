@@ -9,7 +9,7 @@ from tasks.services.tasks_prepare import get_tasks
 from tasks.services.tree_nodes import GroupsTree
 from .filters import ObjectFilter, get_current_filter_params, get_fields_for_filter, TaskFilter, filter_url, \
     applied_filters_count
-from .forms import CKEditorEditForm, CKEditorCreateForm, CKEditorEditObjForm, CKEditorCreateObjForm
+from .forms import CKEditorEditForm, CKEditorCreateForm, CKEditorEditObjForm, CKEditorCreateObjForm, CKEditorAnswerForm
 from .models import Object, Task
 from .services.statistics import get_stat
 from .services.tree_nodes.tree_nodes import AllTagsTree
@@ -87,6 +87,7 @@ def get_tasks_page(request):
 
     task_filter = TaskFilter(request.GET)
     ckeditor = CKEditorCreateForm(request.POST)
+    ckeditor_answer = CKEditorAnswerForm(request.POST)
 
     context = {
         **tasks,
@@ -95,6 +96,7 @@ def get_tasks_page(request):
         "filter_data": filter_url(request, obj=obj),  # Передаем объект в filter_url
         "params_count": task_filter.applied_filters_count_taks,
         "ckeditor": ckeditor,
+        "ckeditor_answer": ckeditor_answer,
     }
 
     return render(request, "components/task/tasks_page.html", context=context)
