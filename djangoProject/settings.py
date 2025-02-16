@@ -223,31 +223,14 @@ CKEDITOR_CONFIGS = {
 
         ],
         'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
-        # 'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] }],
-        # 'height': 291,
-        # 'width': '100%',
-        # 'filebrowserWindowHeight': 725,
-        # 'filebrowserWindowWidth': 940,
-        # 'toolbarCanCollapse': True,
-        # 'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
+
         'tabSpaces': 4,
-        # 'filebrowserUploadUrl': '/ckeditor/upload/',
-        # 'filebrowserBrowseUrl': '/ckeditor/browse/',
+
         'extraPlugins': ','.join([
             'uploadimage',  # the upload image feature
-            # your extra plugins here
-            # 'div',
+
             'autolink',
-            # 'autoembed',
-            # 'embedsemantic',
-            # 'autogrow',
-            # 'devtools',
-            # 'widget',
-            # 'lineutils',
-            # 'clipboard',
-            # 'dialog',
-            # 'dialogui',
-            # 'elementspath'
+
         ]),
         'filebrowserUploadUrl': '/ckeditor/upload/',
         'filebrowserBrowseUrl': '/ckeditor/browse/',
@@ -255,7 +238,7 @@ CKEDITOR_CONFIGS = {
     },
     'minimal': {
         'height': 150,
-        # 'skin': 'office2013',
+        'skin': 'moono-lisa',
         'toolbar_Basic': [
             ['Source', '-', 'Bold', 'Italic']
         ],
@@ -275,31 +258,14 @@ CKEDITOR_CONFIGS = {
 
         ],
         'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
-        # 'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] }],
-        # 'height': 291,
-        # 'width': '100%',
-        # 'filebrowserWindowHeight': 725,
-        # 'filebrowserWindowWidth': 940,
-        # 'toolbarCanCollapse': True,
-        # 'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
+
         'tabSpaces': 4,
-        # 'filebrowserUploadUrl': '/ckeditor/upload/',
-        # 'filebrowserBrowseUrl': '/ckeditor/browse/',
+
         'extraPlugins': ','.join([
             'uploadimage',  # the upload image feature
-            # your extra plugins here
-            # 'div',
+
             'autolink',
-            # 'autoembed',
-            # 'embedsemantic',
-            # 'autogrow',
-            # 'devtools',
-            # 'widget',
-            # 'lineutils',
-            # 'clipboard',
-            # 'dialog',
-            # 'dialogui',
-            # 'elementspath'
+
         ]),
         'filebrowserUploadUrl': '/ckeditor/upload/',
         'filebrowserBrowseUrl': '/ckeditor/browse/',

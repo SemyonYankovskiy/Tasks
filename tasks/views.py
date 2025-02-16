@@ -87,7 +87,7 @@ def get_tasks_page(request):
 
     task_filter = TaskFilter(request.GET)
     ckeditor = CKEditorCreateForm(request.POST)
-    ckeditor_answer = CKEditorAnswerForm(request.POST)
+
 
     context = {
         **tasks,
@@ -96,7 +96,7 @@ def get_tasks_page(request):
         "filter_data": filter_url(request, obj=obj),  # Передаем объект в filter_url
         "params_count": task_filter.applied_filters_count_taks,
         "ckeditor": ckeditor,
-        "ckeditor_answer": ckeditor_answer,
+
     }
 
     return render(request, "components/task/tasks_page.html", context=context)
@@ -215,11 +215,12 @@ def get_task_action_form(request, task_id, action_type):
 
 @login_required
 def get_task_comment_form(request, task_id):
-
+    ckeditor_answer = CKEditorAnswerForm(request.POST)
     context = {
         'task_id': task_id,
         'action_url': reverse('reopen_task', args=[task_id]),
         'from_url': request.GET.get('from_url', ''),
+        "ckeditor_answer": ckeditor_answer,
     }
 
     return render(request, 'components/task/comment_task_form.html', context)
