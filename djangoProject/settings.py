@@ -205,32 +205,54 @@ CKEDITOR_CONFIGS = {
             ['Source', '-', 'Bold', 'Italic']
         ],
         'toolbar_YourCustomToolbarConfig': [
-            {'name': 'styles', 'items': ['Font', 'FontSize', 'Styles', 'Format', ]},
-            {'name': 'colors', 'items': ['TextColor', 'BGColor']},
+            {'name': 'styles', 'items': ['Font', 'FontSize', 'Styles', ]},
+            {'name': 'basicstyles',
+             'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', ]},
 
+            {'name': 'colors', 'items': ['TextColor', 'BGColor']},
+            {'name': 'basicstyles',
+             'items': ['RemoveFormat', ]},
             {'name': 'paragraph',
              'items': ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-',
                        'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', ]},
-            {'name': 'links', 'items': ['Link', 'Unlink']},
+            {'name': 'links', 'items': ['Image', 'Link', 'Unlink']},
             {'name': 'insert',
              'items': ['Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', ]},
-            '/',  # put this to force next toolbar on new line
-            {'name': 'basicstyles',
-             'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', ]},
-            {'name': 'basicstyles',
-             'items': ['RemoveFormat', ]},
-            '/',
+
+            # '/',  # put this to force next toolbar on new line
+            # {'name': 'basicstyles',
+            #  'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', ]},
+            # {'name': 'basicstyles',
+            #  'items': ['RemoveFormat', ]},
+            # '/',
 
         ],
         'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
-
+        # 'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] }],
+        # 'height': 291,
+        # 'width': '100%',
+        # 'filebrowserWindowHeight': 725,
+        # 'filebrowserWindowWidth': 940,
+        # 'toolbarCanCollapse': True,
+        # 'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
         'tabSpaces': 4,
-
+        # 'filebrowserUploadUrl': '/ckeditor/upload/',
+        # 'filebrowserBrowseUrl': '/ckeditor/browse/',
         'extraPlugins': ','.join([
             'uploadimage',  # the upload image feature
-
+            # your extra plugins here
+            # 'div',
             'autolink',
-
+            # 'autoembed',
+            # 'embedsemantic',
+            # 'autogrow',
+            # 'devtools',
+            # 'widget',
+            # 'lineutils',
+            # 'clipboard',
+            # 'dialog',
+            # 'dialogui',
+            # 'elementspath'
         ]),
         'filebrowserUploadUrl': '/ckeditor/upload/',
         'filebrowserBrowseUrl': '/ckeditor/browse/',
@@ -238,19 +260,19 @@ CKEDITOR_CONFIGS = {
     },
     'minimal': {
         'height': 150,
-        'skin': 'moono-lisa',
+        # 'skin': 'office2013',
         'toolbar_Basic': [
             ['Source', '-', 'Bold', 'Italic']
         ],
         'toolbar_YourCustomToolbarConfig': [
-            {'name': 'styles', 'items': ['Font', 'FontSize', 'Styles', 'Format', ]},
+            {'name': 'styles', 'items': ['Font', 'FontSize', 'Styles', ]},
 
             {'name': 'basicstyles',
              'items': ['Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor', 'Subscript', 'Superscript',
                        '-', ]},
 
-            {'name': 'basicstyles','items': ['RemoveFormat', ]},
-            {'name': 'links', 'items': ['Link', 'Unlink']},
+            {'name': 'basicstyles', 'items': ['RemoveFormat', ]},
+            {'name': 'links', 'items': ['Image', 'Link', 'Unlink']},
 
             # '/',  # put this to force next toolbar on new line
 
@@ -258,14 +280,31 @@ CKEDITOR_CONFIGS = {
 
         ],
         'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
-
+        # 'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] }],
+        # 'height': 291,
+        # 'width': '100%',
+        # 'filebrowserWindowHeight': 725,
+        # 'filebrowserWindowWidth': 940,
+        # 'toolbarCanCollapse': True,
+        # 'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
         'tabSpaces': 4,
-
+        # 'filebrowserUploadUrl': '/ckeditor/upload/',
+        # 'filebrowserBrowseUrl': '/ckeditor/browse/',
         'extraPlugins': ','.join([
             'uploadimage',  # the upload image feature
-
+            # your extra plugins here
+            # 'div',
             'autolink',
-
+            # 'autoembed',
+            # 'embedsemantic',
+            # 'autogrow',
+            # 'devtools',
+            # 'widget',
+            # 'lineutils',
+            # 'clipboard',
+            # 'dialog',
+            # 'dialogui',
+            # 'elementspath'
         ]),
         'filebrowserUploadUrl': '/ckeditor/upload/',
         'filebrowserBrowseUrl': '/ckeditor/browse/',
