@@ -115,11 +115,12 @@ class TaskFilter(django_filters.FilterSet):
         # Ensure 'show_my_tasks_only' is set based on user's staff status if request is available
         if self.data.get("show_my_tasks_only") is None:
             # Check if request exists and user is staff
-            if hasattr(self, 'request') and self.request and hasattr(self.request,'user') and self.request.user.is_staff:
-
-                self.data["show_my_tasks_only"] = "false"
-            else:
-                self.data["show_my_tasks_only"] = "true"
+            # if hasattr(self, 'request') and self.request and hasattr(self.request,'user') and self.request.user.is_staff:
+            #
+            #     self.data["show_my_tasks_only"] = "false"
+            # else:
+            #     self.data["show_my_tasks_only"] = "true"
+            self.data["show_my_tasks_only"] = "false"
 
         if self.data.get("sort_order") is None:
             self.data["sort_order"] = "desc"

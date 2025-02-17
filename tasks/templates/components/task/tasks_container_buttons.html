@@ -17,16 +17,16 @@
                         <!-- Кнопка "Показывать только мои задачи" с иконкой -->
                         {% if show_my_tasks_only == "true" %}
                             <button id="showMyTasksOnlyBtn" onclick="toggleShowMyTasksOnly()"
-                                    class="btn btn-primary">
+                                    class="btn btn-outline-primary">
                                 <i class="bi bi-person-lines-fill"></i>
 {#                                Мои задачи {{ my_tasks_count }} из {{ available_tasks_count }}#}
-                                Мои задачи
+                                Показать все задачи
                             </button>
                         {% else %}
                             <button id="showMyTasksOnlyBtn" onclick="toggleShowMyTasksOnly()"
-                                    class="btn btn-outline-primary">
+                                    class="btn btn-primary">
                                 <i class="bi bi-person-lines-fill"></i>
-                                Все задачи
+                                Показать мои задачи
                             </button>
                         {% endif %}
                     </div>
