@@ -95,7 +95,7 @@ def create_task(request):
         else:
             messages.add_message(request, messages.WARNING, form.errors)
 
-    return redirect("tasks")
+    return redirect(redirect_to)
 
 
 @login_required
@@ -180,6 +180,8 @@ def delete_task(request, task_id):
 
             # Обновление задачи
             task.deleted = True
+
+            task.save()
 
             add_event_log(user=request.user, task=task, text="🗑️ Задача удалена")
 

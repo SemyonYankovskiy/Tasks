@@ -28,7 +28,7 @@
                 {% csrf_token %}
 
                 <!-- Скрытое поле для сохранения URL с фильтрами -->
-                <input type="hidden" name="from_url" value="{{ request.get_full_path }}#tasks">
+                <input type="hidden" name="from_url" value="{{ request.get_full_path }}">
 
 
                 <div class="modal-body p-4">

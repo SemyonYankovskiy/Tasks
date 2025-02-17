@@ -1,6 +1,8 @@
 import random
 import string
 
+from tasks.models import Notification
+
 
 class RandomString:
 
@@ -21,3 +23,9 @@ def ascii_letters(request):
         "ascii_lowercase": string.ascii_lowercase,
         "ascii_uppercase": string.ascii_uppercase,
     }
+
+
+def notifications_processor(request):
+    if request.user.is_authenticated:
+        return {'notifications': Notification.objects.filter(user=request.user, is_read=False)}
+    return {}

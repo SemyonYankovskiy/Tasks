@@ -89,6 +89,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "djangoProject.extra_processors.get_random_icon",
                 "djangoProject.extra_processors.get_current_page",
+                "djangoProject.context_processors.notifications_processor",
             ],
         },
     },

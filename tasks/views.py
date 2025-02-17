@@ -1,6 +1,7 @@
 from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
@@ -232,3 +233,11 @@ def get_stat_page(request):
     stat = get_stat()
     context = {**stat}
     return render(request, 'stat_page.html', context)
+
+
+
+
+@login_required
+def mark_notifications_as_read(request):
+    request.user.notifications.update(is_read=True)
+    return JsonResponse({'status': 'ok'})

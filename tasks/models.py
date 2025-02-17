@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, MinValueValidator
 from django.db import models
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, m2m_changed
 from django.dispatch import receiver
 
 from tasks.services.cache_version import CacheVersion
@@ -110,6 +110,7 @@ class Task(models.Model):
     tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m", blank=True)
     files = models.ManyToManyField("AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True)
     creator = models.ForeignKey(get_user_model(), related_name="created_tasks", on_delete=models.PROTECT)
+    status_changed_by = models.CharField(max_length=32, blank=True, null=True)
 
     # slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
 
@@ -120,15 +121,36 @@ class Task(models.Model):
     def __str__(self):
         return self.header
 
+    def save(self, *args, **kwargs):
+        # Проверяем, существовала ли задача ранее
+        is_new = self.pk is None
+        previous = None
+        if not is_new:
+            previous = Task.objects.filter(pk=self.pk).first()
 
-class Tag(models.Model):
-    tag_name = models.CharField(max_length=64, unique=True)
+        # Вызываем стандартное сохранение
+        super().save(*args, **kwargs)
 
-    class Meta:
-        db_table = "tags"
+        # Определяем контекст изменения
+        if is_new:
+            self.status_changed_by = "create"
+        elif previous and previous.is_done and not self.is_done:
+            self.status_changed_by = "restore"
+        else:
+            self.status_changed_by = "edit"
 
-    def __str__(self):
-        return self.tag_name
+        # Дополнительное сохранение, если статус изменился
+        super().save(update_fields=["status_changed_by"])
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="notifications")
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)  # Флаг для прочитанных уведомлений
+
+    def str(self):
+        return f"{self.user} - {self.message}"
 
 
 class Comment(models.Model):
@@ -139,6 +161,16 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.author} on {self.created_at}"
+
+
+class Tag(models.Model):
+    tag_name = models.CharField(max_length=64, unique=True)
+
+    class Meta:
+        db_table = "tags"
+
+    def __str__(self):
+        return self.tag_name
 
 
 class Engineer(models.Model):
@@ -223,6 +255,9 @@ class AttachedFile(models.Model):
             self.is_image = self.extension in [".jpeg", ".jpg", ".png"]
 
         super().save(*args, **kwargs)
+
+
+
 
 
 class Address(models.Model):
@@ -394,3 +429,86 @@ def update_cache_version7_save(sender, created, **kwargs):
 def update_cache_version7_delete(sender, instance, **kwargs):
     CacheVersion("tasks_page_version_cache").increment_cache_version()
     CacheVersion("objects_page_cache_version").increment_cache_version()
+
+
+@receiver(m2m_changed, sender=Task.engineers.through)
+def notify_assigned_engineers(sender, instance, action, **kwargs):
+    """Создаёт уведомления для инженеров, назначенных на задачу"""
+    if action in ["post_add"]:  # Если инженеры добавлены в задачу
+        for engineer in instance.engineers.all():
+            if engineer.user:  # Проверяем, есть ли у инженера связанный пользователь
+                Notification.objects.create(
+                    user=engineer.user,
+                    message=f"{datetime.now().strftime('%H:%M')} | Вам назначена  задача: '{instance.header}'"
+                )
+
+@receiver(m2m_changed, sender=Task.departments.through)
+def notify_department_engineers(sender, instance, action, **kwargs):
+    """Создаёт уведомления для всех инженеров департамента, на который назначена задача"""
+    if action in ["post_add"]:  # Если департамент добавлен в задачу
+        for department in instance.departments.all():
+            for engineer in department.engineers.all():
+                if engineer.user:
+                    Notification.objects.create(
+                        user=engineer.user,
+                        message=f"{datetime.now().strftime('%H:%M')} | Вашему отделу назначена  задача: '{instance.header}'"
+                    )
+
+
+
+@receiver(post_save, sender=Task)
+def notify_task_status_change(sender, instance, created, **kwargs):
+    """Создаёт уведомления при изменении статуса задачи"""
+    if created:
+        return  # Не уведомляем при создании
+
+    message = None
+
+    # Уведомление о закрытии задачи
+    if instance.is_done:
+        message = f"{datetime.now().strftime('%H:%M')} | Задача '{instance.header}' была выполнена."
+        # Уведомление для создателя задачи
+        if instance.creator:
+            if not Notification.objects.filter(user=instance.creator, message=message).exists():
+                Notification.objects.create(user=instance.creator,message=f"{datetime.now().strftime('%H:%M')} | Задача '{instance.header}' была выполнена."
+                )
+    elif instance.deleted:
+        message = f"{datetime.now().strftime('%H:%M')} | Задача '{instance.header}' была удалена."
+    elif instance.status_changed_by == "restore":
+        message = f"{datetime.now().strftime('%H:%M')} | Задача '{instance.header}' была возвращена в работу."
+
+    if message:
+        for engineer in instance.engineers.all():
+            if engineer.user:
+                # Проверяем, есть ли уже такое уведомление
+                if not Notification.objects.filter(user=engineer.user, message=message).exists():
+                    Notification.objects.create(user=engineer.user, message=message)
+
+
+@receiver(m2m_changed, sender=Task.engineers.through)
+def notify_removed_engineers(sender, instance, action, pk_set, **kwargs):
+    """
+    Уведомляет инженера, если его убрали из задачи.
+    pk_set содержит ID удалённых инженеров.
+    """
+    if action == "post_remove":  # Если кого-то удалили из исполнителей
+        for engineer_id in pk_set:
+            engineer = Engineer.objects.filter(id=engineer_id).first()
+            if engineer and engineer.user:
+                Notification.objects.create(
+                    user=engineer.user,
+                    message=f"{datetime.now().strftime('%H:%M')} | Вы больше не являетесь исполнителем задачи '{instance.header}'."
+                )
+
+
+@receiver(post_save, sender=Comment)
+def notify_task_creator_on_comment(sender, instance, created, **kwargs):
+    """Создаёт уведомление для создателя задачи, когда добавлен новый комментарий"""
+    if created:
+        task = instance.task
+        # Создаём уведомление для создателя задачи
+        if task.creator and task.creator != instance.author:
+            Notification.objects.create(
+                user=task.creator,
+                message=f"{datetime.now().strftime('%H:%M')} | {instance.author} добавил ответ к задаче '{task.header}'"
+            )
