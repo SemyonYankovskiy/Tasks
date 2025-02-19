@@ -211,7 +211,7 @@ def reopen_task(request, task_id):
         task.is_done = False
 
         task.save()
-        add_event_log(user=request.user, task=task, text="↩️ Задача переоткрыта: " + comment)
+        add_event_log(user=request.user, task=task, text="↩️ Задача переоткрыта")
         messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' возвращена в работу")
 
     return HttpResponseRedirect(redirect_to)
@@ -244,15 +244,14 @@ def comment_task(request, task_id):
         if is_done:
             # Обновление задачи
             task.is_done = True
-            task.completion_time = datetime.now()  # Устанавливаем текущее время как время завершения
             task.save()
 
             # Логируем событие о закрытии задачи
-            add_event_log(user=request.user, task=task, text="✅ Задача закрыта: " + answer)
+            add_event_log(user=request.user, task=task, text="✅ Задача закрыта")
             messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' закрыта")
         else:
             # Логируем событие о новом комментарии
-            add_event_log(user=request.user, task=task, text="⤴️ Ответ на задачу: " + answer)
+            add_event_log(user=request.user, task=task, text="⤴️ Ответ на задачу")
             messages.add_message(request, messages.SUCCESS, f"Добавлен ответ к задаче '{task.header}'")
 
     return HttpResponseRedirect(redirect_to)
@@ -276,7 +275,7 @@ def close_task(request, task_id):
         task.is_done = True
         # task.completion_time = datetime.now()
         task.save()
-        add_event_log(user=request.user, task=task, text="✅ Задача закрыта: " + comment)
+        add_event_log(user=request.user, task=task, text="✅ Задача закрыта")
         messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' закрыта")
 
     return HttpResponseRedirect(redirect_to)

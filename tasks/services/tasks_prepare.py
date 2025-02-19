@@ -3,10 +3,11 @@ from dataclasses import dataclass
 from zoneinfo import ZoneInfo
 
 from django.core.cache import cache
+from django.db.models import Prefetch
 from django.db.models import Q, Count, Case, When, QuerySet
 
 from tasks.filters import TaskFilter, TaskFilterByDone
-from tasks.models import Task, Engineer
+from tasks.models import Task, Engineer, Comment
 from tasks.services.cache_version import CacheVersion
 from tasks.services.service import paginate_queryset
 from user.models import User
@@ -120,7 +121,17 @@ def get_filtered_tasks(request, obj=None):
     Возвращает часть задач, которые отфильтрованы или включены/выключены в шаблоне
     """
     tasks_qs = permission_filter(user=request.user)
-    tasks_qs = tasks_qs.prefetch_related("files", "tags", "engineers", "objects_set", "departments", "creator", "comments")
+
+    # Сортируем комментарии по дате создания (от старых к новым)
+    tasks_qs = tasks_qs.prefetch_related(
+        "files",
+        "tags",
+        "engineers",
+        "objects_set",
+        "departments",
+        "creator",
+        Prefetch("comments", queryset=Comment.objects.order_by('created_at'))
+    )
 
     # Сохраняем исходный QuerySet для подсчета доступных задач
     tasks_qs_all = tasks_qs

@@ -160,7 +160,7 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Comment by {self.author} on {self.created_at}"
+        return f"Comment {self.task.header} by {self.author} on {self.created_at}"
 
 
 class Tag(models.Model):
@@ -476,7 +476,12 @@ def notify_task_status_change(sender, instance, created, **kwargs):
         message = f"{datetime.now().strftime('%H:%M')} | Задача '{instance.header}' была удалена."
     elif instance.status_changed_by == "restore":
         message = f"{datetime.now().strftime('%H:%M')} | Задача '{instance.header}' была возвращена в работу."
-
+        # Уведомление для создателя задачи
+        if instance.creator:
+            if not Notification.objects.filter(user=instance.creator, message=message).exists():
+                Notification.objects.create(user=instance.creator,
+                                            message=f"{datetime.now().strftime('%H:%M')} | Задача '{instance.header}' была возвращена в работу."
+                                            )
     if message:
         for engineer in instance.engineers.all():
             if engineer.user:
