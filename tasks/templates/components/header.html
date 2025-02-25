@@ -111,7 +111,7 @@
                                     style="text-decoration: none;color: #000000;">
                                     <span>{{ notification.created_at|time:"H:i" }} |
                                         {% if notification.event_type == "task_assigned" %}
-                                            Вам назначена задача <strong>{ notification.data.task_header }}</strong>
+                                            Вам назначена задача <strong>{{ notification.data.task_header }}</strong>
                                         {% elif notification.event_type == "task_department_assigned" %}
                                             Вашему отделу назначена задача <strong>{{ notification.data.task_header }}</strong>
                                         {% elif notification.event_type == "task_completed" %}
@@ -161,10 +161,10 @@
                                             </div>
                                         </li>
                                         {% if request.user.engineer.position %}
-                                            <li><i class="bi bi-dot"></i>{{ request.user.engineer.position }}</li>
+                                            <li><i class="bi bi-dot"></i> {{ request.user.engineer.position }}</li>
                                         {% endif %}
                                         {% if request.user.engineer.department %}
-                                            <li><i class="bi bi-dot"></i>{{ request.user.engineer.department }}</li>
+                                            <li><i class="bi bi-dot"></i> Отдел: {{ request.user.engineer.department }}</li>
                                         {% endif %}
                                         <li>
                                             {% if request.user.engineer.head_of_department %}
