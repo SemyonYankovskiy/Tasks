@@ -74,10 +74,10 @@
 
                                 <li class="ps-4 pe-4 nav-item" id="notification-nav-item">
                                     <div class="notification-container">
-                                        <!-- Иконка уведомлений -->
                                         <div id="notification-icon" class="notification-icon">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"
-                                                 fill="currentColor" class="bi bi-bell-fill" viewBox="0 0 16 16">
+                                                 fill="currentColor"
+                                                 class="bi bi-bell-fill" viewBox="0 0 16 16">
                                                 <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>
                                             </svg>
                                             {% if notifications %}
@@ -85,13 +85,13 @@
                                             {% endif %}
                                         </div>
 
-                                        <!-- Выпадающее меню уведомлений -->
                                         <div id="notification-dropdown" class="notification-dropdown border border-1"
                                              style="border-color: grey !important; display: none;">
                                             <div class="d-flex justify-content-between border-bottom border-1 pb-2">
                                                 <div class="ms-2">
-                                                    <i class="bi bi-list-ul" style="font-size: 1.3rem"> <span
-                                                            style="font-size: 1.2rem; font-style: normal">Уведомления</span></i>
+                                                    <i class="bi bi-list-ul" style="font-size: 1.3rem">
+                                                        <span style="font-size: 1.2rem; font-style: normal">Уведомления</span>
+                                                    </i>
                                                 </div>
                                                 <div class="me-2">
                                                     {% if notifications %}
@@ -100,20 +100,41 @@
                                                         </button>
                                                     {% endif %}
                                                 </div>
-
                                             </div>
-                                            {% if notifications %}
-                                                {% for notification in notifications %}
-                                                    <div class="notification-item">
-                                                        {{ notification.message }}
-                                                    </div>
-                                                {% endfor %}
-                                                {#                                                <button id="clear-notifications" class="mt-3 btn btn-outline-dark">#}
-                                                {#                                                    Очистить уведомления#}
-                                                {#                                                </button>#}
-                                            {% else %}
-                                                <div class="mt-2 ms-1">Нет новых уведомлений</div>
-                                            {% endif %}
+                                            <div id="notification-list">
+                                                {% if notifications %}
+                                                    {% for notification in notifications %}
+
+
+                                <div href="#" class="task-link notification-item"
+                                   data-task-id="{{ notification.task.id }}"
+                                    style="text-decoration: none;color: #000000;">
+                                    <span>{{ notification.created_at|time:"H:i" }} |
+                                        {% if notification.event_type == "task_assigned" %}
+                                            Вам назначена задача <strong>{ notification.data.task_header }}</strong>
+                                        {% elif notification.event_type == "task_department_assigned" %}
+                                            Вашему отделу назначена задача <strong>{{ notification.data.task_header }}</strong>
+                                        {% elif notification.event_type == "task_completed" %}
+                                            Задача <strong>{{ notification.data.task_header }}</strong> была выполнена.
+                                        {% elif notification.event_type == "task_deleted" %}
+                                            Задача <strong>{{ notification.data.task_header }}</strong> была удалена.
+                                        {% elif notification.event_type == "task_restored" %}
+                                            Задача <strong>{{ notification.data.task_header }}</strong> была возвращена в работу.
+                                        {% elif notification.event_type == "task_unassigned" %}
+                                            Вы больше не являетесь исполнителем задачи <strong>{{ notification.data.task_header }}</strong>.
+                                        {% elif notification.event_type == "task_commented" %}
+                                            {{ notification.data.author }} добавил комментарий к задаче <strong>{{ notification.data.task_header }}</strong>.
+                                        {% else %}
+                                            Новое уведомление
+                                        {% endif %}
+                                    </span>
+                                </div>
+
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <div class="mt-2 ms-1">Нет новых уведомлений</div>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
                                 </li>
@@ -364,6 +385,10 @@
     .notification-item {
         padding: 8px;
         border-bottom: 1px solid #ddd;
+    }
+
+    .notification-item:hover{
+        background-color: #f6f6f6;
     }
 
     .notification-item:last-child {

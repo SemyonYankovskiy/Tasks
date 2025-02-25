@@ -106,7 +106,8 @@ class Task(models.Model):
     text = RichTextUploadingField(blank=True)
     completion_text = RichTextUploadingField(blank=True)
     engineers = models.ManyToManyField("Engineer", related_name="tasks", db_table="tasks_engineers_m2m", blank=True)
-    departments = models.ManyToManyField("Department", related_name="tasks", db_table="tasks_departments_m2m", blank=True)
+    departments = models.ManyToManyField("Department", related_name="tasks", db_table="tasks_departments_m2m",
+                                         blank=True)
     tags = models.ManyToManyField("Tag", related_name="tasks", db_table="tasks_tags_m2m", blank=True)
     files = models.ManyToManyField("AttachedFile", related_name="tasks", db_table="tasks_files_m2m", blank=True)
     creator = models.ForeignKey(get_user_model(), related_name="created_tasks", on_delete=models.PROTECT)
@@ -143,14 +144,26 @@ class Task(models.Model):
         super().save(update_fields=["status_changed_by"])
 
 
+# class Notification(models.Model):
+#     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="notifications")
+#     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="notifications")
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     is_read = models.BooleanField(default=False)  # Флаг для прочитанных уведомлений
+#
+#     def str(self):
+#         return f"{self.user} - {self.task.header}"
+
+
 class Notification(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="notifications")
-    message = models.CharField(max_length=255)
+    task = models.ForeignKey("Task", on_delete=models.CASCADE, related_name="notifications", null=True, blank=True)
+    event_type = models.CharField(max_length=50, default="task_completed")  # Тип события, например, "task_assigned"
+    data = models.JSONField(default=dict)  # Данные для формирования сообщения на фронтенде
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)  # Флаг для прочитанных уведомлений
 
     def str(self):
-        return f"{self.user} - {self.message}"
+        return f"{self.user} - {self.event_type}"
 
 
 class Comment(models.Model):
@@ -255,9 +268,6 @@ class AttachedFile(models.Model):
             self.is_image = self.extension in [".jpeg", ".jpg", ".png"]
 
         super().save(*args, **kwargs)
-
-
-
 
 
 class Address(models.Model):
@@ -434,26 +444,30 @@ def update_cache_version7_delete(sender, instance, **kwargs):
 @receiver(m2m_changed, sender=Task.engineers.through)
 def notify_assigned_engineers(sender, instance, action, **kwargs):
     """Создаёт уведомления для инженеров, назначенных на задачу"""
-    if action in ["post_add"]:  # Если инженеры добавлены в задачу
+    if action == "post_add":
         for engineer in instance.engineers.all():
-            if engineer.user:  # Проверяем, есть ли у инженера связанный пользователь
+            if engineer.user:
                 Notification.objects.create(
                     user=engineer.user,
-                    message=f"{datetime.now().strftime('%H:%M')} | Вам назначена  задача: '{instance.header}'"
+                    task=instance.task,
+                    event_type="task_assigned",
+                    data={"task_header": instance.header}
                 )
+
 
 @receiver(m2m_changed, sender=Task.departments.through)
 def notify_department_engineers(sender, instance, action, **kwargs):
     """Создаёт уведомления для всех инженеров департамента, на который назначена задача"""
-    if action in ["post_add"]:  # Если департамент добавлен в задачу
+    if action == "post_add":
         for department in instance.departments.all():
             for engineer in department.engineers.all():
                 if engineer.user:
                     Notification.objects.create(
                         user=engineer.user,
-                        message=f"{datetime.now().strftime('%H:%M')} | Вашему отделу назначена  задача: '{instance.header}'"
+                        task=instance.task,
+                        event_type="task_department_assigned",
+                        data={"task_header": instance.header}
                     )
-
 
 
 @receiver(post_save, sender=Task)
@@ -462,47 +476,45 @@ def notify_task_status_change(sender, instance, created, **kwargs):
     if created:
         return  # Не уведомляем при создании
 
-    message = None
-
-    # Уведомление о закрытии задачи
     if instance.is_done:
-        message = f"{datetime.now().strftime('%H:%M')} | Задача '{instance.header}' была выполнена."
-        # Уведомление для создателя задачи
-        if instance.creator:
-            if not Notification.objects.filter(user=instance.creator, message=message).exists():
-                Notification.objects.create(user=instance.creator,message=f"{datetime.now().strftime('%H:%M')} | Задача '{instance.header}' была выполнена."
-                )
+        event_type = "task_completed"
     elif instance.deleted:
-        message = f"{datetime.now().strftime('%H:%M')} | Задача '{instance.header}' была удалена."
+        event_type = "task_deleted"
     elif instance.status_changed_by == "restore":
-        message = f"{datetime.now().strftime('%H:%M')} | Задача '{instance.header}' была возвращена в работу."
-        # Уведомление для создателя задачи
-        if instance.creator:
-            if not Notification.objects.filter(user=instance.creator, message=message).exists():
-                Notification.objects.create(user=instance.creator,
-                                            message=f"{datetime.now().strftime('%H:%M')} | Задача '{instance.header}' была возвращена в работу."
-                                            )
-    if message:
-        for engineer in instance.engineers.all():
-            if engineer.user:
-                # Проверяем, есть ли уже такое уведомление
-                if not Notification.objects.filter(user=engineer.user, message=message).exists():
-                    Notification.objects.create(user=engineer.user, message=message)
+        event_type = "task_restored"
+    else:
+        return  # Если нет значимого изменения, не создаем уведомление
+
+    if instance.creator:
+        Notification.objects.create(
+            user=instance.creator,
+            task=instance.task,
+            event_type=event_type,
+            data={"task_header": instance.header}
+        )
+
+    for engineer in instance.engineers.all():
+        if engineer.user:
+            Notification.objects.create(
+                user=engineer.user,
+                task=instance.task,
+                event_type=event_type,
+                data={"task_header": instance.header}
+            )
 
 
 @receiver(m2m_changed, sender=Task.engineers.through)
 def notify_removed_engineers(sender, instance, action, pk_set, **kwargs):
-    """
-    Уведомляет инженера, если его убрали из задачи.
-    pk_set содержит ID удалённых инженеров.
-    """
-    if action == "post_remove":  # Если кого-то удалили из исполнителей
+    """Уведомляет инженеров, если их убрали из задачи"""
+    if action == "post_remove":
         for engineer_id in pk_set:
             engineer = Engineer.objects.filter(id=engineer_id).first()
             if engineer and engineer.user:
                 Notification.objects.create(
                     user=engineer.user,
-                    message=f"{datetime.now().strftime('%H:%M')} | Вы больше не являетесь исполнителем задачи '{instance.header}'."
+                    task=instance.task,
+                    event_type="task_unassigned",
+                    data={"task_header": instance.header}
                 )
 
 
@@ -511,9 +523,10 @@ def notify_task_creator_on_comment(sender, instance, created, **kwargs):
     """Создаёт уведомление для создателя задачи, когда добавлен новый комментарий"""
     if created:
         task = instance.task
-        # Создаём уведомление для создателя задачи
         if task.creator and task.creator != instance.author:
             Notification.objects.create(
                 user=task.creator,
-                message=f"{datetime.now().strftime('%H:%M')} | {instance.author} добавил ответ к задаче '{task.header}'"
+                task=instance.task,
+                event_type="task_commented",
+                data={"task_header": task.header, "author": str(instance.author)}
             )

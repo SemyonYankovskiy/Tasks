@@ -19,10 +19,10 @@
 
     <div class="px-3 py-3">
         <div class="container  px-3 ">
-        <div class="container">
-        {% include "components/task/tasks_container_buttons.html" with not_done_count=task_count.not_done_count done_count=task_count.done_count show_my_tasks_only=filter_params.show_my_tasks_only sort_order=filter_params.sort_order show_active_task=filter_params.show_active_task show_done_task=filter_params.show_done_task tasks_due_today_count=task_count.tasks_due_today_count %}
+            <div class="container">
+                {% include "components/task/tasks_container_buttons.html" with not_done_count=task_count.not_done_count done_count=task_count.done_count show_my_tasks_only=filter_params.show_my_tasks_only sort_order=filter_params.sort_order show_active_task=filter_params.show_active_task show_done_task=filter_params.show_done_task tasks_due_today_count=task_count.tasks_due_today_count %}
 
-        </div>
+            </div>
 
             <div class="mt-4 px-4" id="calendar"></div>
         </div>
@@ -31,158 +31,6 @@
     {% include 'components/task/edit_task_modal.html' %}
     {% include 'components/task/action_task_modal.html' %}
 
-
-    <!-- Модальное окно -->
-    <div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-                </div>
-                <div id="task-content" class="modal-body">
-                    ...
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let calendarTaskModal;
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const calendarEl = document.getElementById('calendar');
-            calendarTaskModal = new bootstrap.Modal(document.getElementById('taskModal'));
-
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                locale: 'ru',
-                dayMaxEventRows: true, // for all non-TimeGrid views
-                views: {
-                    timeGrid: {
-                        dayMaxEventRows: 10 // adjust to 6 only for timeGridWeek/timeGridDay
-                    }
-                },
-                firstDay: 1,
-                height: '85vh',
-
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'listWeek,dayGridMonth,multiMonthYear'
-                },
-                initialView: 'dayGridMonth',
-                themeSystem: "bootstrap5",
-                displayEventTime: true,
-
-                businessHours: [
-                    {
-                        daysOfWeek: [1, 2, 3, 4, 5],
-                        startTime: '08:30',
-                        endTime: '17:30'
-                    },
-                ],
-
-                eventClick: function (info) {
-                    const currentFullPath = window.location.pathname + window.location.search; // Получаем полный URL
-
-                    const url = "/ajax/tasks/" + info.event.id + "/?referrer=" + encodeURIComponent(currentFullPath);
-
-                    if (calendarTaskModal) {
-                        // Закрываем popover FullCalendar, если он открыт
-                        let popoverElement = document.querySelector('.fc-more-popover');
-                        if (popoverElement) {
-                            popoverElement.style.display = 'none';
-                        }
-                        calendarTaskModal.show();
-                        modals.push(calendarTaskModal);
-                        $("#task-content").load(url);
-                    }
-                },
-                eventTimeFormat: { // like '14:30:00'
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    meridiem: false
-                },
-
-                events: [
-                    {% for task in tasks %}
-                        {
-                            title: '{{ task.header }}',
-                            start: '{{ task.completion_time|date:"Y-m-d\TH:i:s" }}',
-                            id: '{{ task.id }}',
-
-                            classNames: ['taskCalendar',
-                                {% if task.is_done %}
-                                    'taskDone',
-                                {% else %}
-                                    {% if task.priority == 'CRITICAL' %}
-                                        'taskCrit',
-                                    {% elif task.priority == 'HIGH' %}
-                                        'taskDanger',
-                                    {% elif task.priority == 'MEDIUM' %}
-                                        'taskWarning',
-                                    {% elif task.priority == 'LOW' %}
-                                        'taskInfo',
-                                    {% endif %}
-                                {% endif %}
-                            ],
-                            priority: '{{ task.priority }}',
-                            isDone: '{{ task.is_done }}' // Добавляем is_done для проверки
-
-                        },
-                    {% endfor %}
-                ],
-
-                eventDidMount: function (info) {
-                    let color;
-
-                    // Если задача завершена, устанавливаем зеленый цвет
-                    if (info.event.extendedProps.isDone === 'True') {
-                        color = '#32CD32'; // Green color for done tasks
-                    } else {
-                        // Если задача не завершена, выбираем цвет в зависимости от приоритета
-                        switch (info.event.extendedProps.priority) {
-                            case 'CRITICAL':
-                                color = '#FF0000'; // Red for critical
-                                break;
-                            case 'HIGH':
-                                color = '#FF6347'; // Tomato for high
-                                break;
-                            case 'MEDIUM':
-                                color = '#FFD700'; // Gold for medium
-                                break;
-                            case 'LOW':
-                                color = '#1E90FF'; // DodgerBlue for low
-                                break;
-                            default:
-                                color = 'gray'; // Default color if priority is not matched
-                        }
-                    }
-
-                    // Устанавливаем цвет рамки и фона события
-                    info.el.style.borderColor = color;
-                    info.el.style.borderWidth = '1px';
-                    info.el.style.borderStyle = 'solid';
-                    info.el.style.borderRadius = '7px';
-                    info.el.style.backgroundColor = color; // Background color matches border
-                },
-                {#weekNumbers : 'true',#}
-                {#weekText :'Неделя ',#}
-
-                buttonText: {
-                    today: '🏠︎',
-                    month: 'Месяц',
-                    week: 'Неделя',
-                    day: 'День',
-                    year: 'Год',
-                },
-                editable: false,
-                selectable: true
-            });
-
-            calendar.render();
-        });
-
-</script>
-<script src="{% static 'self/js/filters.js' %}"></script>
+    <script src="{% static 'self/js/filters.js' %}"></script>
 {% endblock %}
 
