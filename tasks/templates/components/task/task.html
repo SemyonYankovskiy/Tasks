@@ -229,12 +229,16 @@
                             {# Кнопки редактирования и удаления (создатель, суперюзер, стаф) #}
                             {% if request.user == task.creator or request.user.is_superuser or request.user.is_staff %}
                                 {% include "components/task/delete_task_button.html" with task_id=task.id action_type="delete" %}
-                                {% include "components/task/edit_task_button.html" with task_id=task.id %}
+                                {% if not task.is_done %}
+                                    {% include "components/task/edit_task_button.html" with task_id=task.id %}
+                                {% endif %}
                             {% endif %}
 
                             {# Кнопка "Комментировать задачу" (исполнитель, департамент, создатель, суперюзер, стаф) #}
                             {% if request.user.engineer in task.engineers.all or request.user.engineer.department in task.departments.all or request.user == task.creator or request.user.is_superuser or request.user.is_staff %}
-                                {% include "components/task/comment_task_button.html" with task_id=task.id %}
+                                {% if not task.is_done %}
+                                    {% include "components/task/comment_task_button.html" with task_id=task.id %}
+                                {% endif %}
                             {% endif %}
 
                             {# Кнопка "Закрыть" или "Вернуть в работу" #}

@@ -22,6 +22,8 @@
 
 function showEditModal(taskID) {
     const currentUrlWithFilters = window.location.pathname+location.search;  // Получаем текущий URL с фильтрами
+
+    $('.modal').modal('hide');  // Закрывает все другие модальные окна
     myModal.show();
     // Передаем текущий URL с фильтрами в запрос на сервер через параметр
     $("#task-edit-form").load("/ajax/tasks/" + taskID + "/edit?from_url=" + encodeURIComponent(currentUrlWithFilters));

@@ -67,6 +67,9 @@
         $(document).ready(function() {$().UItoTop({ easingType: 'easeOutQuart' });});
     </script>
 
+    {% include 'components/task/edit_task_modal.html' %}
+    {% include 'components/task/action_task_modal.html' %}
+    {% include 'components/task/comment_task_modal.html' %}
 
 <!-- Модальное окно -->
     <div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
