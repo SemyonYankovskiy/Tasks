@@ -8,7 +8,6 @@ from django.db.models import Q, Count, Case, When, QuerySet
 
 from tasks.filters import TaskFilter, TaskFilterByDone
 from tasks.models import Task, Engineer, Comment
-from tasks.services.cache_version import CacheVersion
 from tasks.services.service import paginate_queryset
 from user.models import User
 
@@ -171,40 +170,33 @@ def get_filtered_tasks(request, obj=None):
 
 def get_tasks(request, filter_params, page_number, per_page, obj=None):
     """
-    Возвращает список объектов. Если не применяются фильтры - возвращает объекты из кэша
+    Возвращает список объектов. Если фильтры не применяются - использует кэш,
+    обновляя его раз в 5 минут. Если есть фильтры, кэш не используется.
     """
-    if obj:
-        cache_key = f'{obj.slug}_tasks_page:{page_number}:{request.user}'
-    else:
-        cache_key = f'tasks_page:{page_number}:{request.user}'
+    # Создаём уникальный ключ для кэша, если фильтров нет
+    cache_key = f'tasks_page:{page_number}:{request.user}' if not filter_params else None
+    cache_timeout = 300  # 5 минут (300 секунд)
 
-    version_cache_key = "tasks_page_version_cache"
-    cache_version = CacheVersion(version_cache_key)
-    cache_version_value = cache_version.get_cache_version()
+    # Если кэш есть и фильтры не применяются — берём из кэша
+    if cache_key:
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return cached_data
 
-    cached_data = cache.get(cache_key, version=cache_version_value) if not filter_params else None
-
-    if cached_data:
-        return cached_data
-
+    # Фильтрация задач
     filtered_task = get_filtered_tasks(request, obj=obj)
     pagination_data = paginate_queryset(filtered_task.tasks, page_number, per_page)
 
-    # Задаём московский часовой пояс
+    # Московский часовой пояс
     moscow_tz = ZoneInfo("Europe/Moscow")
+    now_moscow = datetime.datetime.now(moscow_tz)
+
     for task in pagination_data["page_obj"]:
         if task.completion_time:
             completion_time_moscow = task.completion_time.astimezone(moscow_tz)
-            now_moscow = datetime.datetime.now(moscow_tz)
-
-            # Вычисляем оставшееся время
-            time_left = completion_time_moscow - now_moscow
-
-            # Переводим время в часы и преобразуем к int
-            hours_left = int(time_left.total_seconds() // 3600) if time_left.total_seconds() > 0 else 0
-            task.time_left = hours_left
+            time_left = max(int((completion_time_moscow - now_moscow).total_seconds() // 3600), 0)
+            task.time_left = time_left
             task.time_now = now_moscow
-
         else:
             task.time_left = 0  # Если дедлайн не задан
 
@@ -215,11 +207,10 @@ def get_tasks(request, filter_params, page_number, per_page, obj=None):
         "filter_params": filtered_task.filter_params,
     }
 
-    # Кэшируем результат, если отсутствуют фильтры
-    if not filter_params:
-        cache.set(cache_key, result, timeout=600, version=cache_version_value)
+    # Кэшируем только если фильтров нет
+    if cache_key:
+        cache.set(cache_key, result, timeout=cache_timeout)
 
     return result
-
 
 

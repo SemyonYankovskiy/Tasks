@@ -10,170 +10,76 @@
             padding: 20px;
             font-size: 12px;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed;
+            table-layout: fixed; /* Устанавливаем фиксированную ширину столбцов */
         }
-
         th, td {
             border: 1px solid black !important;
             padding: 5px;
             text-align: left;
             font-size: 14px;
-            word-wrap: break-word;
+            word-wrap: break-word; /* Перенос текста в ячейках */
         }
-
         th {
             background-color: #f2f2f2;
         }
-
         th:nth-child(1), td:nth-child(1) {
-            width: 15%;
+            width: 15%; /* Ширина для первого столбца */
         }
-
         th:nth-child(2), td:nth-child(2) {
-            width: 70%;
+            width: 70%; /* Ширина для второго столбца */
         }
-
         th:nth-child(3), td:nth-child(3) {
-            width: 15%;
+            width: 15%; /* Ширина для третьего столбца */
         }
-
         .done {
-            text-decoration: line-through;
-            color: gray;
+            text-decoration: line-through; /* Зачеркивание выполненных задач */
+            color: gray; /* Делаем текст светлее */
         }
-
-        .critical {
-            text-decoration: underline;
-            font-weight: bold;
-        }
-
         @media print {
             body {
                 margin: 0;
                 padding: 0;
             }
-
-            button {
-                display: none;
-            }
-
+            button { display: none; }
             table {
                 width: 100%;
                 page-break-inside: avoid;
             }
-
             th, td {
                 border: 1px solid black !important;
             }
         }
-
-        .dialog {
-            display: none;
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border: 1px solid #ccc;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .dialog button {
-            margin: 5px;
-            padding: 10px;
-            font-size: 14px;
-        }
     </style>
 </head>
 <body>
+    <table>
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Заголовок</th>
+                <th>Инженеры</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr class="{% if task.is_done %}done{% endif %}">
+                <td>{{ task.date }}</td>
+                <td>{{ task.header }}</td>
+                <td>{{ task.engineers }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<table>
-    <thead>
-    <tr>
-        <th>Дата</th>
-        <th>Заголовок</th>
-        <th>Инженеры</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for task in tasks %}
-        <tr class="{% if task.is_done %}done{% endif %} {% if task.priority == 'CRITICAL' %}critical{% endif %}">
-            <td>{{ task.date }}</td>
-            <td>{{ task.header }}</td>
-            <td>{{ task.engineers }}</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+    <button onclick="window.print()">Печать</button>
 
-<button onclick="startPrint()">Печать</button>
-
-<div id="dialog" class="dialog">
-    <p style="font-size: 18px">Печать <strong>активных</strong> задач и <strong>завершенных за последние 4 дня</strong><br>
-        Для печати только активных задач - нажмите <strong>"Активные"</strong> в списке задач.</p>
-    <button onclick="closeDialog(true)">Продолжить</button>
-    <button onclick="closeDialog(false)
-{window.location.href = '/'}">Назад
-    </button>
-</div>
-
-<script>
-
-    function startPrint() {
-        window.print();
-    }
-
-    function closeDialog(shouldPrint) {
-        document.getElementById("dialog").style.display = "none";
-        if (shouldPrint) {
-            startPrint();
-        }
-    }
-
-    window.onload = function () {
-    var urlParams = new URLSearchParams(window.location.search);
-    var dialog = document.getElementById("dialog");
-
-    // Список параметров фильтра и их значения по умолчанию
-    var defaultParams = {
-        "search": "",
-        "completion_time_after": new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 3 дня назад
-        "completion_time_before": new Date().toISOString().split('T')[0], // Сегодня
-        "priority": "",
-        "show_active_task": "true",
-        "show_done_task": "true"
-    };
-
-    var isEmpty = ![...urlParams.keys()].some(key => defaultParams.hasOwnProperty(key));
-
-    if (isEmpty) {
-        // Добавляем параметры фильтра
-        for (let [key, value] of Object.entries(defaultParams)) {
-            urlParams.set(key, value);
-        }
-
-        // Устанавливаем флаг, чтобы после перезагрузки окно осталось открытым
-        sessionStorage.setItem("showDialog", "true");
-
-        // Перенаправляем с обновлёнными параметрами
-        window.location.search = urlParams.toString();
-    } else {
-        // Проверяем, был ли показан диалог
-        if (sessionStorage.getItem("showDialog") === "true") {
-            dialog.style.display = "block";
-            sessionStorage.removeItem("showDialog"); // Удаляем флаг после показа
-        } else {
-            startPrint();
-        }
-    }
-};
-
-</script>
-
+    <script>
+        window.onload = function() {
+            window.print();
+        };
+    </script>
 </body>
 </html>
