@@ -218,6 +218,8 @@
                     {# ============== TASK BUTTONS ============== #}
 
                     <div class="row text-start pt-2 border-top px-1">
+                    {% if not task.deleted %}
+
                         <div class="col">
                             {# Кнопка "Взять задачу" #}
                             {% if not task.is_done and request.user.engineer and request.user.engineer.department in task.departments.all %}
@@ -250,6 +252,7 @@
                                 {#                                {% include "components/task/confirm_task_button.html" with task_id=task.id action_type="close" %}#}
                             {% endif %}
                         </div>
+                    {% endif %}
                     </div>
 
                 </div>
