@@ -8,6 +8,7 @@ from django.db.models import Q, Count, Case, When, QuerySet
 
 from tasks.filters import TaskFilter, TaskFilterByDone
 from tasks.models import Task, Engineer, Comment
+from tasks.services.cache_version import CacheVersion
 from tasks.services.service import paginate_queryset
 from user.models import User
 
@@ -170,24 +171,27 @@ def get_filtered_tasks(request, obj=None):
 
 def get_tasks(request, filter_params, page_number, per_page, obj=None):
     """
-    Возвращает список объектов. Если фильтры не применяются - использует кэш,
+    Возвращает список объектов. Если фильтры не применяются - использует кэш с версионностью,
     обновляя его раз в 5 минут. Если есть фильтры, кэш не используется.
     """
-    # Создаём уникальный ключ для кэша, если фильтров нет
-    cache_key = f'tasks_page:{page_number}:{request.user}' if not filter_params else None
-    cache_timeout = 300  # 5 минут (300 секунд)
+    version_cache_key = "tasks_page_version_cache"
+    cache_version = CacheVersion(version_cache_key).get_cache_version()
 
-    # Если кэш есть и фильтры не применяются — берём из кэша
-    if cache_key:
-        cached_data = cache.get(cache_key)
+    # Формируем ключ кэша, если фильтров нет
+    cache_key = f'tasks_page:{page_number}:{request.user}'
+    cache_timeout = 300  # 5 минут
+
+    # Если фильтров нет, пробуем взять данные из кэша
+    if not filter_params:
+        cached_data = cache.get(cache_key, version=cache_version)
         if cached_data:
             return cached_data
 
-    # Фильтрация задач
+    # Фильтруем задачи
     filtered_task = get_filtered_tasks(request, obj=obj)
     pagination_data = paginate_queryset(filtered_task.tasks, page_number, per_page)
 
-    # Московский часовой пояс
+    # Приводим время к московскому часовому поясу
     moscow_tz = ZoneInfo("Europe/Moscow")
     now_moscow = datetime.datetime.now(moscow_tz)
 
@@ -208,8 +212,8 @@ def get_tasks(request, filter_params, page_number, per_page, obj=None):
     }
 
     # Кэшируем только если фильтров нет
-    if cache_key:
-        cache.set(cache_key, result, timeout=cache_timeout)
+    if not filter_params:
+        cache.set(cache_key, result, timeout=cache_timeout, version=cache_version)
 
     return result
 
