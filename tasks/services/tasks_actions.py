@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from bs4 import BeautifulSoup
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.transaction import atomic
@@ -14,6 +15,34 @@ from tasks.models import Task, AttachedFile, Engineer, Tag, Comment
 from tasks.services.export import TasksExcelExport
 from tasks.services.service import remove_unused_attached_files
 from tasks.services.tasks_prepare import get_tasks
+
+
+def auto_resize_pic(html_string):
+    if html_string:
+        # Парсинг строки
+        soup = BeautifulSoup(html_string, 'html.parser')
+
+        # Находим тег <img>
+        img_tag = soup.find('img')
+
+        # Если есть атрибут style
+        if 'style' in img_tag.attrs:
+            # Разбиваем стили на части
+            styles = img_tag['style'].split(';')
+            # Обрабатываем каждый стиль
+            new_styles = []
+            for style in styles:
+                if style.strip().startswith('width'):
+                    # Заменяем ширину на 100%
+                    new_styles.append('width:100%')
+                # Игнорируем height (удаляем его)
+            # Обновляем атрибут style
+            img_tag['style'] = '; '.join(new_styles).strip('; ')
+
+        # Получаем измененную строку
+        return str(soup)
+    else:
+        return None
 
 
 @atomic
@@ -71,7 +100,7 @@ def create_task(request):
     redirect_to = reverse("tasks")
 
     if request.method == "POST":
-
+        print(request.POST)
         post_data = create_tags(request.POST, "tags_create")  # Сохраняем теги и возвращаем
 
         # Теперь создаем форму с обновлёнными данными (содержит ID всех тегов)
@@ -79,7 +108,8 @@ def create_task(request):
 
         # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
-
+        text = request.POST.get("text")
+        print(text)
         if form.is_valid():
             task = form.save()
 
@@ -107,6 +137,8 @@ def edit_task(request, task_id):
     redirect_to = reverse("tasks")
 
     if request.method == "POST":
+
+        print(auto_resize_pic(request.POST.get("text_edit")))
 
         post_data = create_tags(request.POST, "tags_edit")  # Сохраняем теги и возвращаем
 
@@ -198,12 +230,11 @@ def reopen_task(request, task_id):
     Устанавливает в поле task.is_done = False и добавляет комментарий к полю task.completion_text
     При успешном изменении полей - редирект на страницу откуда была вызвана
     """
-
     redirect_to: str = reverse("tasks")
 
     if request.method == "POST":
         task = get_object_or_404(Task, pk=task_id)
-        comment = request.POST.get("comment", "")
+
         # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
 
@@ -227,7 +258,6 @@ def comment_task(request, task_id):
         is_done = "is_done" in request.POST
         answer = request.POST.get("answer", "").strip()  # Убираем лишние пробелы
 
-
         # Получаем URL с параметрами фильтров (если нужно)
         redirect_to = request.POST.get("from_url", redirect_to).strip()
         print(redirect_to)
@@ -236,10 +266,9 @@ def comment_task(request, task_id):
             comment = Comment.objects.create(
                 task=task,
                 author=request.user,
-                text=answer,
+                text=auto_resize_pic(answer),
             )
             comment.save()
-            print("Comment created!")
 
         if is_done:
             # Обновление задачи
@@ -257,28 +286,26 @@ def comment_task(request, task_id):
     return HttpResponseRedirect(redirect_to)
 
 
-
-
-@login_required
-def close_task(request, task_id):
-
-    redirect_to: str = reverse("tasks")
-
-    if request.method == "POST":
-        task = get_object_or_404(Task, pk=task_id)
-        comment = request.POST.get("comment", "")
-
-        # Получаем URL с параметрами фильтров
-        redirect_to = request.POST.get("from_url", redirect_to).strip()
-
-        # Обновление задачи
-        task.is_done = True
-        # task.completion_time = datetime.now()
-        task.save()
-        add_event_log(user=request.user, task=task, text="✅ Задача закрыта")
-        messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' закрыта")
-
-    return HttpResponseRedirect(redirect_to)
+# @login_required
+# def close_task(request, task_id):
+#
+#     redirect_to: str = reverse("tasks")
+#
+#     if request.method == "POST":
+#         task = get_object_or_404(Task, pk=task_id)
+#         comment = request.POST.get("comment", "")
+#
+#         # Получаем URL с параметрами фильтров
+#         redirect_to = request.POST.get("from_url", redirect_to).strip()
+#
+#         # Обновление задачи
+#         task.is_done = True
+#         # task.completion_time = datetime.now()
+#         task.save()
+#         add_event_log(user=request.user, task=task, text="✅ Задача закрыта")
+#         messages.add_message(request, messages.SUCCESS, f"Задача '{task.header}' закрыта")
+#
+#     return HttpResponseRedirect(redirect_to)
 
 
 @login_required
