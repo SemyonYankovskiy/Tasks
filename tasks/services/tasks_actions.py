@@ -18,31 +18,34 @@ from tasks.services.tasks_prepare import get_tasks
 
 
 def auto_resize_pic(html_string):
+
     if html_string:
         # Парсинг строки
         soup = BeautifulSoup(html_string, 'html.parser')
 
         # Находим тег <img>
         img_tag = soup.find('img')
+        if img_tag:
+            # Если есть атрибут style
+            if 'style' in img_tag.attrs:
+                # Разбиваем стили на части
+                styles = img_tag['style'].split(';')
+                # Обрабатываем каждый стиль
+                new_styles = []
+                for style in styles:
+                    if style.strip().startswith('width'):
+                        # Заменяем ширину на 100%
+                        new_styles.append('width:100%')
+                    # Игнорируем height (удаляем его)
+                # Обновляем атрибут style
+                img_tag['style'] = '; '.join(new_styles).strip('; ')
 
-        # Если есть атрибут style
-        if 'style' in img_tag.attrs:
-            # Разбиваем стили на части
-            styles = img_tag['style'].split(';')
-            # Обрабатываем каждый стиль
-            new_styles = []
-            for style in styles:
-                if style.strip().startswith('width'):
-                    # Заменяем ширину на 100%
-                    new_styles.append('width:100%')
-                # Игнорируем height (удаляем его)
-            # Обновляем атрибут style
-            img_tag['style'] = '; '.join(new_styles).strip('; ')
-
-        # Получаем измененную строку
-        return str(soup)
+            # Получаем измененную строку
+            return str(soup)
+        else:
+            return html_string
     else:
-        return None
+        return ""
 
 
 @atomic
@@ -260,13 +263,16 @@ def comment_task(request, task_id):
 
         # Получаем URL с параметрами фильтров (если нужно)
         redirect_to = request.POST.get("from_url", redirect_to).strip()
-        print(redirect_to)
+
 
         if answer:
+            print(answer)
+            text = auto_resize_pic(answer)
+            print(text)
             comment = Comment.objects.create(
                 task=task,
                 author=request.user,
-                text=auto_resize_pic(answer),
+                text=text,
             )
             comment.save()
 
