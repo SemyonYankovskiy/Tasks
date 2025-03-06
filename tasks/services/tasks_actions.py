@@ -103,16 +103,20 @@ def create_task(request):
     redirect_to = reverse("tasks")
 
     if request.method == "POST":
-        print(request.POST)
-        post_data = create_tags(request.POST, "tags_create")  # Сохраняем теги и возвращаем
 
+        created_text = auto_resize_pic(request.POST.get("text"))  # Обрабатываем текст
+        post_data = request.POST.copy()  # Создаём копию данных формы
+        post_data["text"] = created_text  # Заменяем текст в копии
+        print(created_text)
+        post_data = create_tags(post_data, "tags_create")  # Сохраняем теги и возвращаем
+        print(post_data)
         # Теперь создаем форму с обновлёнными данными (содержит ID всех тегов)
         form = AddTaskForm(post_data, request.FILES, instance=Task(creator=request.user))
 
         # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
-        text = request.POST.get("text")
-        print(text)
+
+
         if form.is_valid():
             task = form.save()
 
@@ -140,12 +144,13 @@ def edit_task(request, task_id):
     redirect_to = reverse("tasks")
 
     if request.method == "POST":
+        edited_text = auto_resize_pic(request.POST.get("text_edit"))  # Обрабатываем текст
+        post_data = request.POST.copy()  # Создаём копию данных формы
+        post_data["text_edit"] = edited_text  # Заменяем текст в копии
 
-        print(auto_resize_pic(request.POST.get("text_edit")))
+        post_data = create_tags(post_data, "tags_edit")  # Обновляем теги
 
-        post_data = create_tags(request.POST, "tags_edit")  # Сохраняем теги и возвращаем
-
-        form = EditTaskForm(post_data, request.FILES, instance=task)
+        form = EditTaskForm(post_data, request.FILES, instance=task)  # Используем обновлённые данные
 
         # Получаем URL с параметрами фильтров
         redirect_to = request.POST.get("from_url", redirect_to).strip()
