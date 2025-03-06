@@ -15,7 +15,7 @@ from user.models import User
 from .cache_version import CacheVersion
 from .service import paginate_queryset
 from .service import remove_unused_attached_files
-from .tasks_actions import create_tags
+from .tasks_actions import create_tags, auto_resize_pic
 from .tasks_prepare import permission_filter
 from ..filters import ObjectFilter
 
@@ -155,7 +155,11 @@ def edit_object(request, object_slug):
 
     if request.method == "POST":
 
-        post_data = create_tags(request.POST, "obj_tags_edit")  # Сохраняем теги и возвращаем
+        created_text = auto_resize_pic(request.POST.get("description"))  # Обрабатываем текст
+        post_data = request.POST.copy()  # Создаём копию данных формы
+        post_data["description"] = created_text  # Заменяем текст в копии
+
+        post_data = create_tags(post_data, "obj_tags_edit")  # Сохраняем теги и возвращаем
         form = ObjectForm(post_data, request.FILES, instance=obj)
 
         if form.is_valid():
@@ -207,7 +211,12 @@ def create_object(request):
     redirect_to = reverse("home")
 
     if request.method == "POST":
-        post_data = create_tags(request.POST, "tags_create")  # Сохраняем теги и возвращаем
+
+        created_text = auto_resize_pic(request.POST.get("description"))  # Обрабатываем текст
+        post_data = request.POST.copy()  # Создаём копию данных формы
+        post_data["description"] = created_text  # Заменяем текст в копии
+
+        post_data = create_tags(post_data, "tags_create")  # Сохраняем теги и возвращаем
         # Теперь создаем форму с обновлёнными данными (содержит ID всех тегов)
         form = ObjectCreateForm(post_data, request.FILES)
 

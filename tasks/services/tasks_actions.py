@@ -107,9 +107,9 @@ def create_task(request):
         created_text = auto_resize_pic(request.POST.get("text"))  # Обрабатываем текст
         post_data = request.POST.copy()  # Создаём копию данных формы
         post_data["text"] = created_text  # Заменяем текст в копии
-        print(created_text)
+
         post_data = create_tags(post_data, "tags_create")  # Сохраняем теги и возвращаем
-        print(post_data)
+
         # Теперь создаем форму с обновлёнными данными (содержит ID всех тегов)
         form = AddTaskForm(post_data, request.FILES, instance=Task(creator=request.user))
 
