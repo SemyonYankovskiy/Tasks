@@ -6,7 +6,7 @@ from django.urls import path
 
 from tasks import views
 from tasks.services import tasks_actions, objects
-from tasks.views import mark_notifications_as_read
+from tasks.services.notifications import mark_notifications_as_read, mark_one_notifications_as_read
 
 urlpatterns = [
     path("create-task/", tasks_actions.create_task, name="create_task"),
@@ -32,7 +32,8 @@ urlpatterns = [
     path("ajax/objects/<slug:slug>/edit", views.get_obj_edit_form, name="ajax-obj-edit-form"),
     path('ajax/tasks/<int:task_id>/action/<str:action_type>', views.get_task_action_form, name='ajax-task-action-form'),
     path('ajax/tasks/<int:task_id>/comment', views.get_task_comment_form, name='ajax-task-action-form-comment'),
-    path('notifications/read/', mark_notifications_as_read, name='mark_notifications_as_read'),
+    path('notifications/read/all', mark_notifications_as_read, name='mark_notifications_as_read'),
+    path("notifications/read/<int:notification_id>/", mark_one_notifications_as_read, name="mark_one_notifications_as_read"),
 
     # CKEDITOR
     path('ckeditor/', include('ckeditor_uploader.urls')),

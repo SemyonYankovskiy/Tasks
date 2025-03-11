@@ -106,29 +106,41 @@
                                                     {% for notification in notifications %}
 
 
-                                <div href="#" class="task-link notification-item"
-                                   data-task-id="{{ notification.task.id }}"
-                                    style="text-decoration: none;color: #000000;">
-                                    <span>{{ notification.created_at|time:"H:i" }} |
-                                        {% if notification.event_type == "task_assigned" %}
-                                            Вам назначена задача <strong>{{ notification.data.task_header }}</strong>
-                                        {% elif notification.event_type == "task_department_assigned" %}
-                                            Вашему отделу назначена задача <strong>{{ notification.data.task_header }}</strong>
-                                        {% elif notification.event_type == "task_completed" %}
-                                            Задача <strong>{{ notification.data.task_header }}</strong> была выполнена.
-                                        {% elif notification.event_type == "task_deleted" %}
-                                            Задача <strong>{{ notification.data.task_header }}</strong> была удалена.
-                                        {% elif notification.event_type == "task_restored" %}
-                                            Задача <strong>{{ notification.data.task_header }}</strong> была возвращена в работу.
-                                        {% elif notification.event_type == "task_unassigned" %}
-                                            Вы больше не являетесь исполнителем задачи <strong>{{ notification.data.task_header }}</strong>.
-                                        {% elif notification.event_type == "task_commented" %}
-                                            {{ notification.data.author }} добавил комментарий к задаче <strong>{{ notification.data.task_header }}</strong>.
-                                        {% else %}
-                                            Новое уведомление
-                                        {% endif %}
-                                    </span>
-                                </div>
+                                                        <div class="notification-container notification-item"
+                                                             style="display: flex; align-items: center; justify-content: space-between;">
+                                                            <a href="#" class="task-link"
+                                                               data-task-id="{{ notification.task.id }}"
+                                                               style="text-decoration: none; color: #000000; flex-grow: 1;">
+        <span>{{ notification.created_at|time:"H:i" }} |
+            {% if notification.event_type == "task_assigned" %}
+                Вам назначена задача <strong>{{ notification.data.task_header }}</strong>
+            {% elif notification.event_type == "task_department_assigned" %}
+                Вашему отделу назначена задача
+                <strong>{{ notification.data.task_header }}</strong>
+            {% elif notification.event_type == "task_completed" %}
+                Задача <strong>{{ notification.data.task_header }}</strong> была выполнена.
+            {% elif notification.event_type == "task_deleted" %}
+                Задача <strong>{{ notification.data.task_header }}</strong> была удалена.
+            {% elif notification.event_type == "task_restored" %}
+                Задача <strong>{{ notification.data.task_header }}</strong> была возвращена
+                в работу.
+            {% elif notification.event_type == "task_unassigned" %}
+                Вы больше не являетесь исполнителем задачи
+                <strong>{{ notification.data.task_header }}</strong>.
+            {% elif notification.event_type == "task_commented" %}
+                {{ notification.data.author }} добавил комментарий к задаче
+                <strong>{{ notification.data.task_header }}</strong>.
+            {% else %}
+                Новое уведомление
+            {% endif %}
+        </span>
+                                                            </a>
+                                                            <button class="btn btn-sm border-0 mark_one_notifications_as_read"
+                                                                    data-notification-id="{{ notification.id }}">
+                                                                <i class="bi bi-x" style="font-size: 1.5rem;"></i>️
+                                                            </button>
+                                                        </div>
+
 
                                                     {% endfor %}
                                                 {% else %}
@@ -164,7 +176,8 @@
                                             <li><i class="bi bi-dot"></i> {{ request.user.engineer.position }}</li>
                                         {% endif %}
                                         {% if request.user.engineer.department %}
-                                            <li><i class="bi bi-dot"></i> Отдел: {{ request.user.engineer.department }}</li>
+                                            <li><i class="bi bi-dot"></i> Отдел: {{ request.user.engineer.department }}
+                                            </li>
                                         {% endif %}
                                         <li>
                                             {% if request.user.engineer.head_of_department %}
@@ -278,6 +291,8 @@
         const userMenuIcon = document.getElementById('user-menu-icon');
         const userDropdown = document.getElementById('user-dropdown');
         const clearNotificationsBtn = document.getElementById("clear-notifications");
+        const notificationList = document.getElementById("notification-list");
+
 
         // Функция для закрытия всех открытых меню
         function closeAllDropdowns() {
@@ -324,6 +339,51 @@
                         }
                     });
             });
+        }
+
+
+        if (notificationList) {
+            notificationList.addEventListener("click", function (event) {
+                console.log("CYKA-COBAKA")
+                if (event.target.classList.contains("mark_one_notifications_as_read")) {
+                    const notificationId = event.target.getAttribute("data-notification-id");
+
+                    fetch(`/notifications/read/${notificationId}/`, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": getCSRFToken(),
+                            "Content-Type": "application/json"
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === "ok") {
+                                event.target.closest(".notification-item").remove();
+
+                                // Обновляем счетчик уведомлений
+                                const badge = document.querySelector(".notification-icon .badge");
+                                if (badge) {
+                                    let count = parseInt(badge.textContent, 10) - 1;
+                                    if (count <= 0) {
+                                        badge.remove();
+                                    } else {
+                                        badge.textContent = count;
+                                    }
+                                }
+                                // Если удалили все уведомления, показать сообщение
+                                if (notificationList.children.length === 0) {
+                                    notificationList.innerHTML = "<div class='mt-2 ms-1'>Нет новых уведомлений</div>";
+                                }
+                            }
+                        })
+                        .catch(error => console.error("Ошибка удаления уведомления:", error));
+                }
+            });
+        }
+
+        // Функция для получения CSRF-токена
+        function getCSRFToken() {
+            return document.cookie.split('; ').find(row => row.startsWith("csrftoken="))?.split('=')[1];
         }
     });
 </script>
@@ -387,8 +447,9 @@
         border-bottom: 1px solid #ddd;
     }
 
-    .notification-item:hover{
+    .notification-item:hover {
         background-color: #f6f6f6;
+
     }
 
     .notification-item:last-child {
@@ -405,5 +466,18 @@
     .logout-btn:hover {
         background-color: #212529; /* Цвет фона при наведении */
         color: #f8f9fa; /* Цвет текста при наведении */
+    }
+
+    .notification-item:hover .mark_one_notifications_as_read {
+        visibility: visible; /* Изменение видимости элемента при наведении */
+    }
+
+    .mark_one_notifications_as_read {
+        color: #c6c6c6;
+        visibility: hidden;
+    }
+
+    .mark_one_notifications_as_read:hover {
+        color: #000000;
     }
 </style>

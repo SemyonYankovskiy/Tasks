@@ -1,7 +1,6 @@
 from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
@@ -88,7 +87,6 @@ def get_tasks_page(request):
 
     task_filter = TaskFilter(request.GET)
     ckeditor = CKEditorCreateForm(request.POST)
-
 
     context = {
         **tasks,
@@ -227,17 +225,8 @@ def get_task_comment_form(request, task_id):
     return render(request, 'components/task/comment_task_form.html', context)
 
 
-
 @login_required
 def get_stat_page(request):
     stat = get_stat()
     context = {**stat}
     return render(request, 'stat_page.html', context)
-
-
-
-
-@login_required
-def mark_notifications_as_read(request):
-    request.user.notifications.update(is_read=True)
-    return JsonResponse({'status': 'ok'})
