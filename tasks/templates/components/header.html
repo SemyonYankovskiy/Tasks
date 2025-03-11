@@ -185,6 +185,11 @@
                                                 <span class="text-black text-decoration-underline">Руководитель</span>
                                             {% endif %}
                                         </li>
+                                        <li class="mt-3 ">
+                                            <button class="btn btn-outline-secondary" id="updateCacheButton"><i
+                                                    class="bi bi-receipt" style="font-style: normal"> Обновить кэш</i>
+                                            </button>
+                                        </li>
                                         <li class="mt-3">
                                             <form action="{% url 'user:logout' %}" method="post" id="logout-form">
                                                 {% csrf_token %}
@@ -343,8 +348,7 @@
 
 
         if (notificationList) {
-            notificationList.addEventListener("click", function (event)
-            {
+            notificationList.addEventListener("click", function (event) {
                 console.log("CYKA-COBAKA")
                 if (event.target.classList.contains("delete-notification")) {
                     const notificationId = event.target.getAttribute("data-notification-id");
@@ -381,6 +385,17 @@
                 }
             });
         }
+        document.getElementById("updateCacheButton").addEventListener("click", function () {
+            fetch("{% url 'update_cache' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(() => location.reload()) // Перезагрузка страницы после сброса кэша
+                .catch(error => console.error("Ошибка:", error));
+        });
 
         // Функция для получения CSRF-токена
         function getCSRFToken() {
@@ -472,8 +487,8 @@
         visibility: visible; /* Изменение видимости элемента при наведении */
     }
 
-    .mark_one_notifications_as_read
-    {   font-size: 1.1rem;
+    .mark_one_notifications_as_read {
+        font-size: 1.1rem;
         color: #c6c6c6;
         visibility: hidden;
     }

@@ -3,6 +3,8 @@ import json
 
 from django.core.paginator import Paginator
 
+from tasks.services.cache_version import CacheVersion
+
 
 def remove_unused_attached_files(file_uploader_data: str, qs_object, *, delete_orphan_files: bool = False):
     """Удаляет прикрепленные к задачам файлы, которые не используются"""
@@ -109,3 +111,30 @@ def transliterate(text: str) -> str:
         'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya'
     }
     return ''.join(cyrillic_to_latin.get(char, char) for char in text)
+
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+
+def update_all_caches():
+    cache_keys = [
+        "tasks_page_version_cache", "objects_page_cache_version",
+        "objects_page_cache_version", "filter_components_cache_version_tasks",
+        "filter_components_cache_version_objects", "filter_components_cache_version_tasks",
+        "filter_components_cache_version_objects",
+        "filter_components_cache_version_objects",
+        "tasks_page_version_cache", "objects_page_cache_version",
+    ]
+
+    for key in cache_keys:
+        CacheVersion(key).increment_cache_version()
+
+
+@csrf_exempt
+def update_cache_view(request):
+    if request.method == "POST":
+        update_all_caches()
+        return JsonResponse({"status": "success"})
+    return JsonResponse({"status": "error"}, status=400)

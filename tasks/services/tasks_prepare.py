@@ -171,27 +171,25 @@ def get_filtered_tasks(request, obj=None):
 
 def get_tasks(request, filter_params, page_number, per_page, obj=None):
     """
-    Возвращает список объектов. Если фильтры не применяются - использует кэш с версионностью,
+    Возвращает список объектов. Если фильтры не применяются - использует кэш,
     обновляя его раз в 5 минут. Если есть фильтры, кэш не используется.
     """
+    obj_key = obj.id if obj else 'none'
+    # Создаём уникальный ключ для кэша, если фильтров нет
+    cache_key = f'tasks_page:{page_number}:{request.user}:{obj_key}' if not filter_params else None
+    cache_timeout = 300  # 5 минут (300 секунд)
+
     version_cache_key = "tasks_page_version_cache"
-    cache_version = CacheVersion(version_cache_key).get_cache_version()
+    cache_version = CacheVersion(version_cache_key)
+    cache_version_value = cache_version.get_cache_version()
 
-    # Формируем ключ кэша, если фильтров нет
-    cache_key = f'tasks_page:{page_number}:{request.user}'
-    cache_timeout = 300  # 5 минут
+    cached_data = cache.get(cache_key, version=cache_version_value) if not filter_params else None
 
-    # Если фильтров нет, пробуем взять данные из кэша
-    if not filter_params:
-        cached_data = cache.get(cache_key, version=cache_version)
-        if cached_data:
-            return cached_data
-
-    # Фильтруем задачи
+    # Фильтрация задач
     filtered_task = get_filtered_tasks(request, obj=obj)
     pagination_data = paginate_queryset(filtered_task.tasks, page_number, per_page)
 
-    # Приводим время к московскому часовому поясу
+    # Московский часовой пояс
     moscow_tz = ZoneInfo("Europe/Moscow")
     now_moscow = datetime.datetime.now(moscow_tz)
 
@@ -212,8 +210,8 @@ def get_tasks(request, filter_params, page_number, per_page, obj=None):
     }
 
     # Кэшируем только если фильтров нет
-    if not filter_params:
-        cache.set(cache_key, result, timeout=cache_timeout, version=cache_version)
+    if cache_key:
+        cache.set(cache_key, result, timeout=cache_timeout)
 
     return result
 
