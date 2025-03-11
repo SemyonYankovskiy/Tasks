@@ -135,9 +135,9 @@
             {% endif %}
         </span>
                                                             </a>
-                                                            <button class="btn btn-sm border-0 mark_one_notifications_as_read"
+                                                            <button class="btn btn-sm  border-0 mark_one_notifications_as_read delete-notification"
                                                                     data-notification-id="{{ notification.id }}">
-                                                                <i class="bi bi-x" style="font-size: 1.5rem;"></i>️
+                                                                ×️
                                                             </button>
                                                         </div>
 
@@ -343,11 +343,12 @@
 
 
         if (notificationList) {
-            notificationList.addEventListener("click", function (event) {
+            notificationList.addEventListener("click", function (event)
+            {
                 console.log("CYKA-COBAKA")
-                if (event.target.classList.contains("mark_one_notifications_as_read")) {
+                if (event.target.classList.contains("delete-notification")) {
                     const notificationId = event.target.getAttribute("data-notification-id");
-
+                    console.log("CYKA-PES")
                     fetch(`/notifications/read/${notificationId}/`, {
                         method: "POST",
                         headers: {
@@ -449,7 +450,6 @@
 
     .notification-item:hover {
         background-color: #f6f6f6;
-
     }
 
     .notification-item:last-child {
@@ -472,7 +472,8 @@
         visibility: visible; /* Изменение видимости элемента при наведении */
     }
 
-    .mark_one_notifications_as_read {
+    .mark_one_notifications_as_read
+    {   font-size: 1.1rem;
         color: #c6c6c6;
         visibility: hidden;
     }
