@@ -35,7 +35,7 @@ def auto_resize_pic(html_string):
                 for style in styles:
                     if style.strip().startswith('width'):
                         # Заменяем ширину на 100%
-                        new_styles.append('width:100%')
+                        new_styles.append('max-width:100%')
                     # Игнорируем height (удаляем его)
                 # Обновляем атрибут style
                 img_tag['style'] = '; '.join(new_styles).strip('; ')
@@ -109,7 +109,7 @@ def create_task(request):
         post_data["text"] = created_text  # Заменяем текст в копии
 
         post_data = create_tags(post_data, "tags_create")  # Сохраняем теги и возвращаем
-
+        print(post_data)
         # Теперь создаем форму с обновлёнными данными (содержит ID всех тегов)
         form = AddTaskForm(post_data, request.FILES, instance=Task(creator=request.user))
 
@@ -271,9 +271,7 @@ def comment_task(request, task_id):
 
 
         if answer:
-            print(answer)
             text = auto_resize_pic(answer)
-            print(text)
             comment = Comment.objects.create(
                 task=task,
                 author=request.user,
