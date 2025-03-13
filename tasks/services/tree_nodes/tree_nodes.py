@@ -77,7 +77,7 @@ class TasksTagsTree(Tree):
 class GroupsTree(Tree):
 
     def _get_queryset(self):
-        qs = ObjectGroup.objects.filter(objects_set__isnull=False)
+        qs = ObjectGroup.objects.filter()
 
         user = self._context.get("user", None)
         if user is None:
