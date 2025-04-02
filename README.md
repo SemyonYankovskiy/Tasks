@@ -11,10 +11,16 @@
 docker compose up -d;
 ```
 
+```shell
 docker exec -t -i tasks-backend-1 sh
+```
 
+```shell
 cat /usr/local/lib/python3.12/site-packages/ckeditor_uploader/urls.py
+docker compose up -d;
+```
 
+```shell
 cat > /usr/local/lib/python3.12/site-packages/ckeditor_uploader/urls.py <<EOF
 from django.contrib.auth.decorators import login_required
 from django.urls import re_path
@@ -32,3 +38,4 @@ urlpatterns = [
     ),
 ]
 EOF
+```
