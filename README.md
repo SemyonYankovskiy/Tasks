@@ -5,11 +5,10 @@
 Перед запуском нужно создать файл `.env` с содержимым из файла `env.sample`
 с указанием своих параметров.
 
-Запуск через docker compose:
+Запуск через docker compose.
 
-```shell
-docker compose up -d;
-```
+
+
 
 ```shell
 docker exec -t -i tasks-backend-1 sh
@@ -17,7 +16,6 @@ docker exec -t -i tasks-backend-1 sh
 
 ```shell
 cat /usr/local/lib/python3.12/site-packages/ckeditor_uploader/urls.py
-docker compose up -d;
 ```
 
 ```shell
