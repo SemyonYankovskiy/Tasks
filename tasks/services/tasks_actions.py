@@ -5,10 +5,12 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.transaction import atomic
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.dateformat import format
+from django.utils.timezone import now
 
 from tasks.forms import AddTaskForm, EditTaskForm
 from tasks.models import Task, AttachedFile, Engineer, Tag, Comment
@@ -365,3 +367,30 @@ def print_tasks(request):
         tasks_data.append(task_info)
 
     return render(request, "components/task/print.html", {"tasks": tasks_data})
+
+
+@login_required
+def update_date_task(request):
+    filter_params = ""  # Если нужно, можно передавать фильтры
+
+    # Получаем задачи из запроса
+    tasks = get_tasks(request, filter_params, page_number=1, per_page=100000)
+    all_tasks = tasks["pagination_data"]["paginator"].object_list
+
+    today = now().date()
+    updated_count = 0
+
+    for task in all_tasks:
+        # Фильтруем по важности, выполнению и удалению
+        if (
+            task.priority in [task.Priority.CRITICAL, task.Priority.HIGH] and
+            not task.is_done and
+            not task.deleted
+        ):
+            # Проверяем, нужно ли обновлять дату
+            if task.completion_time.date() != today:
+                task.completion_time = task.completion_time.replace(year=today.year, month=today.month, day=today.day)
+                task.save(update_fields=["completion_time"])
+                updated_count += 1
+
+    return JsonResponse({"status": "success", "updated_tasks": updated_count})
