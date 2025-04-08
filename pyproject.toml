@@ -15,6 +15,7 @@ django-ckeditor = "^6.7.1"
 django-redis = "^5.4.0"
 openpyxl = "^3.1.5"
 bs4 = "^0.0.2"
+celery = "^5.5.0"
 
 
 [tool.poetry.group.dev.dependencies]
